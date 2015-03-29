@@ -1,0 +1,5 @@
+*.class
+*.log
+build/
+data/P1/*.cbundle
+data/P2/*.cbundle

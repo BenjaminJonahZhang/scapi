@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="fastyao" default="jar" basedir=".">
+
+  <!--build properties-->
+  <property name="fastyao.build.directory" value="build"/>
+  <property name="fastyao.build.output" value="build/classes"/>
+  <property name="fastyao.build.version" value="0-0-1"/>
+  <property name="fastyao.build.final.name" value="FastYao"/>
+
+  <!--paths-->
+  <path id="bouncy-castle">
+    <pathelement location="assets/scapi/bcprov-jdk15on-150.jar"/>
+  </path>
+
+  <path id="apache-commons-exec">
+    <pathelement location="assets/scapi/commons-exec-1.2.jar"/>
+  </path>
+
+  <path id="scapi">
+    <pathelement location="assets/scapi/Scapi-V2-3-0.jar"/>
+  </path>
+  
+  <!--targets-->
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${fastyao.build.directory}"/>
+  </target>
+  
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${fastyao.build.output}"/>
+    <javac destdir="${fastyao.build.output}" debug="true" optimize="false" includeAntRuntime="false" encoding="ISO-8859-1">
+      <src>
+        <pathelement location="${basedir}/src"/>
+      </src>
+      <classpath>
+        <path refid="bouncy-castle"/>
+	<path refid="apache-commons-exec"/>
+	<path refid="scapi"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile" description="Build the JAR">
+    <jar jarfile="${fastyao.build.directory}/${fastyao.build.final.name}.jar" basedir="${fastyao.build.output}" />
+  </target>
+  
+</project>
