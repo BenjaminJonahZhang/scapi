@@ -64,6 +64,7 @@ public class OpenSSLHash implements CryptographicHash {
 	//Deletes the created pointer.
 	private native void deleteHash(long ptr);
 	
+	private int hashSize;
 	
 	/**
 	 * Constructs the native hash function using OpenSSL library.
@@ -74,7 +75,7 @@ public class OpenSSLHash implements CryptographicHash {
 		//Instantiates a hash object in OpenSSL. We keep a pointer to the created hash object in c++.
 		//Remember to delete it using the finalize method.
 		hash = createHash(hashName);
-		
+		hashSize = getDigestSize(hash);
 	} 
 	
 	/**
@@ -155,8 +156,8 @@ public class OpenSSLHash implements CryptographicHash {
 	 */
 	public int getHashedMsgSize() {
 		
-		//Call the native function.
-		return getDigestSize(hash);
+		//Return the hash size
+		return hashSize;
 	}
 	
 	
