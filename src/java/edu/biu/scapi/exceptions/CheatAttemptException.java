@@ -31,7 +31,7 @@ package edu.biu.scapi.exceptions;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CheatAttemptException extends Exception {
+public class CheatAttemptException extends RuntimeException {
 
 	/**
 	 * 
