@@ -65,6 +65,8 @@ public abstract class CryptoPpHash implements CryptographicHash {
 	//deletes the created pointer.
 	private native void deleteHash(long ptr);
 	
+	private int hashSize;
+	
 	
 	/**
 	 * Constructs the related pointer of the underlying crypto++ hash.
@@ -77,7 +79,7 @@ public abstract class CryptoPpHash implements CryptographicHash {
 		//instantiates a hash object in crypto++. Remember to delete it using the finalize method.
 		//we keep a pointer to the created hash object in c++.
 		collHashPtr = createHash(hashName);
-		
+		hashSize = getDigestSize(collHashPtr);
 	} 
 	
 	/**
@@ -158,8 +160,8 @@ public abstract class CryptoPpHash implements CryptographicHash {
 	 */
 	public int getHashedMsgSize() {
 		
-		//calls the native function
-		return getDigestSize(collHashPtr);
+		//return the hash size
+		return hashSize;
 	}
 	
 	
