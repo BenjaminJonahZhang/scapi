@@ -50,6 +50,7 @@ public class CryptoPpAES implements AES{
 	private long aesCompute;		//native object used for compute blocks
 	private long aesInvert;			//native object used for invert blocks
 	private SecureRandom random;
+	private int blockSize;
 	
 	private native long createAESCompute();
 	private native long createAESInvert();
@@ -79,6 +80,8 @@ public class CryptoPpAES implements AES{
 		aesCompute = createAESCompute();
 		aesInvert = createAESInvert();
 		this.random = random; //Sets the given random
+		//Call the native code to the block size.
+		blockSize = getBlockSize(aesCompute);
 	}
 	
 	/**
@@ -121,8 +124,8 @@ public class CryptoPpAES implements AES{
 
 	@Override
 	public int getBlockSize(){
-		//Call the native code to return the name of the Crypto++ algorithm.
-		return getBlockSize(aesCompute);
+		//AES works on 128 bit block.
+		return blockSize;
 	}
 
 	/**
