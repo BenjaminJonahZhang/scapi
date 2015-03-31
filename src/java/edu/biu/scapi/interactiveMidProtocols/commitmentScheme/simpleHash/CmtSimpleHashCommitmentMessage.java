@@ -34,7 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-class CmtSimpleHashCommitmentMessage implements CmtCCommitmentMsg, Serializable {
+public class CmtSimpleHashCommitmentMessage implements CmtCCommitmentMsg, Serializable {
 	
 	private static final long serialVersionUID = -4365203740560516693L;
 	
