@@ -65,7 +65,7 @@ BOOL maliciousot::OtExtensionMaliciousReceiverInterface::precompute_base_ots_rec
 
   int nSndVals = 2;
   BYTE* pBuf = new BYTE[m_num_base_ots * SHA1_BYTES];
-  int log_nVals = (int) ceil(log(nSndVals)/log(2));
+  int log_nVals = (int) ceil(log((double)nSndVals)/log((double)2));
   int cnt = 0;
 	
   U.Create(m_num_base_ots * log_nVals, m_receiver_seed, cnt);
