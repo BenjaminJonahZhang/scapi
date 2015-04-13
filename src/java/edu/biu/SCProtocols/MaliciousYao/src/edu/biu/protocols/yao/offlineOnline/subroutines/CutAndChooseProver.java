@@ -98,11 +98,11 @@ public class CutAndChooseProver {
 	 * @throws CheatAttemptException
 	 */
 	public void run() throws IOException, CheatAttemptException {
-		LogTimer timer = new LogTimer("constructGarbledCircuitBundles");
+		//LogTimer timer = new LogTimer("constructGarbledCircuitBundles");
 		try {
 			//Prepare the garbled circuit, commitment and other parameters needed by the protocol.
 			constructGarbledCircuitBundles();
-			timer.stop();
+		//	timer.stop();
 			
 			//Send to the verifier all garbled circuits.
 			//timer.reset("sendGarbledCircuits");
@@ -110,34 +110,34 @@ public class CutAndChooseProver {
 			//timer.stop();
 			
 			//Receive the commitments of the circuits selection and mapping.
-			timer.reset("receiveCommitmentToCutAndChoose");
+		//	timer.reset("receiveCommitmentToCutAndChoose");
 			receiveCommitmentToCutAndChoose();
-			timer.stop();
+		//	timer.stop();
 			
 			//Generate and send to the verifier the commitments needed by the protocol (on keys, masks, seed, etc).
-			timer.reset("sendCommitments");
+		//	timer.reset("sendCommitments");
 			sendCommitments();
-			timer.stop();
+		//	timer.stop();
 			
 			//Receive from the verifier the decommitment of the circuit selection and mapping.
-			timer.reset("receiveCutAndChooseChallenge");
+		//	timer.reset("receiveCutAndChooseChallenge");
 			receiveCutAndChooseChallenge();
-			timer.stop();
+		//	timer.stop();
 			
 			//Prove the checked circuits by sending to the verifier the decommitments of the seeds, masks, keys of the checked circuits.
-			timer.reset("proveCheckCircuits");
+		//	timer.reset("proveCheckCircuits");
 			proveCheckCircuits();
-			timer.stop();
+		//	timer.stop();
 			
 			//Put all evaluated circuits in buckets according to the received mapping.
-			timer.reset("putCircuitsInBuckets");
+		//	timer.reset("putCircuitsInBuckets");
 			putCircuitsInBuckets();
-			timer.stop();
+		//	timer.stop();
 			
 			//Prove the placement masks by sending the decommitments of the diff protocol.
-			timer.reset("proveCorrectnessOfPlacementMasks");
+		//	timer.reset("proveCorrectnessOfPlacementMasks");
 			proveCorrectnessOfPlacementMasks();
-			timer.stop();
+		//	timer.stop();
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
@@ -162,7 +162,7 @@ public class CutAndChooseProver {
 	private void constructGarbledCircuitBundles() throws IOException {
 		//Get the number of threads to use in the protocol.
 		int numOfThreads = primitives.getNumOfThreads();
-		System.out.println("building garbled circuit bundle for " + numCircuits + " circuits...");
+//		System.out.println("building garbled circuit bundle for " + numCircuits + " circuits...");
 		
 		//If the number of threads is more than zero, create the threads and assign to each one the appropriate circuits.
 		if (numOfThreads > 0){
@@ -245,9 +245,9 @@ public class CutAndChooseProver {
 	 */
 	private void buildCircuit(int j, int i) throws IOException {
 		// Build a garbled circuit bundle with a randomly picked seed of size 160 bits.
-		if (j % 50 == 0) {
-			System.out.println("building garbled circuit bundle for circuit j = " + j);
-		}
+//		if (j % 50 == 0) {
+//			System.out.println("building garbled circuit bundle for circuit j = " + j);
+//		}
 		
 		circuitBundles[j] = bundleBuilders[i].build(20);
 		channels[i].send(circuitBundles[j].getGarbledTables());

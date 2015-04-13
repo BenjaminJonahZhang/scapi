@@ -180,38 +180,38 @@ public class CutAndChooseVerifier {
 	public void run() throws IOException, CheatAttemptException {
 		
 		//Receive all garbled circuits from the cut and choose prover.
-		LogTimer timer = new LogTimer("receiveGarbledCircuits");
+	//	LogTimer timer = new LogTimer("receiveGarbledCircuits");
 		receiveGarbledCircuits();
-		timer.stop();
+	//	timer.stop();
 		//Send the commitments of the circuits selection and mapping.
+		//	timer.reset("commitToCutAndChoose");
 		commitToCutAndChoose();
-		timer.stop();
+	//	timer.stop();
 		
 		//Receive the commitments needed by the protocol (on keys, masks, seed, etc).
-		timer.reset("commitToCutAndChoose");
-		timer.reset("receiveCommitments");
+	//	timer.reset("receiveCommitments");
 		receiveCommitments();
-		timer.stop();
+	//	timer.stop();
 		
 		//Send to the cut and choose prover the circuit selection and mapping.
-		timer.reset("revealCutAndChoose");
+	//	timer.reset("revealCutAndChoose");
 		revealCutAndChoose();
-		timer.stop();
+	//	timer.stop();
 		
 		//Verify the checked circuits by verifying the commitments of the seeds, masks, keys of the checked circuits.
-		timer.reset("verifyCheckCircuits");
+	//	timer.reset("verifyCheckCircuits");
 		verifyCheckCircuits();
-		timer.stop();
+	//	timer.stop();
 		
 		//Put all evaluated circuits in buckets according to the received mapping.
-		timer.reset("putCircuitsInBuckets");
+	//	timer.reset("putCircuitsInBuckets");
 		putCircuitsInBuckets();
-		timer.stop();
+	//	timer.stop();
 		
 		//Verify the placement masks by verifying the decommitments of the diff protocol.
-		timer.reset("verifyCorrectnessOfPlacementMasks");
+	//	timer.reset("verifyCorrectnessOfPlacementMasks");
 		verifyCorrectnessOfPlacementMasks();
-		timer.stop();
+	//	timer.stop();
 	}
 	
 	/**
@@ -282,7 +282,7 @@ public class CutAndChooseVerifier {
 				
 		//Get the number of threads to use in the protocol.
 		int numOfThreads = primitives.getNumOfThreads();
-		System.out.println("building garbled circuit bundle for " + numCircuits + " circuits...");
+//		System.out.println("building garbled circuit bundle for " + numCircuits + " circuits...");
 		
 		//If the number of threads is more than zero, create the threads and assign to each one the appropriate circuits.
 		if (numOfThreads > 0){
