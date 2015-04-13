@@ -256,7 +256,7 @@ public class BundleBuilder {
 		
 		//1. Get both keys of each wire (y0, y1)
 		//2. Choose a random key w0
-		//3. Compute z0 = y0, w0
+		//3. Compute z0 = y0 ^ w0
 		//			 w1 = w0 ^ delta
 		//			 z1 = z0 ^ delta
 		//4. set (k0, k1) to be one set of keys to Y0 and (z0,z1) to bw set of keys to Y2.

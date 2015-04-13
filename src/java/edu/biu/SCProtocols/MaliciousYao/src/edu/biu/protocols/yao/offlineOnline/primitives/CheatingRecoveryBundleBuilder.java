@@ -101,7 +101,7 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 			System.arraycopy(key0, 0, inputWiresY, i*2*keySize, keySize);
 			System.arraycopy(key1, 0, inputWiresY, (i*2+1)*keySize, keySize);
 			
-			//Get the key that mar=tches the sigma of this wire.
+			//Get the key that matches the sigma of this wire.
 			if (sigmaArray[i] == 1){
 				currentKey = key1;
 			} else{
