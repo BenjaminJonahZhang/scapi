@@ -42,6 +42,7 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
 import edu.biu.scapi.exceptions.PlaintextTooLongException;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
+import edu.biu.scapi.primitives.prg.openSSL.OpenSSLRC4;
 
 /**
  * This class is an implementation of the fast extended garbled boolean circuit.<P>
@@ -72,6 +73,7 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 													// garbled values.
 	private FastIdentityGate[] outputIdentityGates; // The array of output gates in case the user set the input
 													// garbled values.
+	private byte[] garbledInputs;
 
 	/*
 	 * Holds the garbled tables of this garbled circuit. This is stored in the garbled circuit and also in the gates. 
@@ -118,6 +120,7 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 
 		this.gbc = gbc;
 		this.mes = mes;
+		this.prg = new OpenSSLRC4();
 
 		// Input and output indices will be needed multiple times, we hold them as class members to avoid the 
 		// creation of the arrays each time they needed.
@@ -297,8 +300,11 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 		return gbc.getGarbledInputFromUngarbledInput(ungarbledInputBits, allInputWireValues, partyNumber);
 	}
 
+	public void setInputs(byte[] garbledInputs){
+		this.garbledInputs = garbledInputs;
+	}
 	@Override
-	public byte[] compute(byte[] garbledInputs) throws NotAllInputsSetException {
+	public byte[] compute() throws NotAllInputsSetException {
 		
 		int inputGatesSize = inputIndices.length;
 		int identityKeySize = mes.getCipherSize();
@@ -332,10 +338,9 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 			}
 			computedWires = garbledInputs;
 		}
-
 		// Compute the inner circuit.
-		outputFromInnerCircuit = gbc.compute(computedWires);
-
+		gbc.setInputs(computedWires);
+		outputFromInnerCircuit = gbc.compute();
 		byte[] garbledOutputs;
 		// If there are output identity gates, compute each one of them.
 		if (outputIdentityGates != null) {
@@ -538,7 +543,6 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 			return false;
 		}
 
-		int index; 
 		// Verify each identity gate. This is done by creating a Gate object
 		// with the identity truth table and the right wires indices.
 		// The verify method of the identity gate check the gate is consistent

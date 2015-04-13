@@ -54,6 +54,9 @@ public interface FastGarbledBooleanCircuit {
 	 */
 	public byte[] getGarbledInputFromUngarbledInput(byte[] ungarbledInputBits, byte[] allInputWireValues, int partyNumber) ;
  
+	
+	public void setInputs(byte[] garbledInputs);
+	
 	/**
 	 * This method computes the circuit using the given inputs. <p>
 	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
@@ -61,7 +64,7 @@ public interface FastGarbledBooleanCircuit {
 	 * @return returns an array containing the garbled value of each output wire.
 	 * @throws NotAllInputsSetException if the given inputs array does not includes a key for all input wires.
 	 */
-	public byte[] compute(byte[] garbledInputs) throws NotAllInputsSetException;
+	public byte[] compute() throws NotAllInputsSetException;
 
 	/**
      * The verify method is used in the case of malicious adversaries.<p>

@@ -5,13 +5,13 @@
 
 /* OpenGarble includes */
 #ifdef _WIN32
-#include <OpenGarble/StdAfx.h>
+//#include <OpenGarble/StdAfx.h>
 #else
 #include <OpenGarble/Compat.h>
 #endif
-#include <OpenGarble/RowReductionGarbledBooleanCircuit.h>
-#include <OpenGarble/StandardGarbledBooleanCircuit.h>
-#include <OpenGarble/FreeXorGarbledBooleanCircuit.h>
+#include <RowReductionGarbledBooleanCircuit.h>
+#include <StandardGarbledBooleanCircuit.h>
+#include <FreeXorGarbledBolleanCircuit.h>
 
 /* OpenGarble jni interface includes */
 #include "ScNativeGarbledBooleanCircuit.h"
@@ -39,7 +39,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_circuits_fastGarbledCircuit_ScNativeG
 	 }
 	 else{
 		 if (isFreeXor)
-			 garbledCircuit = new FreeXorGarbledBooleanCircuit(str);
+			 garbledCircuit = new FreeXorGarbledBolleanCircuit(str);
 		 else
 			 garbledCircuit = new StandardGarbledBooleanCircuit(str);
 		 

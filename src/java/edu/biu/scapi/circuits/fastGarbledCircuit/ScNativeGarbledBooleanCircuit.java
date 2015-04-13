@@ -25,7 +25,7 @@
 package edu.biu.scapi.circuits.fastGarbledCircuit;
 
 import java.security.InvalidKeyException;
-import java.util.Date;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.circuits.garbledCircuit.GarbledTablesHolder;
 import edu.biu.scapi.circuits.garbledCircuit.JustGarbledGarbledTablesHolder;
@@ -54,8 +54,11 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	private int[] inputsIndices;
 	private int[] outputWireIndices;
 	private int[] numOfInputsForEachParty;
+	private boolean isFreeXor;
+	private boolean isRowReduction;
+	private byte[] garbledInputs;
 	
-	private native long createGarbledcircuit(String fileName, boolean isFreeXor, boolean isRowReduction);//Creates a garbled. It returns the pointer to that circuit saved in the dll memory 
+	private native long createGarbledcircuit(String fileName, boolean isFreeXor, boolean isRowReduction,boolean isNonXorOutputsRequired);//Creates a garbled. It returns the pointer to that circuit saved in the dll memory 
 	private native int[] getOutputIndicesArray(long ptr);//Returns the output indices taken from the circuit file.
 	private native int[] getInputIndicesArray(long ptr);//Returns the input indices taken from the circuit file..
 	private native int[] getNumOfInputsForEachParty(long ptr);//Returns an array that stores the number of inputs for each party
@@ -64,6 +67,7 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 																			
 	private native byte[] getGarbleTables(long ptr);//Gets the garbled tables from the jni dll. Again, this is a costly functions since we need to pass a large amount of information
 													//from the dll memory space to the java memory space.
+	
 	
 	
 	/*
@@ -80,7 +84,7 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	private native long garble( byte[] inputKeys, byte[] outputKeys, byte[] translationTable, byte[] seed, long ptr);//Does the garbling of the circuit, returns the input keys and the output keys that were generated
 																			  //by the circuit. The input and the output keys are converted to the structures that are defined 
 																			  //in the SCAPI circuit
-	private native byte[] compute(long ptr, byte[] inputKeys);//Does the compute and returns the output keys that are the results.
+	private native byte[] compute(long ptr, byte[] inputKeys, boolean isFreeXor, boolean isRowReduction);//Does the compute and returns the output keys that are the results.
 	private native boolean verify(long ptr, byte[] bothInputKeys);//Does the compute and returns the output keys that are the results.
 	private native boolean internalVerify(long ptr, byte[] bothInputKeys, byte[] emptyBothOutputKeys);//does the verify without checking the translation table
 	private native byte[] translate(long ptr, byte[] ouyputKeys);
@@ -99,11 +103,14 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	 * @param isFreeXor a flag indicating the use of the optimization of FreeXor
 	 * @param isRowReduction a flag indicating the use of the optimization of Row Reduction
 	 */
-	public ScNativeGarbledBooleanCircuit(String fileName, boolean isFreeXor, boolean isRowReduction){
+	public ScNativeGarbledBooleanCircuit(String fileName, boolean isFreeXor, boolean isRowReduction, boolean isNonXorOutputsRequired){
 
+		this.isFreeXor = isFreeXor;
+		this.isRowReduction = isRowReduction;
+		
 		
 		//create an object in the native code
-		garbledCircuitPtr = createGarbledcircuit(fileName, isFreeXor, isRowReduction);
+		garbledCircuitPtr = createGarbledcircuit(fileName, isFreeXor, isRowReduction,isNonXorOutputsRequired);
 	
 		outputWireIndices =  getOutputIndicesArray(garbledCircuitPtr);//Returns the output indices taken from the circuit file.
 		inputsIndices = getInputIndicesArray(garbledCircuitPtr);//Returns the input indices taken from the circuit file..
@@ -114,11 +121,21 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	
 	
 	/**
-	 * Not used in this implementation since we require a seed for optimization concerns
+	 * This method generates all the needed keys of the circuit.  
+	 * It then creates the garbled table according to those values.<p>
+	 * @return FastCircuitCreationValues Contains both keys for each input and output wire and the translation table.
 	 */
 	@Override
 	public FastCircuitCreationValues garble() {
-		// TODO Auto-generated method stub
+		 SecureRandom random = new SecureRandom();
+		 byte[] seed = new byte[16];
+		 random.nextBytes(seed);
+		 try {
+			return garble(seed);
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
@@ -130,10 +147,11 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	 * @throws InvalidKeyException In case the seed is an invalid key for the given PRG.
 	 */
 	@Override
-	public FastCircuitCreationValues garble(byte[] seed)
-			throws InvalidKeyException {
+	public FastCircuitCreationValues garble(byte[] seed) throws InvalidKeyException {
+		if (seed.length != 16){
+			throw new InvalidKeyException("seed length should be 16 bytes");
+		}
 		
-		Date temp = new Date();
 		byte[] allInputWireValues = null;
 		byte[] allOutputWireValues = null;
 		byte[] translationTable = null;
@@ -143,8 +161,6 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 		translationTable = new byte[outputWireIndices.length];
 		
 		garble(allInputWireValues, allOutputWireValues, translationTable, seed,garbledCircuitPtr);
-		//PATCH should be removed after jni problems are solved.
-		//temp.getTime();
 		
 		FastCircuitCreationValues outputVal = new FastCircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);
 		
@@ -194,6 +210,11 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 		
 		
 	}
+	
+	@Override
+	public void setInputs(byte[] garbledInputs){
+		this.garbledInputs = garbledInputs;
+	}
 	/**
 	 * Computes the circuit using the given inputs. <p>
 	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
@@ -203,14 +224,13 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	 */
 	
 	@Override
-	public byte[] compute(byte[] garbledInputs) throws NotAllInputsSetException {
+	public byte[] compute() throws NotAllInputsSetException {
 		
-		Date temp = new Date();
 		if (garbledInputs.length/16!= inputsIndices.length) {
 				throw new NotAllInputsSetException();
 			}
 		
-		byte[] result = compute(garbledCircuitPtr, garbledInputs);
+		byte[] result = compute(garbledCircuitPtr, garbledInputs, isFreeXor, isRowReduction);
 		
 		//PATCH should be removed after jni problems are solved.
 		//temp.getTime();
@@ -219,6 +239,8 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 		
 		
 	}
+	
+	
 	
 	/**
      * The verify method is used in the case of malicious adversaries.<p>
@@ -229,14 +251,8 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
      */
 	@Override
 	public boolean verify(byte[] allInputWireValues) {
-		Date temp = new Date();
+		return verify(garbledCircuitPtr, allInputWireValues);
 		
-		boolean isVerified = verify(garbledCircuitPtr, allInputWireValues);
-		
-		//PATCH should be removed after jni problems are solved.
-		//temp.getTime();
-		
-		return isVerified;
 	}
 	
 	/**
@@ -252,14 +268,7 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	@Override
 	public boolean internalVerify(byte[] allInputWireValues, byte[] allOutputWireValues) {
 		
-		Date temp = new Date();
-
-		boolean isVerified = internalVerify(garbledCircuitPtr, allInputWireValues, allOutputWireValues);
-		
-		//PATCH should be removed after jni problems are solved.
-		//temp.getTime();
-		
-		return isVerified;
+		return internalVerify(garbledCircuitPtr, allInputWireValues, allOutputWireValues);
 	}
 	
 	/**
@@ -410,8 +419,8 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	
 	static {
 		 
-		 //loads the OpenGarbledJavaInterface jni dll
-		 System.loadLibrary("OpenGarbleJavaInterface");
+		 //loads the JustGarbledJavaInterface jni dll
+		 System.loadLibrary("ScGarbledCircuitJavaInterface");
 	}
 
 	

@@ -49,7 +49,7 @@ public class FastIdentityGate {
 	private BasicGarbledTablesHolder garbledTablesHolder; 	//Holds the garbled tables.
 	
 	//The number of this {@code IdentityGate}. This number is used to order {@code IdentityGate}s in a {@link GarbledBooleanCircuitExtended}
-	private int gateNumber;
+	int gateNumber;
 	
 	/**
 	 * Constructs an identity gate using the given {@code MultiKeyEncryptionScheme}.
