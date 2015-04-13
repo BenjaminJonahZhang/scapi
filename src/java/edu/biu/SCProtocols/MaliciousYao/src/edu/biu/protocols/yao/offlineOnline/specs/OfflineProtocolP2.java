@@ -17,7 +17,6 @@ import edu.biu.protocols.yao.primitives.CryptoPrimitives;
 import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.protocols.yao.primitives.KProbeResistantMatrixBuilder;
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.comm.Party;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTExtensionMaliciousReceiver;
 
@@ -34,7 +33,6 @@ public class OfflineProtocolP2 {
 	private final ExecutionParameters mainExecution;	// Parameters of the main circuit.
 	private final ExecutionParameters crExecution;		// Parameters of the cheating recovery circuit.
 	private final CryptoPrimitives primitives;			// Contains the low level instances to use.
-	private final CommunicationConfig communication;	// Configuration of communication between parties.
 	private final Channel[] channels;					// The channels used communicate between the parties.
 
 	private KProbeResistantMatrix mainMatrix;			//The probe-resistant matrix used to extend the main circuit's keys.
@@ -51,19 +49,20 @@ public class OfflineProtocolP2 {
 	 * @param primitives Contains the low level instances to use.
 	 * @param communication Configuration of communication between parties.
 	 */
-	public OfflineProtocolP2(ExecutionParameters mainExecution, ExecutionParameters crExecution, CryptoPrimitives primitives, CommunicationConfig communication) {
+	public OfflineProtocolP2(ExecutionParameters mainExecution, ExecutionParameters crExecution, CryptoPrimitives primitives, 
+			CommunicationConfig communication, OTExtensionMaliciousReceiver maliciousOtReceiver) {
 		this.mainExecution = mainExecution;
 		this.crExecution = crExecution;
 		this.primitives = primitives;
-		this.communication = communication;
 		this.channels = communication.getChannels();		// Get the channel from the communication configuration.
+		this.maliciousOtReceiver = maliciousOtReceiver;
 	}
 	
 	/**
 	 * Runs the second party in the offline phase of the malicious Yao protocol.
 	 */
 	public void run() {
-		LogTimer timer = new LogTimer("selecting and sending probe resistant matrices");
+		//LogTimer timer = new LogTimer("selecting and sending probe resistant matrices");
 		try {
 			int crInputSizeY = primitives.getMultiKeyEncryptionScheme().getCipherSize()*8;
 			
@@ -71,40 +70,35 @@ public class OfflineProtocolP2 {
 			mainMatrix = selectAndSendProbeResistantMatrix(mainExecution);
 			// Selecting E' and sending it to P1 (derive the length of the new input from the MES key size - that is the size of proofOfCheating).
 			crMatrix = selectAndSendProbeResistantMatrix(crInputSizeY, crExecution.statisticalParameter()); 
-			timer.stop();
+			//timer.stop();
 			
-			timer.reset("runCutAndChooseProtocol(AES)");
+		//	timer.reset("runCutAndChooseProtocol(AES)");
 			//Create the main bundleBuilder from the main circuit.
 			//Use the first circuit only because there is no use of thread in this party and therefore, only one circuit is needed.
 			BundleBuilder mainBundleBuilder = new BundleBuilder(mainExecution.getCircuit(0), mainMatrix, primitives, channels);
 			
 			//Run Cut and Choose protocol on the main circuit.
 			mainBuckets = runCutAndChooseProtocol(mainExecution, mainMatrix, mainBundleBuilder); 
-			timer.stop();
+		//	timer.stop();
 			
-			timer.reset("runCutAndChooseProtocol(CR)");
+		//	timer.reset("runCutAndChooseProtocol(CR)");
 			//Create the cheating recovery bundleBuilder from the main circuit.
 			//Use the first circuit only because there is no use of thread in this party and therefore, only one circuit is needed.
 			BundleBuilder crBundleBuilder = new CheatingRecoveryBundleBuilder(crExecution.getCircuit(0), crMatrix, 
 					primitives, channels, primitives.getMultiKeyEncryptionScheme().generateKey());
 			//Run Cut and Choose protocol on the cheating recovery circuit.
 			crBuckets = runCutAndChooseProtocol(crExecution, crMatrix, crBundleBuilder, getSecretSharingLabels(crInputSizeY)); 
-			timer.stop();
+		//	timer.stop();
 			
-			timer.reset("initMaliciousOtReceiver");
-			//Initialize the malicious OT receiver.
-			initMaliciousOtReceiver(mainMatrix.getProbeResistantInputSize());
-			timer.stop();
-			
-			timer.reset("runObliviousTransferOnP2Keys(AES)");
+		//	timer.reset("runObliviousTransferOnP2Keys(AES)");
 			//Run OT on p2 keys of the main circuit.
 			runObliviousTransferOnP2Keys(mainExecution, mainMatrix, mainBuckets);
-			timer.stop();
+		//	timer.stop();
 			
-			timer.reset("runObliviousTransferOnP2Keys(CR)");
+		//	timer.reset("runObliviousTransferOnP2Keys(CR)");
 			//Run OT on p2 keys of the cheating recovery circuit.
 			runObliviousTransferOnP2Keys(crExecution, crMatrix, crBuckets);
-			timer.stop();
+		//	timer.stop();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (CheatAttemptException e) {
@@ -214,19 +208,6 @@ public class OfflineProtocolP2 {
 	}
 	
 	/**
-	 * Initializes the malicious OT receiver.
-	 * @param numOts The number of OTs to run.
-	 */
-	private void initMaliciousOtReceiver(int numOts) {
-		//Get the ip and port of the receiver.
-		Party maliciousOtServer = communication.maliciousOtServer();
-		String serverAddress = maliciousOtServer.getIpAddress().getHostAddress();
-		int serverPort = maliciousOtServer.getPort();
-		//Create the malicious OT receiver using the ip, port and number of OTs.
-		maliciousOtReceiver = new OTExtensionMaliciousReceiver(serverAddress, serverPort, numOts);
-	}
-	
-	/**
 	 * Runs the Malicious OT protocol.
 	 * @param execution Parameters of the circuit.
 	 * @param matrix The matrix that used to extend the keys.
@@ -236,5 +217,6 @@ public class OfflineProtocolP2 {
 		//Create and run malicious OT routine.
 		OfflineOtReceiverRoutine otReceiver = new OfflineOtReceiverRoutine(execution, primitives, maliciousOtReceiver, matrix, channels[0], buckets);
 		otReceiver.run();
+		
 	}
 }
