@@ -33,6 +33,7 @@ public class CommunicationConfig {
 	
 	private Party maliciousOtServer;				//The server data in the malicious OT protocol.
 	private Channel[] channels;						//The created channels between the parties.
+	TwoPartyCommunicationSetup commSetup = null;
 
 	/**
 	 * A constructor that gets the name of the communication configuration file and use it to initialize
@@ -59,7 +60,6 @@ public class CommunicationConfig {
 	public Channel[] connectToOtherParty(int numberOfChannels) {
 		System.out.println("Connecting to the other party...");
 		
-		TwoPartyCommunicationSetup commSetup = null;
 		Map<String, Channel> connections = null;
 		try {
 			//Creates the communicationSetup class that manage the communication.
@@ -140,5 +140,12 @@ public class CommunicationConfig {
         
         //Crate a Party object with the created ip and port.
         this.maliciousOtServer = new Party(ip, port);
+	}
+
+	public void close() {
+		for (int i=0; i<channels.length; i++){
+			channels[i].close();
+		}
+		commSetup.close();
 	}
 }
