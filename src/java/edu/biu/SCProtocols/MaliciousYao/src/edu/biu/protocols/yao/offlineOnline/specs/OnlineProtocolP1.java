@@ -386,7 +386,7 @@ public class OnlineProtocolP1 implements Protocol {
 		
 		int keySize = mes.getCipherSize();
 		
-		byte[] xoredProof = new byte[outputLabels.length*bucket.size()*2*16];
+		byte[] xoredProof = new byte[outputLabels.length*bucket.size()*2*keySize];
 		
 		//Xor the output keys with R[v] and P[v].
 		for (int v = 0; v < outputLabels.length; v++) {
