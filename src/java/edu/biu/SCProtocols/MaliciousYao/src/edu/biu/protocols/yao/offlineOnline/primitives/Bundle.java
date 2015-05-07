@@ -224,7 +224,7 @@ public class Bundle implements Serializable {
 	
 	public GarbledTablesHolder getGarbledTables() {
 		GarbledTablesHolder temp = garbledTables;
-		garbledTables = null;
+		//garbledTables = null;
 		return temp;
 	}
 
