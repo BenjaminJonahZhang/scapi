@@ -31,6 +31,8 @@ import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Wire;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.garbledCircuit.GarbledTablesHolder;
+import edu.biu.scapi.circuits.garbledCircuit.JustGarbledGarbledTablesHolder;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolInput;
@@ -65,6 +67,7 @@ public class OnlineProtocolP2 implements Protocol {
 	private final CryptoPrimitives primitives; 				//Contains some primitives object to use during the protocol. For example, hash function.
 	private final int keyLength;							//The length of each secret key in bytes.
 	
+	OnlineComputeRoutine computeRoutine;					//The instance that computes the main circuit.
 	/* 
 	 * The buckets to use in the online protocol.
 	 * The buckets contain some circuits to evaluate.
@@ -637,7 +640,7 @@ public class OnlineProtocolP2 implements Protocol {
 			byte[] xInputs = circuitBundle.getXInputKeys();
 			byte[] yInputs = circuitBundle.getYInputKeys();
 
-			System.arraycopy(xInputs, 0, inputs, 0, xInputs.length);				
+			System.arraycopy(xInputs, 0, inputs, 0, xInputs.length);		
 			System.arraycopy(yInputs, 0, inputs, xInputs.length, yInputs.length);
 		
 			//Set the inputs to the circuit.
@@ -645,13 +648,12 @@ public class OnlineProtocolP2 implements Protocol {
 		}
 		
 		//Create a compute routine.
-		OnlineComputeRoutine computeRoutine = new OnlineComputeRoutine(garbledCircuits, primitives, proofCiphers, hashedProof);
+		computeRoutine = new OnlineComputeRoutine(garbledCircuits, primitives, proofCiphers, hashedProof);
 		//Computes the circuits.
 		computeRoutine.computeCircuits();
 		//Check if all circuits return the same output.
 		evaluationResult = computeRoutine.runOutputAnalysis();
-		//Get the output of the circuit.
-		mainOutput = computeRoutine.getOutput();
+		
 		//If found a proof of cheating, get it. Else, get a dummy key.
 		proofOfCheating = computeRoutine.getProofOfCheating();
 	}
@@ -675,8 +677,11 @@ public class OnlineProtocolP2 implements Protocol {
 		
 		int[] outputLabels = bucket.get(0).getOutputLabels();
 
+		int correctCircuit = -1;
 		//for each circuit in the bucket, 
 		for (int j = 0; j < bucket.size(); j++) {
+			boolean allOutputsAreCorrect = true;
+			
 			CmtCCommitmentMsg commitment = bucket.get(j).getCommitmentsOutputKeys();
 		
 			int hashSize = hash.getHashedMsgSize();
@@ -691,17 +696,23 @@ public class OnlineProtocolP2 implements Protocol {
 			
 			//Generate a key from the decommitted value and xor it with the proof ciphers.
 			byte[] decryptKey = cmtReceiver.generateBytesFromCommitValue(kVal);
+			
+			
 			//For each output key, get the corresponding keys.
 			for (int v = 0; v < outputLabels.length; v++) {
 				byte[][] decryptions = new byte[2][];
+				byte[][] keys = new byte[2][];
 				for (int k = 0; k < 2; k++) {
 		
+					keys[k] = new byte[keyLength];
 					decryptions[k] = new byte[keyLength];
-					System.arraycopy(decryptKey, (v*2+k)*keyLength, decryptions[k], 0, keyLength);
+					System.arraycopy(decryptKey, (v*2+k)*keyLength, keys[k], 0, keyLength);
 					for (int i=0; i<keyLength; i++){
-						decryptions[k][i] = (byte) (decryptions[k][i] ^ proofCiphers[v][j][k][i]);
-					}
+						decryptions[k][i] = (byte) (keys[k][i] ^ proofCiphers[v][j][k][i]);
+					}		
 				}
+				
+				allOutputsAreCorrect = checkCircuitOutputsFromCompute(keys, j, v);
 				
 				//Xor both result of the above decryptions.
 				SecretKey result = null;
@@ -714,10 +725,31 @@ public class OnlineProtocolP2 implements Protocol {
 				if (!KeyUtils.compareKeys(result, realProofOfCheating)) {
 					throw new CheatAttemptException("the xor of the output keys does not give the real proof for label v = " + v);
 				}
+				
 			}
+			
+			if (allOutputsAreCorrect){
+				correctCircuit = j;
+			} 
+		}
+		
+		if (correctCircuit != -1){
+			computeRoutine.setCorrectCircuit(correctCircuit);
+			mainOutput = computeRoutine.getOutput();
 		}
 	}
 	
+	private boolean checkCircuitOutputsFromCompute(byte[][] keys, int circuitIndex, int wireIndex) {
+		byte[] garbledOutput = computeRoutine.getComputedOutputWires(circuitIndex);
+		byte[] key = new byte[keyLength];
+		System.arraycopy(garbledOutput, wireIndex*keyLength, key, 0, keyLength);
+		
+		if (Arrays.equals(key, keys[0]) || Arrays.equals(key, keys[1])){
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Computes the cheating recovery circuit.
 	 * @param bucket The bucket to work on.
@@ -735,7 +767,8 @@ public class OnlineProtocolP2 implements Protocol {
 			int[] secretSharingLabels = circuitBundle.getInputLabelsY2();
 			
 			byte[] masterKey = new byte[keyLength];
-			System.arraycopy(masterKeyShares, secretSharingLabels[0]*keyLength, masterKey, 0, keyLength);
+			System.arraycopy(masterKeyShares, 0, masterKey, 0, keyLength);
+			//System.arraycopy(masterKeyShares, secretSharingLabels[0]*keyLength, masterKey, 0, keyLength);
 			for (int i = 1; i < secretSharingLabels.length; i++) {
 				byte[] temp = new byte[keyLength];
 				System.arraycopy(masterKeyShares, i*keyLength, temp, 0, keyLength);
@@ -765,8 +798,12 @@ public class OnlineProtocolP2 implements Protocol {
 		//Create the majority comute routine.
 		CutAndChooseSelection dummySelection = new EvaluateAllSelectionBuilder().build(bucket.size());
 		MajoriryComputeRoutine computeRoutine = new MajoriryComputeRoutine(dummySelection, garbledCircuits,  primitives);
+		
 		//Computes the circuits.
 		computeRoutine.computeCircuits();
+		
+		//get majority output.
+		computeRoutine.runOutputAnalysis();
 		
 		//Get the majority output.
 		crOutput = computeRoutine.getOutput();	
@@ -797,8 +834,8 @@ public class OnlineProtocolP2 implements Protocol {
 		
 		//Create the input of p1 according to the cheating recovery output.
 		Map<Integer, Wire> inputP1 = new HashMap<Integer, Wire>();
-		for (int i=0; i<inputP1.size(); i++){
-			inputP1.put(inputIndices.get(i), new Wire(crOutput[inputIndices.get(i)]));
+		for (int i=0; i<inputIndices.size(); i++){
+			inputP1.put(inputIndices.get(i), new Wire(crOutput[i]));
 		}
 		
 		//Get the input to p2 from the circuit input.
@@ -823,7 +860,7 @@ public class OnlineProtocolP2 implements Protocol {
 		//Convert the output into a byte array.
 		byte[] byteOutput = new byte[outputLabels.length];
 		for (int i=0; i<outputLabels.length; i++){
-			byteOutput[outputLabels[i]] = output.get(outputLabels[i]).getValue();
+			byteOutput[i] = output.get(outputLabels[i]).getValue();
 		}
 		
 		//Create an output object using the converted array.
