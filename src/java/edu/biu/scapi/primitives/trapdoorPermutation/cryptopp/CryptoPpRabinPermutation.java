@@ -270,7 +270,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	 * There are three possible validity values: 
 	 * VALID (it is an element)
 	 * NOT_VALID (it is not an element)
-	 * DON’T_KNOW (there is not enough information to check if it is an element or not)  
+	 * DONT_KNOW (there is not enough information to check if it is an element or not)  
 	 * @throws - IllegalStateException if a key has not been set
 	 * @throws - IllegalArgumentException if the given element is not CryptoPpRabinElement
 	 */

@@ -55,8 +55,8 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	
 	/*	
 	  This class uses an instance of SigmaDHExtendedSimulator with:
-	  	•	Common DlogGroup
-	  	•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
+        Common DlogGroup
+        Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 	*/
 	
 	private SigmaDHExtendedSimulator dhSim; 	//underlying SigmaDHExtendedSimulator to use.

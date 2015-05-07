@@ -51,9 +51,9 @@ public class SigmaElGamalCmtKnowledgeProverComputation implements SigmaProverCom
 
 	/*	
 	  This class uses an instance of SigmaDlogProver with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: h (1st element of commitment)
-		•	P’s private input: a value w in Zq such that h = g^w (given w can decrypt and so this proves knowledge of committed value).	
+        Common parameters (G,q,g) and t
+        Common input: h (1st element of commitment)
+        P's private input: a value w in Zq such that h = g^w (given w can decrypt and so this proves knowledge of committed value).	
 	*/	 
 	
 	private SigmaDlogProverComputation sigmaDlog;	//underlying SigmaDlogProver to use.

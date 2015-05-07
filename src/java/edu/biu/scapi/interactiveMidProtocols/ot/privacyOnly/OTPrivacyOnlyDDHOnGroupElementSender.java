@@ -71,8 +71,8 @@ public class OTPrivacyOnlyDDHOnGroupElementSender extends OTPrivacyOnlyDDHSender
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	c0 = x0 * k0
-	 *		•	c1 = x1 * k1"
+	 *			c0 = x0 * k0
+	 *			c1 = x1 * k1"
 	 * @param input MUST be OTSOnGroupElementInput.
 	 * @param k1 
 	 * @param k0 

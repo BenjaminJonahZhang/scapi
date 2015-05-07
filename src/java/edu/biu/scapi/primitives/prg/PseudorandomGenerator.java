@@ -35,7 +35,7 @@ import javax.crypto.SecretKey;
 /** 
  * General interface of pseudorandom generator. Every concrete class in this family should implement this interface. <p>
  * 
- * A pseudorandom generator (PRG) is a deterministic algorithm that takes a “short” uniformly distributed string, 
+ * A pseudorandom generator (PRG) is a deterministic algorithm that takes a short uniformly distributed string, 
  * known as the seed, and outputs a longer string that cannot be efficiently distinguished from a uniformly 
  * distributed string of that length.
  * 

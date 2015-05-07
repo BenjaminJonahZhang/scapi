@@ -45,7 +45,7 @@ BOOL Connect()
 	LONG lTO = CONNECT_TIMEO_MILISEC;
 
 #ifndef BATCH
-	//cout << "Connecting to party "<< !m_nPID << ": " << m_nAddr << ", " << m_nPort << endl;
+	//cerr << "Connecting to party "<< !m_nPID << ": " << m_nAddr << ", " << m_nPort << endl;
 #endif
 	for(int k = m_nNumOTThreads-1; k >= 0 ; k--)
 	{
@@ -62,11 +62,11 @@ BOOL Connect()
 				// send pid when connected
 				m_vSockets[k].Send( &k, sizeof(int) );
 		#ifndef BATCH
-			//	cout << " (" << !m_nPID << ") (" << k << ") connected" << endl;
+			//	cerr << " (" << !m_nPID << ") (" << k << ") connected" << endl;
 		#endif
 				if(k == 0) 
 				{
-					//cout << "connected" << endl;
+					//cerr << "connected" << endl;
 					return TRUE;
 				}
 				else
@@ -84,7 +84,7 @@ BOOL Connect()
 server_not_available:
 	printf("Server not available: ");
 connect_failure:
-	cout << " (" << !m_nPID << ") connection failed" << endl;
+	cerr << " (" << !m_nPID << ") connection failed" << endl;
 	return FALSE;
 }
 
@@ -93,7 +93,7 @@ connect_failure:
 BOOL Listen()
 {
 #ifndef BATCH
-	//cout << "Listening: " << m_nAddr << ":" << m_nPort << ", with size: " << m_nNumOTThreads << endl;
+	//cerr << "Listening: " << m_nAddr << ":" << m_nPort << ", with size: " << m_nNumOTThreads << endl;
 #endif
 	if( !m_vSockets[0].Socket() ) 
 	{
@@ -107,7 +107,7 @@ BOOL Listen()
 	for( int i = 0; i<m_nNumOTThreads; i++ ) //twice the actual number, due to double sockets for OT
 	{
 		CSocket sock;
-		//cout << "New round! " << endl;
+		//cerr << "New round! " << endl;
 		if( !m_vSockets[0].Accept(sock) )
 		{
 			cerr << "Error in accept" << endl;
@@ -125,7 +125,7 @@ BOOL Listen()
 		}
 
 	#ifndef BATCH
-		//cout <<  " (" << m_nPID <<") (" << threadID << ") connection accepted" << endl;
+		//cerr <<  " (" << m_nPID <<") (" << threadID << ") connection accepted" << endl;
 	#endif
 		// locate the socket appropriately
 		m_vSockets[threadID].AttachFrom(sock);
@@ -133,12 +133,12 @@ BOOL Listen()
 	}
 
 #ifndef BATCH
-	//cout << "Listening finished"  << endl;
+	//cerr << "Listening finished"  << endl;
 #endif
 	return TRUE;
 
 listen_failure:
-	cout << "Listen failed" << endl;
+	cerr << "Listen failed" << endl;
 	return FALSE;
 }
 

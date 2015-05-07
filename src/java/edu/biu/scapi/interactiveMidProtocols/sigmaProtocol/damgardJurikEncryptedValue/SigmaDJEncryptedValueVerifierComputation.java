@@ -52,7 +52,7 @@ public class SigmaDJEncryptedValueVerifierComputation implements SigmaVerifierCo
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroVerifier with:
-	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
+	  		Common input: (n,c') where c' =c*(1+n)^(-x) mod N'
 	
 	*/	
 	
@@ -142,7 +142,7 @@ public class SigmaDJEncryptedValueVerifierComputation implements SigmaVerifierCo
 	 */
 	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		/*
-		 * Converts the input (n, c, x) to (n, c') where c’ = c*(1+n)^(-x) mod N'.
+		 * Converts the input (n, c, x) to (n, c') where c' = c*(1+n)^(-x) mod N'.
 		 */
 		if (!(in instanceof SigmaDJEncryptedValueCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueCommonInput");

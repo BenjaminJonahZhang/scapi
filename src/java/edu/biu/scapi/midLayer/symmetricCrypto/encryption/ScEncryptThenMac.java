@@ -80,7 +80,7 @@ public class ScEncryptThenMac implements AuthenticatedEnc {
 
 	/**
 	 * This function supplies the encrypt-then-mac object with a Secret Key.
-	 * It calls encryptor’s relevant setKey with corresponding key and mac’s relevant setKey with corresponding key.
+	 * It calls encryptor's relevant setKey with corresponding key and mac's relevant setKey with corresponding key.
 	 * @param secretKey MUST be an instance of EncThenMacKey.
 	 * @throws InvalidKeyException if key is not of type EncThenMacKey.
 	 */

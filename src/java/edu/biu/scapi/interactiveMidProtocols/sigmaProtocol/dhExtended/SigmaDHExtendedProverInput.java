@@ -32,7 +32,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedProver.<p>
- * In SigmaProtocolDHExtended, the prover gets an extended DH tuple - (g1,…,gm,h1,…,hm) and a value w in Zq such that hi=gi^w for all i.
+ * In SigmaProtocolDHExtended, the prover gets an extended DH tuple - (g1,...,gm,h1,...,hm) and a value w in Zq such that hi=gi^w for all i.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -44,7 +44,7 @@ public class SigmaDHExtendedProverInput implements SigmaProverInput{
 	
 	/**
 	 * Sets the input for the prover. <p>
-	 * The prover gets an extended DH tuple - (g1,…,gm,h1,…,hm) and a value w in Zq such that hi=gi^w for all i.
+	 * The prover gets an extended DH tuple - (g1,...,gm,h1,...,hm) and a value w in Zq such that hi=gi^w for all i.
 	 * @param gArray
 	 * @param hArray
 	 * @param w

@@ -84,13 +84,13 @@ class FactoriesUtility {
 	}
 	
 	/* 
-	 * parseAlgNames : The string algName should be of the form “alg1Name(alg2Name, …,algnName)”, where n can be any number greater than zero. 
-	 * (If n = zero, then AlgDetails.Name = null and AlgDetails.tail = null. If n = 1 then  AlgDetails.Name = “alg1” and AlgDetails.params=null. 
-	 * If n >=2 then AlgDetails.Name = alg1 and AlgDetails.tail = [alg2Name , …,algnName)])
-	 * •	Parse the string and return the following:
+	 * parseAlgNames : The string algName should be of the form alg1Name(alg2Name, ,algnName), where n can be any number greater than zero. 
+	 * (If n = zero, then AlgDetails.Name = null and AlgDetails.tail = null. If n = 1 then  AlgDetails.Name = alg1 and AlgDetails.params=null. 
+	 * If n >=2 then AlgDetails.Name = alg1 and AlgDetails.tail = [alg2Name , ,algnName)])
+	 * 	Parse the string and return the following:
 	 * o	If n = 0, then AlgDetails.name = null and AlgDetails.params = null. 
-	 * o	If n = 1, then AlgDetails.name = “alg1” and AlgDetails.params =null. 
-	 * If n >=2, then AlgDetails.name = “alg1” and AlgDetails.params = [alg2Name, …,algnName]
+	 * o	If n = 1, then AlgDetails.name = alg1 and AlgDetails.params =null. 
+	 * If n >=2, then AlgDetails.name = alg1 and AlgDetails.params = [alg2Name, ,algnName]
 	 * 
 	 * @param algNames a string of the form "alg1Name(alg2Name,alg3Name(alg4Name, alg5Name)" where alg1 is the main algorithm which takes
 	 * 					 other algorithms as parameters (complex algorithm) and alg3 is also a complex algorithm that takes
@@ -226,13 +226,13 @@ class FactoriesUtility {
 	/* 
 	 * pseudocode:
 	 * This function returns an Object instantiation of algName algorithm for the specified provider.
-	 * •	Check validity of AlgDetails.name. If not valid, throw exception.
-	 * •	Prepare key for map by concatenating provider + algName.
-	 * •	Get relevant class name from properties map with the key obtained.
-	 * •	Get an object of type Class representing our algorithm. (Class algClass).
-	 * •	Retrieve a Constructor of algClass that accepts t parameters of type String, while t=tailVector.length.
-	 * •	Create an instance of type algClass by calling the above Constructor. Pass as a parameter the “tailVector” in AlgDetails. The call Constructor.newInstance returns an object of type Object. (For example, if algName is a series of algorithms: "HMAC(SHA1)", the function creates an HMAC object and passes the tail – "SHA1" to the instance of HMAC. HMAC should be a class that takes as argument a string and in its constructor uses the factories to create the hash object. In this case, where there is a tail, the getObject function passes the String "SHA1" by retrieving a constructor that gets a String. If there is no such constructor, an exception will be thrown). 
-	 * •    Return the object created.
+	 * 	Check validity of AlgDetails.name. If not valid, throw exception.
+	 * 	Prepare key for map by concatenating provider + algName.
+	 * 	Get relevant class name from properties map with the key obtained.
+	 * 	Get an object of type Class representing our algorithm. (Class algClass).
+	 * 	Retrieve a Constructor of algClass that accepts t parameters of type String, while t=tailVector.length.
+	 * 	Create an instance of type algClass by calling the above Constructor. Pass as a parameter the tailVector in AlgDetails. The call Constructor.newInstance returns an object of type Object. (For example, if algName is a series of algorithms: "HMAC(SHA1)", the function creates an HMAC object and passes the tail "SHA1" to the instance of HMAC. HMAC should be a class that takes as argument a string and in its constructor uses the factories to create the hash object. In this case, where there is a tail, the getObject function passes the String "SHA1" by retrieving a constructor that gets a String. If there is no such constructor, an exception will be thrown). 
+	 * Return the object created.
 	 *
 	 * @param provider the required provider name
 	 * @param algName the required algorithm name

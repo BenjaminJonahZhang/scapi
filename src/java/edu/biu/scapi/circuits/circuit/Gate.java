@@ -167,7 +167,7 @@ public class Gate {
 	private int calculateIndexOfTruthTable(Map<Integer, Wire> computedWires) {
   
 		/*
-		 * Since a truth table’s order is the order of binary counting, the index of a desired row can be calculated as follows: 
+		 * Since a truth tables order is the order of binary counting, the index of a desired row can be calculated as follows: 
 		 * For a truth table with L inputs whose input columns are labeled aL...ai...a2,a1, 
 		 * the output index for a given input set is given by: summation from 0 to L : ai *2^i. 
 		 * This is calculated below:

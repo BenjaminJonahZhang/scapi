@@ -41,7 +41,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
  * 
- * This protocol is used for a prover to convince a verifier that the input tuple (g1,…,gm,h1,…,hm) is an 
+ * This protocol is used for a prover to convince a verifier that the input tuple (g1,...,gm,h1,...,hm) is an 
  * extended Diffie-Hellman tuple, meaning that there exists a single w in Zq such that hi=gi^w for all i.<p>
  * 
  * The pseudo code of this protocol can be found in Protocol 1.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
@@ -54,7 +54,7 @@ public class SigmaDHExtendedVerifierComputation implements SigmaVerifierComputat
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE a random challenge  e <- {0, 1}^t 
-			ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,…,gm in G AND for all i=1,…,m it holds that gi^z = ai*hi^e        
+			ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,...,gm in G AND for all i=1,...,m it holds that gi^z = ai*hi^e        
               
 	*/	
 	
@@ -140,7 +140,7 @@ public class SigmaDHExtendedVerifierComputation implements SigmaVerifierComputat
 	/**
 	 * Computes the protocol's verification.<p>
 	 * Computes the following line from the protocol:<p>
-	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,…,gm in G AND for all i=1,…,m it holds that gi^z = ai*hi^e".   <p>  
+	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,...,gm in G AND for all i=1,...,m it holds that gi^z = ai*hi^e".   <p>  
 	 * @param input MUST be an instance of SigmaDHExtendedCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

@@ -53,10 +53,10 @@ import edu.biu.scapi.comm.Channel;
  * In fact, the sender does not need to know anything about the receiver; nor does the receiver need to know anything 
  * about the sender. The sender and the receiver need to know only which message format and which destination to use.
  * In this respect, messaging differs from tightly coupled technologies, such as Remote Method Invocation (RMI), 
- * which require an application to know a remote application’s methods.<p>
+ * which require an application to know a remote applications methods.<p>
  * 
  * In order to enforce the right usage of the Channel class we will restrict the ability to instantiate one, 
- * only to classes within the Communication Layer’s package. This means that the constructor of the channel will be 
+ * only to classes within the Communication Layers package. This means that the constructor of the channel will be 
  * unreachable from another package. However, the send, receive and close functions will be declared public, therefore 
  * allowing anyone holding a channel to be able to use them.<p>
  * 

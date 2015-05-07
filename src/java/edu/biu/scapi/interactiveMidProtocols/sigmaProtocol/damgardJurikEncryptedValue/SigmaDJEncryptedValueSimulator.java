@@ -52,7 +52,7 @@ public class SigmaDJEncryptedValueSimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroSimulator with:
-	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
+	  		Common input: (n,c') where c'=c*(1+n)^(-x) mod N'
 	*/
 	
 	private SigmaDJEncryptedZeroSimulator djSim; // Underlying SigmaDamgardJurikEncryptedZeroSimulator to use.

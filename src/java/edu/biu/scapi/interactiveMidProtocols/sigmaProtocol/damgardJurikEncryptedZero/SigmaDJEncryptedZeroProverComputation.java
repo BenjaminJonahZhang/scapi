@@ -52,9 +52,9 @@ public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputa
 
 	/*	
 	  This class computes the following calculations:
-		  	SAMPLE random value s <- Z*n 
-			COMPUTE a = s^N mod N’
-			COMPUTE z = s*r^e mod n.
+        SAMPLE random value s <- Z*n 
+        COMPUTE a = s^N mod N'
+        COMPUTE z = s*r^e mod n.
 	
 	*/	
 	
@@ -127,7 +127,7 @@ public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputa
 	/**
 	 * Computes the first message of the protocol.<p>
 	 * "SAMPLE random value s <- Z*n<p>
-	 * COMPUTE a = s^N mod N’". 
+	 * COMPUTE a = s^N mod N'". 
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroProverInput.
 	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroProverInput.

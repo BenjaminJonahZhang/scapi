@@ -49,7 +49,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE a random challenge  e -< {0, 1}^t 
-			ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N’
+			ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N'
         
 	*/
 	
@@ -138,7 +138,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 
 	/**
 	 * Computes the verification of the protocol.<p>
-	 * 	"ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N’".
+	 * 	"ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N'".
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
@@ -190,7 +190,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 		//Calculate z^N mod N' (left side of the equation).
 		BigInteger left = zBI.modPow(N, NTag);
 		
-		//Calculate (a*c^e) mod N’ (left side of the equation).
+		//Calculate (a*c^e) mod N' (left side of the equation).
 		//Convert e to BigInteger.
 		BigInteger eBI = new BigInteger(1, e);
 		BigInteger cToe = c.modPow(eBI, NTag);

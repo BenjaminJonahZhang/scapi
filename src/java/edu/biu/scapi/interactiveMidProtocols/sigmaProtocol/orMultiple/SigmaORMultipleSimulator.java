@@ -49,10 +49,10 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 
 	/*	
 	  This class computes the following calculations:
-		  	SAMPLE random points e1,…,en-k in GF[2t].
-			COMPUTE the polynomial Q and values en-k+1,…,en like in the protocol.
-			RUN the simulator on each statement/challenge pair (xi,ei) for all i=1,…,n to obtain (ai,ei,zi).
-			OUTPUT (a1,e1,z1),…, (an,en,zn).
+		  	SAMPLE random points e1,...,en-k in GF[2t].
+			COMPUTE the polynomial Q and values en-k+1,...,en like in the protocol.
+			RUN the simulator on each statement/challenge pair (xi,ei) for all i=1,...,n to obtain (ai,ei,zi).
+			OUTPUT (a1,e1,z1),..., (an,en,zn).
 	*/
 	
 	private ArrayList<SigmaSimulator> simulators;	// Underlying simulators.
@@ -163,7 +163,7 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		ArrayList<byte[]> eOutputs = new ArrayList<byte[]>();
 		ArrayList<SigmaProtocolMsg> zOutputs = new ArrayList<SigmaProtocolMsg>();
 		SigmaSimulatorOutput output;
-		//Run the simulator on each statement,challenge pair (xi,ei) for all i=1,…,n to obtain (ai,ei,zi).
+		//Run the simulator on each statement,challenge pair (xi,ei) for all i=1,...,n to obtain (ai,ei,zi).
 		for (int i = 0; i < len; i++){
 			try {
 				output = simulators.get(i).simulate(orInput.getInputs().get(i), challenges[i]);

@@ -50,7 +50,7 @@ public class SigmaDJEncryptedZeroSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE a random value z <- Z*n
-			COMPUTE a = z^N/c^e mod N’ 
+			COMPUTE a = z^N/c^e mod N'
 			OUTPUT (a,e,z)
 	*/
 	
@@ -133,7 +133,7 @@ public class SigmaDJEncryptedZeroSimulator implements SigmaSimulator{
 		BigInteger NTag = n.pow(lengthParameter + 1);
 		BigInteger e = new BigInteger(1, challenge);
 		
-		//Compute a = z^N/c^e mod N’
+		//Compute a = z^N/c^e mod N'
 		BigInteger zToN = z.modPow(N, NTag);
 		BigInteger denominator = djInput.getCiphertext().getCipher().modPow(e, NTag);
 		BigInteger denomInv = denominator.modInverse(NTag);

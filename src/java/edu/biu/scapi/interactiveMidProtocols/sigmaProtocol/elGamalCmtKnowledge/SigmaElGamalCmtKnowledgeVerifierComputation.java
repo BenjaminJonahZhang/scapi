@@ -50,9 +50,9 @@ public class SigmaElGamalCmtKnowledgeVerifierComputation implements SigmaVerifie
 
 	/*	
 	  This class uses an instance of SigmaDlogVerifier with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: h (1st element of commitment)
-	*/	
+        Common parameters (G,q,g) and t
+        Common input: h (1st element of commitment)
+	*/
 	
 	private SigmaDlogVerifierComputation sigmaDlog;//underlying SigmaDlogVerifier to use.
 	

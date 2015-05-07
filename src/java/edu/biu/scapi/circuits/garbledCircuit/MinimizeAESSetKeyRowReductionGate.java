@@ -111,7 +111,7 @@ class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbledGate 
 	    		/*
 	    		 * The signal bits tell us the position on the garbled truth table for the given row of an ungarbled truth table. 
 	    		 * The signal bit os the last bit of k0.
-	    		 * See Fairplay — A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
+	    		 * See Fairplay - A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
 	    		 */
 	    		byte[] k0 = allWireValues.get(inputWireIndices[i])[0].getEncoded();
 		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);

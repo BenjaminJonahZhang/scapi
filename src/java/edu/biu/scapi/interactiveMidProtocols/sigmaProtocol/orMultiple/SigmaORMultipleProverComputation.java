@@ -58,12 +58,12 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 			For every j not in I, SAMPLE a random element ej <- GF[2^t]
 			For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
 			For every i in I, RUN the prover P on statement xi to get first message ai
-			SET a=(a1,…,an)
+			SET a=(a1,...,an)
 			
 			INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)
 			For every i in I, SET ei = Q(i)
 			For every i in I, COMPUTE the response zi to (ai, ei) in SigmaI using input (xi,wi)
-			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)
+			The message is Q,e1,z1,...,en,zn (where by Q we mean its coefficients)
 	*/
 	
 	private Hashtable<Integer, SigmaProverComputation> provers;	// Underlying Sigma protocol's provers to the OR calculation.
@@ -199,9 +199,9 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	 * "For every j not in I, SAMPLE a random element ej <- GF[2^t]<p>
 	 *  For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)<p>
 		For every i in I, RUN the prover P on statement xi to get first message ai<p>
-		SET a=(a1,…,an)". 
+		SET a=(a1,...,an)". 
 	 * @param input MUST be an instance of SigmaORMultipleInput.
-	 * @return SigmaMultipleMsg contains a1, …, am. 
+	 * @return SigmaMultipleMsg contains a1, ..., am. 
 	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers. 
 	 */
@@ -260,9 +260,9 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	 * "INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)<p>
 			For every i in I, SET ei = Q(i)<p>
 			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)<p>
-			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)".<p>
+			The message is Q,e1,z1,...,en,zn (where by Q we mean its coefficients)".<p>
 	 * @param challenge
-	 * @return SigmaMultipleMsg contains z1, …, zm.
+	 * @return SigmaMultipleMsg contains z1, ..., zm.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {

@@ -54,8 +54,8 @@ public class SigmaDJEncryptedValueProverComputation implements SigmaProverComput
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroProver with:
-	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
-		•	P’s private input: a value r <- Zq such that c’=r^N mod N’.
+        Common input: (n,c') where c'=c*(1+n)^(-x) mod N'
+        P's private input: a value r <- Zq such that c'=r^N mod N'.
 	*/	 
 	
 	private SigmaDJEncryptedZeroProverComputation sigmaDamgardJurik;	//underlying SigmaDamgardJurikProver to use.
@@ -114,7 +114,7 @@ public class SigmaDJEncryptedValueProverComputation implements SigmaProverComput
 	 */
 	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
 		/*
-		 * Converts the input (n, c, x, r) to (n, c', r) where c’ = c*(1+n)^(-x) mod N'.
+		 * Converts the input (n, c, x, r) to (n, c', r) where c' = c*(1+n)^(-x) mod N'.
 		 */
 		if (!(in instanceof SigmaDJEncryptedValueProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueProverInput");

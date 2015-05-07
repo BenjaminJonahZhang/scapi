@@ -187,8 +187,8 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException {
 		/*  
 		 * Pseudo-code:
-		 * 	•	Calculate s = ciphertext.getC1() ^ x^(-1) //x^(-1) is kept in the private key because of the optimization computed in the function initPrivateKey.
-		 *	•	Calculate m = ciphertext.getC2() * s
+		 * 		Calculate s = ciphertext.getC1() ^ x^(-1) //x^(-1) is kept in the private key because of the optimization computed in the function initPrivateKey.
+		 *		Calculate m = ciphertext.getC2() * s
 		 */
 		
 		//If there is no private key, throws exception.

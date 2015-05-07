@@ -183,23 +183,30 @@ We have specified the enabled SSL protocol to be TLSv1.2, and the enabled cipher
 Multiparty communication
 -----------------------------
 
-The multiparty communication layer will be updated soon to be based on the two-party communication layer. Meanwhile, the description below is for the old implementation which will soon be deprecated. 
+This is the communication layer for multiparty protocols, that provides a way to setup channels between all parties in a protocol and communicate between them. 
 
-This is the communication layer for multiparty protocols. Currently, all the classes in the Multiparty Communication Layer belong to the package ``edu.biu.scapi.comm``. The multiparty communication layer follows the old approach that does not provide the options that we have in the two-party communication layer. In the near future this implementation will be declared deprecated and we will provide a new multiparty communication layer that is based on the two-party communication layer.
+Like the two party communciation, this implementation improves the previous SCAPI multiparty communication in some aspects, including letting the user choose the channel type and the amount of channels between each pair of parties, option to recover from communication failures and secure channels.
 
-In the current implementation, we use the ``Socket`` and ``ServerSocket`` of the ``java.net`` package. Each pair of parties has a single socket that carries out all the transportation.
+All the classes in the multiparty communication are in the ``edu.biu.scapi.multiPartyComm`` package.
+
+The previous multiparty implementation in the ``edu.biu.scapi.comm`` package is from now on deprecated. We recommend not to use it since it will not be supported anymore. 
+
+The new multiparty implementation has two main parts: 
+
+	* The first part is a communication that uses ActiveMQ queues in order to communicate between the parties. It uses a :java:ref:`TwoPartyCommunicationSetup` instance between each pair of parties. Thus, the classes that implement the queue multiparty communication are very slim since they delegate all functionality to the underline two party instances.
+	
+	* The second part is a communication that uses sockets in order to communicate between the parties. In this implementation, using the two party communication will be less effective. A Two party object listens to incoming connection on a given fixed port. If the multiparty communication will use two party instances, every two party instance will have the same port number (given to the mltiparty comm) so all the objects will listen on the same port. This cannot be done in parallel since only one socket can be bind to each port at the same time. So the communication can be done only serially and that is not efficient. In light of this, we chose to have a different, but very similar, implementation that listens to incoming connections from **all** parties. When receiving a connection, the listenning thread will determine which party is calling and set the created socket to this party. The creation of the channels and the conneting step will be identical to the two party communication.
+ 
+Both queues and sockets multiparty implementations have a plain communication and a secure communication channels. All the instructions (regarding the SSL protocol, ActiveMQ usage, etc) are the same as in the TwoPartyCommunicationSetup classes.
 
 ---------------------------------
 Setting up communication
 ---------------------------------
 
-There are several steps involved in setting up a communication channel between parties. The steps are different for two-party communication and for multiparty communication.
-
-Two-Party communication
------------------------------------------------------------
+There are several steps involved in setting up a communication channel between parties. Each one of them will be explained below:
 
 Fetch the list of parties from a properties file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 The first step towards obtaining communication services is to setup the connections between the different parties. Each party needs to run the setup process, at the end of which the established connections are obtained. The established connections are called channels. The list of parties and their addresses are usually obtained from a properties file. The format of the properties file depends on the concrete communication type.
 
@@ -266,12 +273,17 @@ or
     LoadQueueParties loadParties = new LoadQueueParties("JmsParties1.properties");
     List<PartyData> listOfParties = loadParties.getPartiesList();
 
-Each party is represented by an instance of the ``PartyData`` class. A ``List<PartyData>`` object is required in the `two party communication setup phase`_.
+Each party is represented by an instance of the ``PartyData`` class. A ``List<PartyData>`` object is required in the `communication setup phase`_.
 
-.. _`two party communication setup phase`:
+.. _`communication setup phase`:
 
 Setting up the actual communication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
+
+This step is different for two-party communication and for multiparty communication.
+
+Two-Party communication
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``TwoPartyCommunicationSetup`` interface is responsible for establishing secure communication to the other party. An application requesting from ``TwoPartyCommunicationSetup`` to prepare for communication needs to create the required concrete communicationSetup class: ``SocketCommunicationSetup``, ``SSLSocketCommunicationSetup`` and ``QueueCommunicationSetup``:
 
@@ -288,7 +300,7 @@ There is no specific class for SSL Queue communication because QueueCommunicatio
 
 All concrete classes implement the org.apache.commons.exec.TimeoutObserver interface. This interface supplies a mechanism for notifying classes that a timeout has occurred.
 
-In order to setup the actual communication, one of the following functions is called (using the PartyData objects obtained from the LoadParties method previously used).
+In order to setup the actual communication, one of the following constructors is called (using the PartyData objects obtained from the LoadParties method previously used).
 
 
 .. java:method:: public void SocketCommunicationSetup(PartyData me, PartyData party) 
@@ -303,6 +315,14 @@ In order to setup the actual communication, one of the following functions is ca
     :param PartyData me: Data of the current application.
     :param PartyData party: Data of the other application to communicate with.
     :param String storePassword: The password of the keystore and truststore.
+
+.. java:method:: public void SSLSocketCommunicationSetup(PartyData me, PartyData party, String keyStoreName, String trustStoreName, String storePass)
+
+	:param PartyData me: Data of the current application.
+	:param PartyData party: Data of the other application to communicate with.
+	:param String keyStoreName: Name of the key store file of this party.
+	:param String trustStoreName: Name of the trust store file of this party.
+	:param String storePassword: The password of the keystore and truststore.
 	
 .. java:method:: public void QueueCommunicationSetup(ConnectionFactory factory, DestroyDestinationUtil destroyer, PartyData me, PartyData party)
     :outertype: QueueCommunicationSetup
@@ -314,7 +334,7 @@ In order to setup the actual communication, one of the following functions is ca
 
 All constructors receive the data of the current and the other application. Note that the party data is different for socket and queue communication.
 
-The :java:ref:`SSLSocketCommunicationSetup` constructor also receive the password of the keyStore and trustStore where the certificates are placed. This is needed for accessing the party's own private key.
+The :java:ref:`SSLSocketCommunicationSetup` constructor also receive the password of the keyStore and trustStore where the certificates are placed. This is needed for accessing the party's own private key. Also, there are constructors that get the key store and trust store files' names if the user does not want to use the default files.
 
 The :java:ref:`QueueCommunicationSetup` constructor also receives the JMS factory and destroyer as parameters. We implement a derived classes that uses the ActiveMQ implementation of JMS, called :java:ref:`ActiveMQCommunicationSetup` (for plain communication) and :java:ref:`SSLActiveMQCommunicationSetup` (for SSL communication). The constructors of these classes receive the parties' data and the ActiveMQ broker's URL and create both the factory and the ``DestroyDestinationUtil``. Thus, the user can use this class instead of dealing with the factory and destroyer construction. Thus, instead of using ``QueueCommunicationSetup`` described above, one can call:
 
@@ -333,6 +353,15 @@ The :java:ref:`QueueCommunicationSetup` constructor also receives the JMS factor
     :param PartyData party: Data of the other application to communicate with.
     :param String storePass: The password of the keystore and truststore.
 
+.. java:method:: public void SSLActiveMQCommunicationSetup(String url, PartyData me, PartyData party, String keyStoreName, String trustStoreName, String storePass)
+
+	:param String url: URL of the ActiveMQ broker.
+	:param PartyData me: Data of the current application.
+	:param PartyData party: Data of the other application to communicate with.
+	:param String keyStoreName: Name of the key store file of this party.
+	:param String trustStoreName: Name of the trust store file of this party.
+	:param String storePass: The password of the keystore and truststore.
+		
 After calling the constructor of the communication setup class, the application should call one of the :java:ref:`TwoPartyCommunicationSetup::prepareForCommunication` functions in order to establish connections:
 
 .. java:method:: public Map<String, Channel> prepareForCommunication(String[] connectionsIds, long timeOut)
@@ -342,7 +371,6 @@ After calling the constructor of the communication setup class, the application 
     :param long timeOut: A time-out (in milliseconds) specifying how long to wait for connections to be established.
     :return: a map of the established channels.
     
-
 .. java:method:: public Map<String, Channel> prepareForCommunication(int connectionsNum, long timeOut)
     :outertype: TwoPartyCommunicationSetup
     
@@ -352,7 +380,7 @@ After calling the constructor of the communication setup class, the application 
 
 In both of the above functions, the user can generate one or more connections between the parties. The channels are connected using a **single port** for each application, specified in the PartyData objects given in the constructor. The first function is used when the user wishes to provide the name of each connection. The second function is used if the user wishes these “names” to be generated automatically. In this case, the name of a channel is actually the index of the channel. That is, the first created channel is named “1”, the second is “2” and so on. These functions can be called several times. The class internally stores the number of created channels so that the next index can be given, when using the second function.
 
-By default, Nagle algorithm is disabled since it has much better performance for cryptographic algorithms. In order to change the default value, call the ``enableNagle()`` function.
+By default, Nagle algorithm is disabled since it has much better performance for cryptographic algorithms. In order to change the default value, call the ``enableNagle()`` function in the socket implementations. In the queue implementations the Nagle algorithm can be changes only in construction time so we added a constructor with ``boolean enableNagle`` to let the user determine if Nagle algorithm should be used or not.
 
 Here is an example on how to use the :java:ref:`SocketCommunicationSetup` class:
 
@@ -454,164 +482,234 @@ And an example to :java:ref:`SSLActiveMQCommunicationSetup` class:
 	//Return the channels to the calling application. 
 	return connections.values().toArray();
 
+Multiparty communication
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _`two party connecting success`: 
+The ``MultipartyCommunicationSetup`` interface is responsible for establishing secure communication between the current running application to each other party in the protocol. An application requesting from ``MultipartyCommunicationSetup`` to prepare for communication needs to create the required concrete  multiparty communicationSetup class: ``SocketMultipartyCommunicationSetup``, ``SSLSocketMultipartyCommunicationSetup``, ``ActiveMQMultipartyCommunicationSetup`` and ``SSLActiveMQMultipartyCommunicationSetup``:
+
+.. java:type:: public class SocketMultipartyCommunicationSetup implements MultipartyCommunicationSetup, TimeoutObserver
+    :package: package edu.biu.scapi.multiPartyComm;
+
+.. java:type:: public class SSLSocketMultipartyCommunicationSetup extends SocketMultipartyCommunicationSetup
+	:package: package edu.biu.scapi.multiPartyComm;
+    
+.. java:type:: public class ActiveMQMultipartyCommunicationSetup implements MultipartyCommunicationSetup
+    :package: package edu.biu.scapi.multiPartyComm;
+
+.. java:type:: public class SSLActiveMQMultipartyCommunicationSetup extends ActiveMQMultipartyCommunicationSetup
+    :package: package edu.biu.scapi.multiPartyComm;
+    
+Here, unlike the two party implementation there is no abstract class for queue communication. As mentioned above, the queue multiparty communication uses two party instances between the current running application and any other party in the protocol. In order to create the underling two party objects, one should know exactly which specific class he should create. This specific two party object fixed the multiparty implementation and that is the reason it cannot be abstract.
+
+The socket implementations implement the org.apache.commons.exec.TimeoutObserver interface. This interface supplies a mechanism for notifying classes that a timeout has occurred. The queue implementations should not implementat this interface since they use the two party queue implementation that implements the TimeoutObserver interface.
+
+In order to setup the actual communication, one of the following constructors is called (using the PartyData list obtained from the LoadParties method previously used).
+
+
+.. java:method:: public void SocketMultipartyCommunicationSetup(List<PartyData> parties) 
+    :outertype: SocketMultipartyCommunicationSetup
+
+    :param List<PartyData> parties: Data of the current application.
+    
+.. java:method:: public void SSLSocketMultipartyCommunicationSetup(List<PartyData> parties, String storePass)
+    :outertype: SSLSocketMultipartyCommunicationSetup
+
+    :param List<PartyData> parties: Data of the current application.
+    :param String storePass: The password of the keystore and truststore.
+
+.. java:method:: public void SSLSocketMultipartyCommunicationSetup(List<PartyData> parties, String keyStoreName, String trustStoreName, String storePass)
+    :outertype: SSLSocketMultipartyCommunicationSetup
+
+    :param List<PartyData> parties: Data of the current application.
+    :param String keyStoreName: Name of the key store file of this party.
+    :param String trustStoreName: Name of the trust store file of this party.
+    :param String storePass: The password of the keystore and truststore.
+	
+.. java:method:: public void ActiveMQMultipartyCommunicationSetup(String url, List<PartyData> parties)
+    :outertype: ActiveMQMultipartyCommunicationSetup
+
+    :param String url: URL of the ActiveMQ broker.
+    :param List<PartyData> parties: Data of the current application.
+
+.. java:method:: public void SSLActiveMQMultipartyCommunicationSetup(String url, List<PartyData> parties, String storePass)
+    :outertype: SSLActiveMQMultipartyCommunicationSetup
+
+    :param String url: URL of the ActiveMQ broker.
+    :param List<PartyData> parties: Data of the current application.
+    :param String storePass: The password of the keystore and truststore.
+
+.. java:method:: public void SSLActiveMQMultipartyCommunicationSetup(String url, List<PartyData> parties, String keyStoreName, String trustStoreName, String storePass)
+    :outertype: SSLActiveMQMultipartyCommunicationSetup
+
+    :param String url: URL of the ActiveMQ broker.
+    :param List<PartyData> parties: Data of the current application.
+    :param String keyStoreName: Name of the key store file of this party.
+    :param String trustStoreName: Name of the trust store file of this party.
+    :param String storePass: The password of the keystore and truststore.
+
+All constructors receive the data of all the parties participate in the protocol, while the first party in the list represents the current running party. Note that the party data objects are different for socket and queue communication.
+
+As in the two parties communication, the secure multiparty classes also receive in the constructor the password of the keyStore and trustStore where the certificates are placed, and there are constructors that get the key store and trust store files' names.
+
+After calling the constructor of the communication setup class, the application should call the :java:ref:`MultipartyCommunicationSetup::prepareForCommunication` function in order to establish connections:
+
+.. java:method:: public Map<PartyData, Map<String, Channel>> prepareForCommunication(Map<PartyData, Object> connectionsPerParty, long timeOut)	
+    :outertype: MultipartyCommunicationSetup
+    
+    :param Map<PartyData,Object> connectionsPerParty: provides the amount of connections or the names of connections that should be created between the current application and other parties in the protocol.
+    :param long timeOut: A time-out (in milliseconds) specifying how long to wait for connections to be established.
+    :return: a map contains the connected channels. The key to the map is a PartyData object (represents a party participates in the protocol) and the value is the created connections to this party.
+    
+Notice that in the two party implementation there are two prepareForCommunication functions. One gets the **number** of requested connections and one gets the **names** of the requested connections. Here, there is only one function that can get both things, since the parameter type is ``Map<PartyData, Object>`` and object can be anything. This is done that way because of technical reasons, since for java ``Map<PartyData, Integer>`` and ``Map<PartyData, string[]>`` are the same thing and therefore java does not allow to split that into two different functions.
+
+As in the two party communication, the user can generate one or more connections between the parties. The channels are connected using a **single port** for each application, specified in the first PartyData object in the given parties list.
+
+Here is an example on how to use the :java:ref:`SocketMultipartyCommunicationSetup` class:
+
+.. code-block:: java
+
+    import java.util.List;
+    import java.util.Map;
+
+	import edu.biu.scapi.comm.Channel;
+	import edu.biu.scapi.comm.multiPartyComm.MultipartyCommunicationSetup;
+	import edu.biu.scapi.comm.multiPartyComm.SocketMultipartyCommunicationSetup;
+	import edu.biu.scapi.comm.twoPartyComm.LoadSocketParties;
+	import edu.biu.scapi.comm.twoPartyComm.PartyData;
+
+	 //Prepare the parties list.
+	 LoadSocketParties loadParties = new LoadSocketParties("MultiPartySocketParties1.properties");
+	
+    List<PartyData> listOfParties = loadParties.getPartiesList();
+
+	//Create the communication setup class.
+	MultipartyCommunicationSetup commSetup = new SocketMultipartyCommunicationSetup(listOfParties);
+		
+	//Request two chanels between me and each other party.
+	HashMap<PartyData, Object> connectionsPerParty = new HashMap<PartyData, Object>();
+
+	connectionsPerParty.put(listOfParties.get(1), 2);
+	connectionsPerParty.put(listOfParties.get(2), 2);
+
+	//Call the prepareForCommunication function to establish the connections within 2000000 milliseconds.
+	Map<PartyData, Map<String, Channel>> connections = commSetup.prepareForCommunication(connectionsPerParty, 2000000);
+	
+	//Returns the channels to the other parties. 
+	return connections;
+
+In order to use the :java:ref:`SSLSocketMultipartyCommunicationSetup` class one should add the key store name, trust store name and password to the constructor:
+
+.. code-block:: java
+
+    import java.util.List;
+    import java.util.Map;
+
+	import edu.biu.scapi.comm.Channel;
+	import edu.biu.scapi.comm.multiPartyComm.MultipartyCommunicationSetup;
+	import edu.biu.scapi.comm.multiPartyComm.SSLSocketMultipartyCommunicationSetup;
+	import edu.biu.scapi.comm.twoPartyComm.LoadSocketParties;
+	import edu.biu.scapi.comm.twoPartyComm.PartyData;
+    
+    //Prepare the parties list.
+    LoadSocketParties loadParties = new LoadSocketParties("SocketParties1.properties");
+	List<PartyData> listOfParties = loadParties.getPartiesList();
+	
+	//Create the communication setup class.
+	MultipartyCommunicationSetup commSetup = new SSLSocketMultipartyCommunicationSetup(listOfParties, "p1Keystore.jks", "p1Cacerts.jks", "changeit");
+		
+	//Request two chanels between me and each other party.
+	HashMap<PartyData, Object> connectionsPerParty = new HashMap<PartyData, Object>();
+	connectionsPerParty.put(listOfParties.get(1), 2);
+	connectionsPerParty.put(listOfParties.get(2), 2);
+
+	//Call the prepareForCommunication function to establish the connections within 2000000 milliseconds.
+	Map<PartyData, Map<String, Channel>> connections = commSetup.prepareForCommunication(connectionsPerParty, 2000000);
+	
+	//Returns the channels to the other parties. 
+	return connections;
+
+Here is an example of how to use the :java:ref:`ActiveMQMultipartyCommunicationSetup` class:
+
+.. code-block:: java
+
+    import java.util.List;
+    import java.util.Map;
+
+	import edu.biu.scapi.comm.Channel;
+    import edu.biu.scapi.exceptions.DuplicatePartyException;
+    import edu.biu.scapi.twoPartyComm.LoadQueueParties;
+    import edu.biu.scapi.twoPartyComm.PartyData;
+    import edu.biu.scapi.multiPartyComm.ActiveMQMultiPartyCommunicationSetup;
+    import edu.biu.scapi.multiPartyComm.MultipartyCommunicationSetup; 
+
+	//Prepare the parties list.
+	LoadQueueParties loadParties = new LoadQueueParties("MultiPartyQueueParties1.properties");
+    List<PartyData> listOfParties = loadParties.getPartiesList();
+		
+	//Create the communication setup class.
+	MultipartyCommunicationSetup commSetup = new ActiveMQMultipartyCommunicationSetup(loadParties.getURL(), listOfParties);
+		
+	//Request two chanels between me and each other party.	
+	HashMap<PartyData, Object> connectionsPerParty = new HashMap<PartyData, Object>();
+	connectionsPerParty.put(listOfParties.get(1), 2);
+	connectionsPerParty.put(listOfParties.get(2), 2);
+
+	//Call the prepareForCommunication function to establish the connections within 2000000 milliseconds.
+	Map<PartyData, Map<String, Channel>> connections = commSetup.prepareForCommunication(connectionsPerParty, 2000000);
+		
+	//Returns the channels to the other parties. 
+	return connections;
+
+And an example to :java:ref:`SSLActiveMQMultipartyCommunicationSetup` class:
+
+.. code-block:: java
+
+	import java.util.List;
+    import java.util.Map;
+
+	import edu.biu.scapi.comm.Channel;
+    import edu.biu.scapi.exceptions.DuplicatePartyException;
+    import edu.biu.scapi.twoPartyComm.LoadQueueParties;
+    import edu.biu.scapi.twoPartyComm.PartyData;
+    import edu.biu.scapi.multiPartyComm.ActiveMQMultiPartyCommunicationSetup;
+    import edu.biu.scapi.multiPartyComm.MultipartyCommunicationSetup; 
+
+	//Prepare the parties list.
+	LoadQueueParties loadParties = new LoadQueueParties("MultiPartySSLQueueParties1.properties");
+	List<PartyData> listOfParties = loadParties.getPartiesList();
+		
+	//Create the communication setup class.
+	MultipartyCommunicationSetup commSetup = new SSLActiveMQMultipartyCommunicationSetup(loadParties.getURL(), listOfParties,"changeit");
+	
+	//Request two chanels between me and each other party.		
+	HashMap<PartyData, Object> connectionsPerParty = new HashMap<PartyData, Object>();
+	connectionsPerParty.put(listOfParties.get(1), 2);
+	connectionsPerParty.put(listOfParties.get(2), 2);
+	
+	//Call the prepareForCommunication function to establish the connections within 2000000 milliseconds.
+	Map<PartyData, Map<String, Channel>> connections = commSetup.prepareForCommunication(connectionsPerParty, 2000000);
+	
+	//Returns the channels to the other parties. 
+	return connections;
+
+
+.. _`connecting success`: 
 
 Verifying that the connections were established
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 In two-party protocols, success means that all requested channels have been established between the parties. The output from the prepareForCommunication function is a map containing the established channels.
+
+In multi-party protocols, different computations may require different types of success when checking the connections between all the parties that were supposed to participate. Some protocols may need to make sure that absolutely all parties participating in it have established connections one with another; other protocols may need only a certain percentage of connections to have succeeded. In the current multiparty communication setup implementation, we implement success as all requested channels have been established. In the future we may support different levels of success.
 
 In case a timeout has occurred before all requested channels have been connected, all connected channels will be closed and a ``ScapiRuntimeException`` will be thrown.
 
 Closing the connection
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The application is responsible for closing the communicationSetup class that creates the channels. This is because this class may contain some members that need to be closed. For example, the :java:ref:`QueueCommunicationSetup` has the JMS Connection object as a class member, and this must be closed at the end of the setup.
 
 Needless to say, the application must also close each created channel when it is no longer needed.
-
-
-Multiparty communication
------------------------------------------------------------
-
-The multiparty communication layer will be updated soon to be based on the two-party communication layer. Meanwhile, the description below is for the old implementation which will soon be deprecated.
-
-Fetch the list of parties from a properties file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The first thing that needs to be done to obtain communication services is to setup the connections between the different parties. Each party needs to run the setup process at the end of which the established connections are obtained. The established connections are called *channels*. The list of parties and their addresses are usually obtained from a Properties file. For example, here is a properties file called *Parties0.properties*: ::
-
-    # A configuration file for the parties
-
-    NumOfParties = 2
-
-    IP0 = 127.0.0.1
-    IP1 = 127.0.0.1
-
-    Port0 = 8001
-    Port1 = 8000
-
-In order to read this file, we can use the ``LoadParties`` class:
-
-.. code-block:: java
-
-    import edu.biu.scapi.comm.Party;
-    import edu.biu.scapi.comm.LoadParties;
-    
-    LoadParties loadParties = new LoadParties("Parties0.properties");
-    List<Party> listOfParties = loadParties.getPartiesList();
-
-Each party is represented by an instance of the ``Party`` class. A ``List<Party>`` object is required in the `multiParty communication setup phase`_.
-
-.. _`multiParty communication setup phase`:
-
-Setup communication to other parties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``CommunicationSetup`` Class is responsible for establishing secure communication to other parties. An application requesting from ``CommunicationSetup`` to prepare for communication needs to call the ``CommunicationSetup::prepareForCommunication()`` function:
-
-.. java:type:: public class CommunicationSetup implements TimeoutObserver
-    :package: edu.biu.scapi.comm
-
-CommunicationSetup implements the org.apache.commons.exec.TimeoutObserver interface. This interface supplies a mechanism for notifying classes that a timeout has arrived.
-
-.. java:method:: Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, ConnectivitySuccessVerifier successLevel, long timeOut, boolean enableNagle)
-    :outertype: CommunicationSetup
-
-    :param List<Party> listOfParties: The list of parties to connect to. As a convention, we will set the first party in the list to be the requesting party, that is, the party represented by the application.
-    :param ConnectivitySuccessVerifier successLevel: The type of `multi party connecting success`_ required.
-    :param long timeOut: A time-out (in milliseconds) specifying how long to wait for connections to be established and secured.
-    :param boolean enableNagle: Whether or not `Nagle's algorithm <http://en.wikipedia.org/wiki/Nagle's_algorithm>` can be enabled.
-    :return: a map of the established channels.
-
-Here is an example on how to use the `CommunicationSetup` class, we leave the discussion about the `ConnectivitySuccessVerifier` instance to the next section.
-
-.. code-block:: java
-
-    import java.net.InetSocketAddress;
-    import java.util.List;
-    import java.util.Map;
-
-    import edu.biu.scapi.comm.Party;
-    import edu.biu.scapi.comm.LoadParties;
-
-    import edu.biu.scapi.comm.Channel;
-    import edu.biu.scapi.comm.CommunicationSetup;
-
-    import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
-    import edu.biu.scapi.comm.NaiveSuccess;
-
-    //Prepare the parties list.
-    LoadParties loadParties = new LoadParties("Parties0.properties");
-    List<Party> listOfParties = loadParties.getPartiesList();
-    
-    //Create the communication setup.
-    CommunicationSetup commSetup = new CommunicationSetup();
-    
-    //Choose the naive connectivity success algorithm.
-    ConnectivitySuccessVerifier naive = new NaiveSuccess();
-    
-    long timeoutInMs = 60000; //The maximum amount of time we are willing to wait to set a connection.
-    
-    Map<InetSocketAddress, Channel> map = commSetup.prepareForCommunication(listOfParties, naive, timeoutInMs);
-    
-    // prepareForCommunication() returns a map with all the established channels,
-    // we return only the first one since this code assumes the two-party case.
-    return map.values().iterator().next();
-
-.. _`multi party connecting success`: 
-
-Verifying that the connections were established
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Different Multi-parties computations may require different types of success when checking the connections between all the parties that were supposed to participate. Some protocols may need to make sure that absolutely all parties participating in it have established connections one with another; other protocols may need only a certain percentage of connections to have succeeded. There are many possibilities and each one of them is represented by a class implementing the ``ConnectivitySuccessVerifier`` interface. The different classes that implement this interface will run different algorithms to verify the level of success of the connections. It is up to the user of the ``CommunicationSetup`` class to choose the relevant level and pass it on to the ``CommunicationSetup`` upon calling the ``prepareForCommuncation`` function.
-
-.. java:type:: public interface ConnectivitySuccessVerifier
-   :package: edu.biu.scapi.comm
-
-.. java:method:: public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties)
-   :outertype: ConnectivitySuccessVerifier
-
-   This function gets the information about the established connections as input and the original list of parties, then it runs a certain algorithm (determined by the implementing class), and it returns true or false according to the level of connectivity checked by the implementing algorithm.
-
-   :param estCon: the actual established connections
-   :param originalListOfParties: the original list of parties to connect to
-   :return: ``true`` if the level of connectivity was reached (depends on implementing algorithm) and ``false`` otherwise.
-   
-Naive
-^^^^^^
-
-.. java:type:: public class NaiveSuccess implements ConnectivitySuccessVerifier
-   :package: edu.biu.scapi.comm
-
-NaiveSuccess does not actually check the connections but rather always returns true. It can be used when there is no need to verify any level of success in establishing the connections.
-
-Clique
-^^^^^^^
-
-.. java:type:: public class CliqueSuccess implements ConnectivitySuccessVerifier
-   :package: edu.biu.scapi.comm
-
-   **For future implementation.**
-   
-   * Check if connected to all parties in original list.
-   * Ask every party if they are connected to all parties in their list.
-   * If all answers are true, return true,
-   * Else, return false.
-
-SecureClique
-^^^^^^^^^^^^^
-
-.. java:type:: public class SecureCliqueSuccess implements ConnectivitySuccessVerifier
-   :package: edu.biu.scapi.comm
-
-   **For future implementation.**
-   
-   * Check if connected to all parties in original list.
-   * Ask every party if they are connected to all parties in their list. USE SECURE BROADCAST. DO NOT TRUST THE OTHER PARTIES.
-   * If all answers are true, return true,
-   * Else, return false.
 
 ----------------------------------
 Using an established connection
@@ -893,3 +991,150 @@ We now provide an example of both encrypted and authenticated communication. Thi
 	return secureChannel;
     }
 
+
+
+
+
+
+
+	
+Multiparty communication
+-----------------------------------------------------------
+
+The multiparty communication layer will be updated soon to be based on the two-party communication layer. Meanwhile, the description below is for the old implementation which will soon be deprecated.
+
+Fetch the list of parties from a properties file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The first thing that needs to be done to obtain communication services is to setup the connections between the different parties. Each party needs to run the setup process at the end of which the established connections are obtained. The established connections are called *channels*. The list of parties and their addresses are usually obtained from a Properties file. For example, here is a properties file called *Parties0.properties*: ::
+
+    # A configuration file for the parties
+
+    NumOfParties = 2
+
+    IP0 = 127.0.0.1
+    IP1 = 127.0.0.1
+
+    Port0 = 8001
+    Port1 = 8000
+
+In order to read this file, we can use the ``LoadParties`` class:
+
+.. code-block:: java
+
+    import edu.biu.scapi.comm.Party;
+    import edu.biu.scapi.comm.LoadParties;
+    
+    LoadParties loadParties = new LoadParties("Parties0.properties");
+    List<Party> listOfParties = loadParties.getPartiesList();
+
+Each party is represented by an instance of the ``Party`` class. A ``List<Party>`` object is required in the `multiParty communication setup phase`_.
+
+.. _`multiParty communication setup phase`:
+
+Setup communication to other parties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``CommunicationSetup`` Class is responsible for establishing secure communication to other parties. An application requesting from ``CommunicationSetup`` to prepare for communication needs to call the ``CommunicationSetup::prepareForCommunication()`` function:
+
+.. java:type:: public class CommunicationSetup implements TimeoutObserver
+    :package: edu.biu.scapi.comm
+
+CommunicationSetup implements the org.apache.commons.exec.TimeoutObserver interface. This interface supplies a mechanism for notifying classes that a timeout has arrived.
+
+.. java:method:: Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, ConnectivitySuccessVerifier successLevel, long timeOut, boolean enableNagle)
+    :outertype: CommunicationSetup
+
+    :param List<Party> listOfParties: The list of parties to connect to. As a convention, we will set the first party in the list to be the requesting party, that is, the party represented by the application.
+    :param ConnectivitySuccessVerifier successLevel: The type of `multi party connecting success`_ required.
+    :param long timeOut: A time-out (in milliseconds) specifying how long to wait for connections to be established and secured.
+    :param boolean enableNagle: Whether or not `Nagle's algorithm <http://en.wikipedia.org/wiki/Nagle's_algorithm>` can be enabled.
+    :return: a map of the established channels.
+
+Here is an example on how to use the `CommunicationSetup` class, we leave the discussion about the `ConnectivitySuccessVerifier` instance to the next section.
+
+.. code-block:: java
+
+    import java.net.InetSocketAddress;
+    import java.util.List;
+    import java.util.Map;
+
+    import edu.biu.scapi.comm.Party;
+    import edu.biu.scapi.comm.LoadParties;
+
+    import edu.biu.scapi.comm.Channel;
+    import edu.biu.scapi.comm.CommunicationSetup;
+
+    import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
+    import edu.biu.scapi.comm.NaiveSuccess;
+
+    //Prepare the parties list.
+    LoadParties loadParties = new LoadParties("Parties0.properties");
+    List<Party> listOfParties = loadParties.getPartiesList();
+    
+    //Create the communication setup.
+    CommunicationSetup commSetup = new CommunicationSetup();
+    
+    //Choose the naive connectivity success algorithm.
+    ConnectivitySuccessVerifier naive = new NaiveSuccess();
+    
+    long timeoutInMs = 60000; //The maximum amount of time we are willing to wait to set a connection.
+    
+    Map<InetSocketAddress, Channel> map = commSetup.prepareForCommunication(listOfParties, naive, timeoutInMs);
+    
+    // prepareForCommunication() returns a map with all the established channels,
+    // we return only the first one since this code assumes the two-party case.
+    return map.values().iterator().next();
+
+.. _`multi party connecting success`: 
+
+Verifying that the connections were established
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Different Multi-parties computations may require different types of success when checking the connections between all the parties that were supposed to participate. Some protocols may need to make sure that absolutely all parties participating in it have established connections one with another; other protocols may need only a certain percentage of connections to have succeeded. There are many possibilities and each one of them is represented by a class implementing the ``ConnectivitySuccessVerifier`` interface. The different classes that implement this interface will run different algorithms to verify the level of success of the connections. It is up to the user of the ``CommunicationSetup`` class to choose the relevant level and pass it on to the ``CommunicationSetup`` upon calling the ``prepareForCommuncation`` function.
+
+.. java:type:: public interface ConnectivitySuccessVerifier
+   :package: edu.biu.scapi.comm
+
+.. java:method:: public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties)
+   :outertype: ConnectivitySuccessVerifier
+
+   This function gets the information about the established connections as input and the original list of parties, then it runs a certain algorithm (determined by the implementing class), and it returns true or false according to the level of connectivity checked by the implementing algorithm.
+
+   :param estCon: the actual established connections
+   :param originalListOfParties: the original list of parties to connect to
+   :return: ``true`` if the level of connectivity was reached (depends on implementing algorithm) and ``false`` otherwise.
+   
+Naive
+^^^^^^
+
+.. java:type:: public class NaiveSuccess implements ConnectivitySuccessVerifier
+   :package: edu.biu.scapi.comm
+
+NaiveSuccess does not actually check the connections but rather always returns true. It can be used when there is no need to verify any level of success in establishing the connections.
+
+Clique
+^^^^^^^
+
+.. java:type:: public class CliqueSuccess implements ConnectivitySuccessVerifier
+   :package: edu.biu.scapi.comm
+
+   **For future implementation.**
+   
+   * Check if connected to all parties in original list.
+   * Ask every party if they are connected to all parties in their list.
+   * If all answers are true, return true,
+   * Else, return false.
+
+SecureClique
+^^^^^^^^^^^^^
+
+.. java:type:: public class SecureCliqueSuccess implements ConnectivitySuccessVerifier
+   :package: edu.biu.scapi.comm
+
+   **For future implementation.**
+   
+   * Check if connected to all parties in original list.
+   * Ask every party if they are connected to all parties in their list. USE SECURE BROADCAST. DO NOT TRUST THE OTHER PARTIES.
+   * If all answers are true, return true,
+   * Else, return false.

@@ -68,8 +68,8 @@ public class OTSemiHonestDDHBatchOnGroupElementSender extends OTSemiHonestDDHBat
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *	•   vi0 = xi0 * ki0
-	 *	•	vi1 = xi1 * ki1""
+	 *	  vi0 = xi0 * ki0
+	 *  	vi1 = xi1 * ki1""
 	 * @param input MUST be an instance of OTSBatchOnGroupElementInput
 	 * @param k1Arr 
 	 * @param k0Arr 

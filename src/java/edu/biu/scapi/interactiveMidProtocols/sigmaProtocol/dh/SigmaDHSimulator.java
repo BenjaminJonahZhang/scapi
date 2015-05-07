@@ -50,9 +50,9 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class SigmaDHSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
-		  	SAMPLE a random z <- Zq
-			COMPUTE a = g^z*u^(-e) and b = h^0z*v^(-e) (where –e here means –e mod q)
-			OUTPUT ((a,b),e,z)
+        SAMPLE a random z <- Zq
+        COMPUTE a = g^z*u^(-e) and b = h^0z*v^(-e) (where -e here means -e mod q)
+        OUTPUT ((a,b),e,z)
 	
 	*/
 
@@ -124,14 +124,14 @@ public class SigmaDHSimulator implements SigmaSimulator{
 		//Sample a random z <- Zq
 		BigInteger z = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//Compute a = g^z*u^(-e) (where –e here means –e mod q)
+		//Compute a = g^z*u^(-e) (where -e here means -e mod q)
 		GroupElement gToZ = dlog.exponentiate(dlog.getGenerator(), z);
 		BigInteger e = new BigInteger(1, challenge);
 		BigInteger minusE = dlog.getOrder().subtract(e);
 		GroupElement uToE = dlog.exponentiate(dhInput.getU(), minusE);
 		GroupElement a = dlog.multiplyGroupElements(gToZ, uToE);
 		
-		//Compute b = h^z*v^(-e) (where –e here means –e mod q)
+		//Compute b = h^z*v^(-e) (where -e here means -e mod q)
 		GroupElement hToZ = dlog.exponentiate(dhInput.getH(), z);
 		GroupElement vToE = dlog.exponentiate(dhInput.getV(), minusE);
 		GroupElement b = dlog.multiplyGroupElements(hToZ, vToE);

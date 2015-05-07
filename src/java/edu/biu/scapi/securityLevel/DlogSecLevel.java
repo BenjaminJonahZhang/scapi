@@ -27,7 +27,7 @@
 package edu.biu.scapi.securityLevel;
 
 /**
- * This hierarchy specifies the security level of a cyclic group in which “discrete log” hardness is assumed to hold. The levels in this hierarchy are Dlog, CDH and DDH.
+ * This hierarchy specifies the security level of a cyclic group in which discrete log hardness is assumed to hold. The levels in this hierarchy are Dlog, CDH and DDH.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

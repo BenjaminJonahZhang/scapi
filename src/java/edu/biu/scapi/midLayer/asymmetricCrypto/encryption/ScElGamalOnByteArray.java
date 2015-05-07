@@ -196,8 +196,8 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException {
 		/*  
 		 * Pseudo-code:
-		 * 	•	Calculate s = ciphertext.getC1() ^ x
-		 *	•	Calculate m = KDF(s) XOR ciphertext.getC2() 
+		 * 		Calculate s = ciphertext.getC1() ^ x
+		 *		Calculate m = KDF(s) XOR ciphertext.getC2() 
 		 */
 		
 		//If there is no private key, throws exception.

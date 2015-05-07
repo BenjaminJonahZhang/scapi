@@ -41,7 +41,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * Concrete implementation of Sigma Simulator.<p>
- * This implementation simulates the case that the prover convince a verifier that the input tuple (g1,…,gm,h1,…,hm) is an 
+ * This implementation simulates the case that the prover convince a verifier that the input tuple (g1,...,gm,h1,...,hm) is an 
  * extended Diffie-Hellman tuple, meaning that there exists a single w in Zq such that hi=gi^w for all i.<P>
  * 
  * The pseudo code of this protocol can be found in Protocol 1.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
@@ -53,8 +53,8 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE a random z <- Zq
-			For every i=1,…,m, COMPUTE ai = gi^z*hi^(-e) (where –e here means –e mod q)
-			OUTPUT ((a1,…,am),e,z)
+			For every i=1,...,m, COMPUTE ai = gi^z*hi^(-e) (where -e here means -e mod q)
+			OUTPUT ((a1,...,am),e,z)
 	*/
 
 	private DlogGroup dlog; 		//Underlying DlogGroup.
@@ -133,14 +133,14 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 		
 		// The simulation is: 
 		//	SAMPLE a random z <- Zq
-		//	For every i=1,…,m, COMPUTE ai = gi^z*hi^(-e) (where –e here means –e mod q)
-		//	OUTPUT ((a1,…,am),e,z)
+		//	For every i=1,...,m, COMPUTE ai = gi^z*hi^(-e) (where -e here means -e mod q)
+		//	OUTPUT ((a1,...,am),e,z)
 		
 		//Sample a random z <- Zq
 		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
 		BigInteger z = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//Compute -e (where –e here means –e mod q)
+		//Compute -e (where -e here means -e mod q)
 		BigInteger e = new BigInteger(1, challenge);
 		BigInteger minusE = dlog.getOrder().subtract(e);
 		
@@ -148,7 +148,7 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 		GroupElement gToZ;
 		GroupElement hToE;
 		GroupElement a;
-		//For every i=1,…,m, Compute ai = gi^z*hi^(-e) 
+		//For every i=1,...,m, Compute ai = gi^z*hi^(-e) 
 		for (int i=0; i<size; i++){
 			
 			gToZ = dlog.exponentiate(gArray.get(i), z);

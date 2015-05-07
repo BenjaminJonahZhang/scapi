@@ -77,13 +77,13 @@ public abstract class OTFullSimReceiverTransferUtilAbs {
 	 *		WAIT for messages (u0,c0) and (u1,c1) from S<p>
 	 *		In ByteArray scenario:<p>
 	 *		IF  NOT<p>
-	 *		•	u0, u1 in G, AND<p>
-	 *		•	c0, c1 are binary strings of the same length<p>
+	 *			u0, u1 in G, AND<p>
+	 *			c0, c1 are binary strings of the same length<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)<p>
 	 *		In GroupElement scenario:<p>
 	 *		IF  NOT<p>
-	 *		•	u0, u1, c0, c1 in G<p>
+	 *			u0, u1, c0, c1 in G<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
 	 * This is the transfer stage of OT protocol which can be called several times in parallel.<p>

@@ -51,8 +51,8 @@ public class SigmaElGamalCommittedValueVerifierComputation implements SigmaVerif
 
 	/*	
 	  This class uses an instance of SigmaDHVerifier with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
+        Common parameters (G,q,g) and t
+        Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/	
 	
 	private SigmaDHVerifierComputation sigmaDH;	//underlying SigmaDHVerifier to use.

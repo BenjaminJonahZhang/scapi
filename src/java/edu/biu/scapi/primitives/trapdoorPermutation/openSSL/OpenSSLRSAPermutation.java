@@ -281,7 +281,7 @@ public final class OpenSSLRSAPermutation extends TrapdoorPermutationAbs implemen
 	 * There are three possible validity values: 
 	 * VALID (it is an element)
 	 * NOT_VALID (it is not an element)
-	 * DON’T_KNOW (there is not enough information to check if it is an element or not)  
+	 * DONT_KNOW (there is not enough information to check if it is an element or not)  
 	 * @throws IllegalArgumentException if the given element is not a RSA element.
 	 */
 	public TPElValidity isElement(TPElement tpEl) throws IllegalArgumentException{

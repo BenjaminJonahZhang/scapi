@@ -58,8 +58,8 @@ public class SigmaCramerShoupEncryptedValueVerifierComputation implements SigmaV
 	/*	
 	  This class uses an instance of SigmaDHExtendedVerifier with:
 	  
-	  		•	Common DlogGroup
-			•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
+        Common DlogGroup
+        Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 	*/	
 	
 	private SigmaDHExtendedVerifierComputation sigmaDH;		//underlying SigmaDHExtendedVerifier to use.

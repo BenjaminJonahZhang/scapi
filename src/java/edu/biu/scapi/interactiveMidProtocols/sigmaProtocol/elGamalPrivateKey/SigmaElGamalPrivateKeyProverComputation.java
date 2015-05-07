@@ -50,8 +50,8 @@ public class SigmaElGamalPrivateKeyProverComputation implements SigmaProverCompu
 	
 	/*	
 	  This class uses an instance of SigmaDlogProver with:
-	  	•	Common DlogGroup
-		•	input: h (the public key) and a value w<- Zq such that h=g^w (the private key).
+        Common DlogGroup
+        input: h (the public key) and a value w<- Zq such that h=g^w (the private key).
 	
 	*/	 
 	

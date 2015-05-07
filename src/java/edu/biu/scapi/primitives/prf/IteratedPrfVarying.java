@@ -100,7 +100,7 @@ public class IteratedPrfVarying extends PrfVaryingFromPrfVaryingInput {
 	 *	Let m be the smallest integer for which L*m > outlen, where L is the output length of the PrfVaryingInputLength. 
 	 *	FOR i = 1 to m 
 	 *	compute Yi = PrfVaryingInputLength(k,(x,outlen,i)) [key=k, data=(x,outlen,i)] 
-	 *	return the first outlen bits of Y1,…,Ym  
+	 *	return the first outlen bits of Y1,-,Ym  
 	 * 
 	 * This function is necessary since this prf has variable input and output length.
 	 * @param inBytes - input bytes to compute

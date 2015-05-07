@@ -49,8 +49,8 @@ public class SigmaElGamalPrivateKeyVerifierComputation implements SigmaVerifierC
 
 	/*	
 	  This class uses an instance of SigmaDlogVerifier with:
-	  	•	Common DlogGroup
-		•	Common input: h (the public key).
+        Common DlogGroup
+        Common input: h (the public key).
 	
 	*/	
 	

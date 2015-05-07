@@ -52,11 +52,11 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	  the secret key or it knows the randomness used to generate the ciphertext.
 	  
 	  This class uses an instance of SigmaDHSimulator with:
-	  	•	Common DlogGroup
-	  	In case we use knowledge of the private key:
-			•	Common input: (g,h,u,v) = (g,c1,h,c2/x) and
-		In case we use knowledge of the randomness used to encrypt:
-			•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
+        Common DlogGroup
+        In case we use knowledge of the private key:
+          Common input: (g,h,u,v) = (g,c1,h,c2/x) and
+        In case we use knowledge of the randomness used to encrypt:
+          Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/
 	
 	private SigmaDHSimulator dhSim; //underlying SigmaDHSimulator to use.

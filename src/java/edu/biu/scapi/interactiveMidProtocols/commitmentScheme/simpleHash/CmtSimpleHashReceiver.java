@@ -64,8 +64,8 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	 *	Decommit phase
 	 *		WAIT for (r, x)  from C
 	 *		IF NOT
-	 *		•	c = H(r,x), AND
-	 *		•	x <- {0, 1}^t
+	 *			c = H(r,x), AND
+	 *			x <- {0, 1}^t
 	 *		      OUTPUT REJ
 	 *		ELSE
 	 *		      OUTPUT ACC and value x"	 
@@ -131,8 +131,8 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	 * Run the decommit phase of the protocol:
 	 * "WAIT for (r, x)  from C
 	 *	IF NOT
-	 *	•	c = H(r,x), AND
-	 *	•	x <- {0, 1}^t
+	 *		c = H(r,x), AND
+	 *		x <- {0, 1}^t
 	 *		OUTPUT REJ
 	 *	ELSE
 	 *	  	OUTPUT ACC and value x".

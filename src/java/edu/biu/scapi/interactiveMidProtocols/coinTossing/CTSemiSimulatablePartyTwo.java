@@ -41,7 +41,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * This class plays as party two of coin tossing protocol which tosses a string.<p>
- * This protocol is fully secure (with simulation) when P1 is corrupted and fulfills a definition of “pseudorandomness” when P2 is corrupted. <p>
+ * This protocol is fully secure (with simulation) when P1 is corrupted and fulfills a definition of "pseudorandomness" when P2 is corrupted. <p>
  * 
  * This protocol uses any perfectly-hiding commitment scheme (e.g., COMMIT_PEDERSEN,  COMMIT_HASH_PEDERSEN, COMMIT_HASH) 
  * and any perfectly-binding commitment scheme (e.g., COMMIT_ELGAMAL). <P>

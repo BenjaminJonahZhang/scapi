@@ -48,9 +48,9 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
-		  	SAMPLE random values u, v in Zq  
-			COMPUTE a = h^u*g^v*c^(-e) (where –e here means –e mod q)
-			OUTPUT (a,e,(u,v))
+        SAMPLE random values u, v in Zq  
+        COMPUTE a = h^u*g^v*c^(-e) (where -e here means -e mod q)
+        OUTPUT (a,e,(u,v))
 	*/
 
 	private DlogGroup dlog; 		//Underlying DlogGroup.
@@ -110,7 +110,7 @@ public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 	 */
 	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		//  SAMPLE random values u, v in Zq  
-		//	COMPUTE a = h^u*g^v*c^(-e) (where –e here means –e mod q)
+		//	COMPUTE a = h^u*g^v*c^(-e) (where -e here means -e mod q)
 		//	OUTPUT (a,e,(u,v))
 		//
 		
@@ -129,7 +129,7 @@ public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 		BigInteger u = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		BigInteger v = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//COMPUTE a = h^u*g^v*c^(-e) (where –e here means –e mod q)
+		//COMPUTE a = h^u*g^v*c^(-e) (where -e here means -e mod q)
 		//Compute h^u
 		GroupElement hToU = dlog.exponentiate(params.getH(), u);
 		//Compute g^v

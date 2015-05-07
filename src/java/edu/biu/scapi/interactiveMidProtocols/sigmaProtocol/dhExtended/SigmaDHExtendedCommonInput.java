@@ -33,7 +33,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtended verifier and simulator.<p>
- * In SigmaProtocolDHExtended, the common input contains an extended DH tuple - (g1,…,gm,h1,…,hm).
+ * In SigmaProtocolDHExtended, the common input contains an extended DH tuple - (g1,...,gm,h1,...,hm).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

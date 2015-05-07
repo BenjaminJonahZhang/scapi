@@ -51,8 +51,8 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	  Since c = g^r*h^x, it suffices to prove knowledge of r s.t. g^r = c*h^(-x). This is just a DLOG Sigma protocol.
 	  
 	  This class uses an instance of SigmaDlogSimulator with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: h’ = c*h^(-x) 
+        Common parameters (G,q,g) and t
+        Common input: h' = c*h^(-x) 
 	*/
 
 	private SigmaDlogSimulator dlogSim; 	//underlying SigmaDlogSimulator to use.
@@ -142,7 +142,7 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 		}
 		SigmaPedersenCommittedValueCommonInput params = (SigmaPedersenCommittedValueCommonInput) in;
 		
-		//Convert the input to the underlying Dlog prover. h’ = c*h^(-x).
+		//Convert the input to the underlying Dlog prover. h' = c*h^(-x).
 		BigInteger minusX = dlog.getOrder().subtract(params.getX());
 		GroupElement hToX = dlog.exponentiate(params.getH(), minusX);
 		GroupElement c = params.getCommitment();

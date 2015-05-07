@@ -52,8 +52,8 @@ public class SigmaPedersenCommittedValueVerifierComputation implements SigmaVeri
 	  Since c = g^r*h^x, it suffices to prove knowledge of r s.t. g^r = c*h^(-x). This is just a DLOG Sigma protocol.
 	  
 	  This class uses an instance of SigmaDlogProver with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: h’ = c*h^(-x) 
+        Common parameters (G,q,g) and t
+        Common input: h' = c*h^(-x) 
 	*/
 	
 	private SigmaDlogVerifierComputation sigmaDlog;	//underlying SigmaDlogVerifier to use.
@@ -94,7 +94,7 @@ public class SigmaPedersenCommittedValueVerifierComputation implements SigmaVeri
 		}
 		SigmaPedersenCommittedValueCommonInput input = (SigmaPedersenCommittedValueCommonInput) in;
 		
-		//Convert the input to the underlying Dlog prover. h’ = c*h^(-x).
+		//Convert the input to the underlying Dlog prover. h' = c*h^(-x).
 		BigInteger minusX = dlog.getOrder().subtract(input.getX());
 		GroupElement hToX = dlog.exponentiate(input.getH(), minusX);
 		GroupElement c = input.getCommitment();

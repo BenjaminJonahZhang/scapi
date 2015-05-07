@@ -225,7 +225,7 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 		}
 
 		// A point (x, y) is a member of a Dlog group with prime order q over an Elliptic Curve if it meets the following two conditions:
-		// 1)	P = (x,y) is a point in the Elliptic curve, i.e (x,y) is a solution of the curve’s equation.
+		// 1)	P = (x,y) is a point in the Elliptic curve, i.e (x,y) is a solution of the curves equation.
 		// 2)	P = (x,y) is a point in the q-order group which is a sub-group of the Elliptic Curve.
 		// Those two checks are done in two steps:
 		// 1.	Checking that the point is on the curve, performed by checkCurveMembership.

@@ -50,7 +50,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE random values z1 <- ZN, z2 <- Z*n, z3 <- Z*n
-			COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N’ AND a2 = c2^z1/(z3^N*c3^e) mod N’
+			COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N' AND a2 = c2^z1/(z3^N*c3^e) mod N'
 			OUTPUT (a,e,z) where a = (a1,a2) AND z=(z1,z2,z3)
 
 	*/
@@ -113,7 +113,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		/*
 		 * SAMPLE random values z1 <- ZN, z2 <- Z*n, z3 <- Z*n
-		 * COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N’ AND a2 = c2^z1/(z3^N*c3^e) mod N’
+		 * COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N' AND a2 = c2^z1/(z3^N*c3^e) mod N'
 		 * OUTPUT (a,e,z) where a = (a1,a2) AND z=(z1,z2,z3)
 		 */
 		
@@ -147,7 +147,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 		//Create the BigInteger value out of the challenge.
 		BigInteger e = new BigInteger(1, challenge);
 		
-		//Compute a1 = (1+n)^z1*(z2^N/c1^e) mod N’
+		//Compute a1 = (1+n)^z1*(z2^N/c1^e) mod N'
 		BigInteger nPlusOne = n.add(BigInteger.ONE);
 		BigInteger leftMul = nPlusOne.modPow(z1, NTag);
 		BigInteger z2ToN = z2.modPow(N, NTag);
@@ -156,7 +156,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 		BigInteger rightMul = z2ToN.multiply(denomInv).mod(NTag);
 		BigInteger a1 = leftMul.multiply(rightMul).mod(NTag);
 		
-		//Compute a2 = c2^z1/(z3^N*c3^e) mod N’
+		//Compute a2 = c2^z1/(z3^N*c3^e) mod N'
 		BigInteger c2ToZ1 = djInput.getC2().getCipher().modPow(z1, NTag);
 		BigInteger z3ToN = z3.modPow(N, NTag);
 		BigInteger c3ToE = djInput.getC3().getCipher().modPow(e, NTag);

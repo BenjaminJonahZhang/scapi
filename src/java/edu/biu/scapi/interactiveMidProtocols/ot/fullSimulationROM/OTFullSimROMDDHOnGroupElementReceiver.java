@@ -180,7 +180,7 @@ public class OTFullSimROMDDHOnGroupElementReceiver implements OTReceiver, Malici
 	 *		SEND (g,h) to S<p>
 	 *		WAIT for messages (u0,c0) and (u1,c1) from S<p>
 	 *		IF  NOT<p>
-	 *		•	u0, u1, c0, c1 in G<p>
+	 *			u0, u1, c0, c1 in G<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
 	 */

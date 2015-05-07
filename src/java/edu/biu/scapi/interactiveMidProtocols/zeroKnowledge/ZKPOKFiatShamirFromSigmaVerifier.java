@@ -104,8 +104,8 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	 * This function computes the following calculations:<p>
 	 *
 	 *		IF<p>
-	 *			•	e=H(x,a,cont), AND<p>
-	 *			•	Transcript (a, e, z) is accepting in sigma on input x<p>
+	 *				e=H(x,a,cont), AND<p>
+	 *				Transcript (a, e, z) is accepting in sigma on input x<p>
 	 *     		OUTPUT ACC<p>
 	 *     ELSE<p>
 	 *          OUTPUT REJ<p>

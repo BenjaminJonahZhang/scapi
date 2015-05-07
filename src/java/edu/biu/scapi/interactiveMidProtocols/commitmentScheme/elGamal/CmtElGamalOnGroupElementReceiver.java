@@ -103,9 +103,9 @@ public class CmtElGamalOnGroupElementReceiver extends CmtElGamalReceiverCore imp
 	/**
 	 * Proccesses the decommitment phase.<p>
 	 * "IF NOT<p>
-	 *	•	u=g^r <p>
-	 *	•	v = h^r * x<p>
-	 *	•	x in G<p>
+	 *		u=g^r <p>
+	 *		v = h^r * x<p>
+	 *		x in G<p>
 	 *		OUTPUT REJ<p>
 	 *	ELSE<p>
 	 *	    OUTPUT ACC and value x"<p>

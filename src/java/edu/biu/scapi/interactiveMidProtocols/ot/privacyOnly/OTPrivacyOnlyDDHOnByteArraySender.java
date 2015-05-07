@@ -82,8 +82,8 @@ public class OTPrivacyOnlyDDHOnByteArraySender extends OTPrivacyOnlyDDHSenderAbs
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	c0 = x0 XOR KDF(|x0|,k0)
-	 *		•	c1 = x1 XOR KDF(|x1|,k1)"
+	 *			c0 = x0 XOR KDF(|x0|,k0)
+	 *			c1 = x1 XOR KDF(|x1|,k1)"
 	 * @param input MUST be OTSOnByteArrayInput with x0, x1 of the same arbitrary length.
 	 * @param k1 
 	 * @param k0 

@@ -282,9 +282,9 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 		}
 		/* 
 		 * Pseudo-code:
-		 * 	•	Choose a random  y <- Zq.
-		 *	•	Calculate c1 = g^y mod p //Mod p operation are performed automatically by the group.
-		 *	•	Calculate c2 = h^y * plaintext.getElement() mod p // For ElGamal on a GroupElement.
+		 * 		Choose a random  y <- Zq.
+		 *		Calculate c1 = g^y mod p //Mod p operation are performed automatically by the group.
+		 *		Calculate c2 = h^y * plaintext.getElement() mod p // For ElGamal on a GroupElement.
 		 *					OR KDF(h^y) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
 		 */
 		//Chooses a random value y<-Zq.
@@ -310,8 +310,8 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 		
 		/* 
 		 * Pseudo-code:
-		 *	•	Calculate c1 = g^r mod p //Mod p operation are performed automatically by the group.
-		 *	•	Calculate c2 = h^r * plaintext.getElement() mod p // For ElGamal on a GroupElement.
+		 *		Calculate c1 = g^r mod p //Mod p operation are performed automatically by the group.
+		 *		Calculate c2 = h^r * plaintext.getElement() mod p // For ElGamal on a GroupElement.
 		 *					OR KDF(h^r) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
 		 */
 		

@@ -52,9 +52,9 @@ public class SigmaElGamalCommittedValueProverComputation implements SigmaProverC
 
 	/*	
 	  This class uses an instance of SigmaDHProver with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
-		•	P’s private input: a value r in Zq such that c1=g^r and c2/x =h^r
+        Common parameters (G,q,g) and t
+        Common input: (g,h,u,v) = (g,h,c1,c2/x)
+        P's private input: a value r in Zq such that c1=g^r and c2/x =h^r
 
 	*/	 
 	

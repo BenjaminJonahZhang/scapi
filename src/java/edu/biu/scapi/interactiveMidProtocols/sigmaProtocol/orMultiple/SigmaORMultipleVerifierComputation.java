@@ -49,10 +49,10 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	/*	
 	  Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi 
 	  This class computes the following calculations:
-		WAIT for messages a1,…,an
+		WAIT for messages a1,...,an
 		SAMPLE a single random challenge  e <- GF[2^t]
 		
-		ACC IFF Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e, and the verifier output on (ai,ei,zi) for all i=1,…,n is ACC
+		ACC IFF Q is of degree n-k AND Q(i)=ei for all i=1,...,n AND Q(0)=e, and the verifier output on (ai,ei,zi) for all i=1,...,n is ACC
        
 	*/
 	
@@ -70,7 +70,7 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	//Samples the challenge as a field element.
 	private native byte[] sampleChallenge(long[] pointer);
 	
-	//Checks if Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e. This function also deletes the allocated memory.
+	//Checks if Q is of degree n-k AND Q(i)=ei for all i=1,...,n AND Q(0)=e. This function also deletes the allocated memory.
 	private native boolean checkPolynomialValidity(byte[][] polynomial, int k, long challengePointer, byte[][] challenges);
 	
 	//Sets the given challenge in the field.
@@ -195,7 +195,7 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 
 	/**
 	 * Computes the verification of the protocol.<p>
-	 * 	"ACC IFF Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e, and the verifier output on (ai,ei,zi) for all i=1,…,n is ACC".
+	 * 	"ACC IFF Q is of degree n-k AND Q(i)=ei for all i=1,...,n AND Q(0)=e, and the verifier output on (ai,ei,zi) for all i=1,...,n is ACC".
 	 * @param input MUST be an instance of SigmaORMultipleCommonInput.
 	 * @param a first message from prover
 	 * @param z second message from prover

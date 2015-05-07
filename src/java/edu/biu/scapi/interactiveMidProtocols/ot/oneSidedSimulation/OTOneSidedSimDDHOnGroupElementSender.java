@@ -77,8 +77,8 @@ public class OTOneSidedSimDDHOnGroupElementSender extends OTOneSidedSimDDHSender
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	c0 = x0 * k0
-	 *		•	c1 = x1 * k1"
+	 *			c0 = x0 * k0
+	 *			c1 = x1 * k1"
 	 * @param input MUST be OTSOnGroupElementInput.
 	 * @param w0
 	 * @param w1

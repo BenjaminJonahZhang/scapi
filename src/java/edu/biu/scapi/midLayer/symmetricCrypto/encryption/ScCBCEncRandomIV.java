@@ -147,8 +147,8 @@ public class ScCBCEncRandomIV extends EncWithIVAbs implements CBCEnc {
 	@Override
 	public Plaintext decrypt(SymmetricCiphertext ciphertext) {
 		/* The algorithm pseudo-code is: 
-		 * 		•	plaintext[0] = prp.invert(cipher[0]) XOR IV
-		 *		•	For i from 1 to length of plaintext do:
+		 * 			plaintext[0] = prp.invert(cipher[0]) XOR IV
+		 *			For i from 1 to length of plaintext do:
 		 *			o	plaintext[i] : = prp.invert(cipher[i]) XOR ciphertext[i-1]
 		 */
 		if (!isKeySet()){
@@ -226,8 +226,8 @@ public class ScCBCEncRandomIV extends EncWithIVAbs implements CBCEnc {
 	@Override
 	protected IVCiphertext encAlg(byte[] plaintext, byte[] iv) {
 		/* The algorithm pseudo-code is: 
-		 * 		•	ciphertext[0] = prp.computeBlock(iv XOR plaintext[0])
-		 *		•	for next blocks in plaintext do: //i = 1
+		 * 			ciphertext[0] = prp.computeBlock(iv XOR plaintext[0])
+		 *			for next blocks in plaintext do: //i = 1
 		 *			o	ciphertext [i] = prp.computeBlock(ciphertext [i-1] XOR plaintext[i])
 		 */
 		byte[] paddedPlaintext; // Will contain the padded plaintext.

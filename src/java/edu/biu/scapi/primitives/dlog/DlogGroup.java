@@ -255,7 +255,7 @@ public interface DlogGroup {
 	
 	/**
 	 * This function returns the value <I>k</I> which is the maximum length of a string to be encoded to a Group Element of this group.<p>
-	 * Any string of length <I>k</I> has a numeric value that is less than (p-1)/2 – 1.
+	 * Any string of length <I>k</I> has a numeric value that is less than (p-1)/2 - 1.
 	 * <I>k</I> is the maximum length a binary string is allowed to be in order to encode the said binary string to a group element and vice-versa.<p>
 	 * If a string exceeds the <I>k</I> length it cannot be encoded.
 	 * @return k the maximum length of a string to be encoded to a Group Element of this group. k can be zero if there is no maximum.

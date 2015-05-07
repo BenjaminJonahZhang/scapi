@@ -49,8 +49,8 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDHSimulator with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
+        Common parameters (G,q,g) and t
+        Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/
 
 	private SigmaDHSimulator dhSim; 	//underlying SigmaDHSimulator to use.

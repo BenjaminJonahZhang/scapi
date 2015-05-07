@@ -79,8 +79,8 @@ public class OTSemiHonestDDHBatchOnByteArraySender extends OTSemiHonestDDHBatchS
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	v0 = x0 XOR KDF(|x0|,k0) 
-	 *		•	v1 = x1 XOR KDF(|x1|,k1)"
+	 *			v0 = x0 XOR KDF(|x0|,k0) 
+	 *			v1 = x1 XOR KDF(|x1|,k1)"
 	 * @param input MUST be an instance of OTSBatchOnByteArrayInput
 	 * @param k1Array
 	 * @param k0Array 

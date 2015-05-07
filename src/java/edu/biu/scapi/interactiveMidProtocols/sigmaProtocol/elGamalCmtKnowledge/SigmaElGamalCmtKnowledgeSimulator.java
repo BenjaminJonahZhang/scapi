@@ -48,8 +48,8 @@ public class SigmaElGamalCmtKnowledgeSimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDlogSimulator with:
-	  	•	Common parameters (G,q,g) and t
-		•	Common input: h (1st element of commitment)
+        Common parameters (G,q,g) and t
+        Common input: h (1st element of commitment)
 	*/
 
 	private SigmaDlogSimulator dlogSim; //underlying SigmaDlogSimulator to use.

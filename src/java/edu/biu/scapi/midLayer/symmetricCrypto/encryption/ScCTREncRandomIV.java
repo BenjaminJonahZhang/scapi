@@ -119,11 +119,11 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 	@Override
 	public Plaintext decrypt(SymmetricCiphertext ciphertext){
 		/* Pseudo-code:
-		 *    •	ctr = ciphertext.getIV
-		 *	  •	For every block in ciphertext (i = 0 to n-1) do:
+		 *    	ctr = ciphertext.getIV
+		 *	  	For every block in ciphertext (i = 0 to n-1) do:
 		 *		o	Plaintext[i] : = ciphertext[i] XOR prp.computeBlock(ctr)
 		 *		o	ctr  = ctr + 1 mod 2n
-		 *	  •	Return the plaintext.
+		 *	  	Return the plaintext.
 		 */
 		if (!isKeySet()){
 			throw new IllegalStateException("no SecretKey was set");
@@ -180,8 +180,8 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 	@Override
 	protected IVCiphertext encAlg(byte[] plaintext, byte[] iv) {
 		/* Pseudo-code:
-		 * 		•	ctr = iv
-		 *		•	For each block in plaintext do: //i = 0
+		 * 			ctr = iv
+		 *			For each block in plaintext do: //i = 0
 		 *			o	cipher[i] = prp.computeBlock(ctr) XOR plaintext[i]
 		 *			o	ctr = ctr +1 mod 2n
 		 */
@@ -220,8 +220,8 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 	 * If called by decrypt then the first two arguments refer to the cipher being processed and the resulting plaintext is written to "out". <p>
 	 * The data is not required to be aligned to the block size of this instance of the encryption scheme. If it is not, then the last part of the data needs special care.
 	 * Pseudo-code:
-	 * 		•out[i] = prp.computeBlock(ctr) XOR in[i]
-	 *		•ctr = ctr +1 mod 2n
+	 * 		out[i] = prp.computeBlock(ctr) XOR in[i]
+	 *		ctr = ctr +1 mod 2n
 	 * 
 	 * @param in a byte array containing the data to be processed
 	 * @param inOffset the offset in "in" byte array

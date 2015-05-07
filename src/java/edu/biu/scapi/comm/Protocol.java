@@ -34,9 +34,9 @@
  * Created by LabTest
  *
  * Any algorithm that needs to be run by an application as a protocol has to implement the Protocol Interface. It has three methods:
- * •	start(ProtocolInput); initialize input
- * •	run(); run the protocol
- * •	getOutput(); returns an object of type Output.
+ * start(ProtocolInput); initialize input
+ * run(); run the protocol
+ * getOutput(); returns an object of type Output.
  * Any necessary data has to be provided to the concrete protocol in the start() function as an object of type ProtocolInput. 
  * This data will be used inside the methods. Each protocol may have a specific type of ProtocolInput. 
  * Having the data passed to the protocol object in the start() function allows for repeated runs of the protocol such that in between 

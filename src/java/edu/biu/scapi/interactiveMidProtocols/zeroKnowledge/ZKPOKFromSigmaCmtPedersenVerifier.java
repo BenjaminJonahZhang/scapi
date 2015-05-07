@@ -86,8 +86,8 @@ public class ZKPOKFromSigmaCmtPedersenVerifier implements ZKPOKVerifier{
 	 *		 RUN TRAP_COMMIT.decommit as the decommitter<p>
 	 *		 WAIT for a message (z,trap) from P<p>
 	 *		 IF  <p>
-	 *			•	TRAP_COMMIT.valid(T,trap) = 1, where T  is the transcript from the commit phase, AND<p>
-	 *			•	Transcript (a, e, z) is accepting in sigma on input x<p>
+	 *				TRAP_COMMIT.valid(T,trap) = 1, where T  is the transcript from the commit phase, AND<p>
+	 *				Transcript (a, e, z) is accepting in sigma on input x<p>
 	 *          OUTPUT ACC<p>
 	 *       ELSE 	<p>
 	 *          OUTPUT REJ<p>

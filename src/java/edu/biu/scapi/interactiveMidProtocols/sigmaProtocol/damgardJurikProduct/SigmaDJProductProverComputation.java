@@ -51,7 +51,7 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n 
-		  	COMPUTE a1=(1+n)^drd^N mod N’ and a2=(1+n)^(d*x2)rdb^N mod N’ and SET a = (a1,a2)
+		  	COMPUTE a1=(1+n)^drd^N mod N' and a2=(1+n)^(d*x2)rdb^N mod N' and SET a = (a1,a2)
 			COMPUTE z1=e*x1+d mod N, z2 = r1^e*rd mod n, z3=(r2^z1)/(rdb*r3^e) mod n, and SET z=(z1,z2,z3)
 	*/	
 	
@@ -162,7 +162,7 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 	/**
 	 * Computes the first message of the protocol.<p>
 	 * "SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n<p>
-	 *  COMPUTE a1 = (1+n)^d*rd^N mod N’ and a2 = ((1+n)^(d*x2))*(rdb^N) mod N’ and SET a = (a1,a2)". 
+	 *  COMPUTE a1 = (1+n)^d*rd^N mod N' and a2 = ((1+n)^(d*x2))*(rdb^N) mod N' and SET a = (a1,a2)". 
 	 * @param input MUST be an instance of SigmaDJProductProverInput.
 	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductProverInput.
@@ -178,7 +178,7 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 		BigInteger nPlusOneToD = nPlusOne.modPow(d, NTag);
 		//Calculate rd^N
 		BigInteger rdToN = rd.modPow(N, NTag);
-		//Calculate a1=(1+n)^d*rd^N mod N’
+		//Calculate a1=(1+n)^d*rd^N mod N'
 		BigInteger a1 = nPlusOneToD.multiply(rdToN).mod(NTag);
 		
 		//Calculate (1+n)^(d*x2)
@@ -186,7 +186,7 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 		BigInteger nPlusOnePow = nPlusOne.modPow(exponent, NTag);
 		//Calculate rdb^N
 		BigInteger rdbToN = rdb.modPow(N, NTag);
-		//Calculate a2 = ((1+n)^(d*x2))*(rdb^N) mod N’
+		//Calculate a2 = ((1+n)^(d*x2))*(rdb^N) mod N'
 		BigInteger a2 = nPlusOnePow.multiply(rdbToN).mod(NTag);
 		
 		//Create and return SigmaDJProductFirstMsg with a1 and a2.

@@ -47,9 +47,9 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
 public class SigmaANDSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
-		  	SAMPLE random values z1 <- ZN, z2 <- Z*n, z3 <- Z*n
-			COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N’ AND a2 = c2^z1/(z3^N*c3^e) mod N’
-			OUTPUT (a,e,z) where a = (a1,a2) AND z=(z1,z2,z3)
+        SAMPLE random values z1 <- ZN, z2 <- Z*n, z3 <- Z*n
+        COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N' AND a2 = c2^z1/(z3^N*c3^e) mod N'
+        OUTPUT (a,e,z) where a = (a1,a2) AND z=(z1,z2,z3)
 
 	*/
 	

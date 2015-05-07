@@ -47,8 +47,8 @@ public class SigmaElGamalPrivateKeySimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDlogSimulator with:
-	  	•	Common DlogGroup
-		•	input: h (the public key).
+        Common DlogGroup
+        input: h (the public key).
 	*/
 
 	private SigmaDlogSimulator dlogSim; //underlying SigmaDlogSimulator to use.

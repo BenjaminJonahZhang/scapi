@@ -66,11 +66,11 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	 *		WAIT for (r, x)  from C
 	 *		Let c = (h,u,v); if not of this format, output REJ
 	 *		IF NOT
-	 *		•	VALID_PARAMS(G,q,g), AND
-	 *		•	h <-G, AND
-	 *		•	u=g^r 
-	 *		•	v = h^r * x
-	 *		•	x in G
+	 *			VALID_PARAMS(G,q,g), AND
+	 *			h <-G, AND
+	 *			u=g^r 
+	 *			v = h^r * x
+	 *			x in G
 	 *		      OUTPUT REJ
 	 *		ELSE
 	 *		      OUTPUT ACC and value x"
@@ -184,9 +184,9 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	 * "WAIT for (r, x)  from C<p>
 	 *	Let c = (h,u,v); if not of this format, output REJ<p>
 	 *	IF NOT<p>
-	 *	•	u=g^r <p>
-	 *	•	v = h^r * x<p>
-	 *	•	x in G<p>
+	 *		u=g^r <p>
+	 *		v = h^r * x<p>
+	 *		x in G<p>
 	 *		OUTPUT REJ<p>
 	 *	ELSE<p>
 	 *	    OUTPUT ACC and value x"

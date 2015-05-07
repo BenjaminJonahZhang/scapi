@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 							       baseOts, // base ots
 							       numOts); // total ots
     sender_interface->init_ot_sender();
-    cout << "finished initOtSender." << endl;
+    cerr << "finished initOtSender." << endl;
     
     // run ot as sender phase
     CBitVector delta, X1, X2;
@@ -35,14 +35,14 @@ int main(int argc, char** argv) {
 	X2.SetByte(i, rand() % 2);
     }
 
-    cout << "started receiver_interface->obliviously_send()" << endl;
+    cerr << "started receiver_interface->obliviously_send()" << endl;
     sender_interface->obliviously_send(X1, X2, numOts, bitLength, G_OT, masking_function); //, delta);
-    cout << "ended receiver_interface->obliviously_send()" << endl;
+    cerr << "ended receiver_interface->obliviously_send()" << endl;
     X1.delCBitVector();
     X2.delCBitVector();
     delta.delCBitVector();
 
-    cout << "ended runOtAsSender." << endl;
+    cerr << "ended runOtAsSender." << endl;
 
     delete sender_interface;
 }

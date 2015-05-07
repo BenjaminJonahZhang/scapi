@@ -84,7 +84,12 @@ public class CircuitInput implements ProtocolInput, Serializable {
 		
 		// Read each integer and immediately cast to a byte.
 		for (int i = 0; i < numberOfInputs; i++) {
-			int bit = scanner.nextInt();
+			int bit = 0;
+			try{
+			bit = scanner.nextInt();
+			}catch(Exception e){
+				System.out.println("error at i = "+i);
+			}
 			inputBits[i] = (byte) bit;
 		}
 		scanner.close();

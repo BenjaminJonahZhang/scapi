@@ -62,7 +62,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 abstract class OTSemiHonestDDHBatchReceiverAbs implements OTBatchReceiver{
 	/*	
 	 	This class runs the following protocol:
-		 	For every i=1,…m, SAMPLE random values alphaI <- Zq and hi <- G 
+		 	For every i=1,...,m, SAMPLE random values alphaI <- Zq and hi <- G 
 			For every i=1,...,m, COMPUTE hi0,hi1 as follows:
 			1.	If SigmaI = 0 then hi0 = g^alphaI  and hi1=hi
 			2.	If SigmaI = 1 then hi0=hi and hi1 = g^alphaI 
@@ -135,7 +135,7 @@ abstract class OTSemiHonestDDHBatchReceiverAbs implements OTBatchReceiver{
 	
 	/**
 	 * Runs the transfer phase of the OT protocol.<p>
-	 * "For every i=1,…m, SAMPLE random values alphaI <- Zq and hi <- G <p>
+	 * "For every i=1,...,m, SAMPLE random values alphaI <- Zq and hi <- G <p>
 	 *	For every i=1,...,m, COMPUTE hi0,hi1 as follows:<p>
 	 *	1.	If SigmaI = 0 then hi0 = g^alphaI  and hi1=hi<p>
 	 *	2.	If SigmaI = 1 then hi0=hi and hi1 = g^alphaI <p>
@@ -164,7 +164,7 @@ abstract class OTSemiHonestDDHBatchReceiverAbs implements OTBatchReceiver{
 			
 		}
 		
-		//For every i=1,…m, SAMPLE random values alphaI <- Zq.
+		//For every i=1,...,m, SAMPLE random values alphaI <- Zq.
 		ArrayList<BigInteger> alphaArr = new ArrayList<BigInteger>();
 		ArrayList<GroupElement> hArr = new ArrayList<GroupElement>();
 		for (int i=0; i<size; i++){

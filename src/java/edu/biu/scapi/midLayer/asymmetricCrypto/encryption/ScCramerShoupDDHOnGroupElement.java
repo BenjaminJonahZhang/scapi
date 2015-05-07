@@ -222,7 +222,7 @@ public class ScCramerShoupDDHOnGroupElement extends CramerShoupAbs {
 			Convert u1, u2, e to byte[] using the dlogGroup
 			Compute alpha - the result of computing the hash function on the concatenation u1+ u2+ e.
 			if u_1^(x1+y1*alpha) * u_2^(x2+y2*alpha) != v throw exception
-			Calculate m = e*((u1^z)^-1)   // equal to m = e/u1^z . We don’t have a divide operation in DlogGroup so we calculate it in equivalent way
+			Calculate m = e*((u1^z)^-1)   // equal to m = e/u1^z . We don't have a divide operation in DlogGroup so we calculate it in equivalent way
 			m is a groupElement. Use it to create and return msg an instance of GroupElementPlaintext.
 			return msg
 		 */

@@ -77,7 +77,7 @@ public class GarbledWire implements Serializable{
 	 * We are not returning the initial signal bit that determined which bit to put on each wire as this information cannot be
 	 * recovered (if it could be, we would be able to determine the actual value of a garbled wire and thus it would not be garbled.)<p>
 	 * 
-	 * See <i>Fairplay — A Secure Two-Party Computation System</i> by Dahlia Malkhi, Noam Nisan, Benny Pinkas, and Yaron Sella. 
+	 * See <i>Fairplay - A Secure Two-Party Computation System</i> by Dahlia Malkhi, Noam Nisan, Benny Pinkas, and Yaron Sella. 
 	 * Section 4.2 describes in more detail how the signal bit works. </p>
 	 * 
 	 * @return the signal bit. <p>

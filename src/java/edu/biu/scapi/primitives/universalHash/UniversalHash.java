@@ -70,10 +70,10 @@ public interface UniversalHash {
 	/** 
 	 * This function has multiple roles depending on the concrete hash function.
 	 * If the concrete class can get a varying input lengths then there are 2 possible answers:
-	 * 1. The maximum size of the input – if there is some kind of an upper bound on the input size 
+	 * 1. The maximum size of the input if there is some kind of an upper bound on the input size 
 	 * (for example in the EvaluationHashFunction there is a limit on the input size due to security reasons) 
 	 * thus, this function returns this bound even though the actual size can be any number between zero and that limit.
-	 * 2. Zero – if there is no limit on the input than this function returns 0.
+	 * 2. Zero if there is no limit on the input than this function returns 0.
 	 * If the concrete class can get a fixed length, this function returns a constant size that may be determined either in the init 
 	 * for some implementations or hardcoded for other implementations.
 

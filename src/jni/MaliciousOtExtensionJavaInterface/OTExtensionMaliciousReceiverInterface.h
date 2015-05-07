@@ -15,7 +15,7 @@
 #include <iomanip>
 #include <string>
 
-#include "OtExtensionMaliciousCommonInterface.h"
+#include "OTExtensionMaliciousCommonInterface.h"
 
 namespace maliciousot {
 

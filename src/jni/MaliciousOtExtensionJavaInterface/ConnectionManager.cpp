@@ -2,7 +2,7 @@
 
 const char * maliciousot::ConnectionManager::DEFAULT_ADDRESS = "localhost";
 
-using std::cout;
+using std::cerr;
 using std::endl;
 
 /*******************************************************************************
@@ -17,7 +17,7 @@ maliciousot::ConnectionManager::ConnectionManager(int role, int num_of_threads, 
     m_port = (USHORT) port;
     m_pid = role;
 
-    cout << "ConnectionManager(" << role << "," << num_of_threads << "," << address << "," << port  << ")" << endl;
+    cerr << "ConnectionManager(" << role << "," << num_of_threads << "," << address << "," << port  << ")" << endl;
 }
 
 /*maliciousot::ConnectionManager::ConnectionManager(int role) : ConnectionManager(role,
@@ -60,7 +60,9 @@ maliciousot::ConnectionManagerServer::ConnectionManagerServer(int role) : Connec
 BOOL maliciousot::ConnectionManagerServer::setup_connection() {
     
     int num_connections = m_num_of_threads+1;
-	
+
+    cerr << "ConnectionManagerServer->setup_connection() started." << endl;
+    
     // try to bind() and then listen
     if ((!m_sockets[0].Socket()) || 
 	(!m_sockets[0].Bind(m_port, m_address)) ||
@@ -78,34 +80,36 @@ BOOL maliciousot::ConnectionManagerServer::setup_connection() {
 	    goto listen_failure;
 	}
 
-	 //cout << "Server: accept succeded i = " << i << endl;
+
+	// cerr << "Server: accept succeded i = " << i << endl;
     
 	// receive the other side thread id (the first thing that is sent on the socket)
 	UINT threadID;
 	sock.Receive(&threadID, sizeof(int));
 
-	// cout << "Server: received threadID = " << threadID << endl;
+	// cerr << "Server: received threadID = " << threadID << endl;
     
 	// ??
 	if(threadID >= num_connections) {
-	    // cout << "Server: threadID >= num_connections, num_connections = " << num_connections << endl;
+	    // cerr << "Server: threadID >= num_connections, num_connections = " << num_connections << endl;
 	    sock.Close();
 	    i--;
 	    continue;
 	}
 
 	// locate the socket appropriately
-	// cout << "Server: attaching socket to threadID = " << threadID << endl;
+	// cerr << "Server: attaching socket to threadID = " << threadID << endl;
 	m_sockets[threadID].AttachFrom(sock);
 	sock.Detach();
     }
 
-   // cout << "ConnectionManagerServer->setup_connection() ended." << endl;
+
+    cerr << "ConnectionManagerServer->setup_connection() ended." << endl;
     
     return TRUE;
 
  listen_failure:
-    cout << "Listen failed" << endl;
+    cerr << "Listen failed" << endl;
     return FALSE;
 }
 
@@ -144,11 +148,13 @@ BOOL maliciousot::ConnectionManagerClient::setup_connection() {
     LONG lTO = CONNECT_TIMEO_MILISEC;
     int num_connections = m_num_of_threads+1;
     
-    //cout << "ConnectionManagerClient->setup_connection() started." << endl;
+
+    cerr << "ConnectionManagerClient->setup_connection() started." << endl;
+
 
     // try to initiate connection for socket k
     for(int k = num_connections-1; k >= 0 ; k--) {
-	// cout << "Client: started k = " << k << endl;
+	// cerr << "Client: started k = " << k << endl;
 	// iterate on retries
 	for(int i=0; i<RETRY_CONNECT; i++) {
 	    if(!m_sockets[k].Socket()) {
@@ -157,21 +163,21 @@ BOOL maliciousot::ConnectionManagerClient::setup_connection() {
 	    }
 			
 	    if(m_sockets[k].Connect(m_address, m_port, lTO)) {
-		// cout << "Client:" << k << "connected to (" << m_address << "," << m_port << ")" << endl;
+		// cerr << "Client:" << k << "connected to (" << m_address << "," << m_port << ")" << endl;
 
 		// send the thread id when connected
 		m_sockets[k].Send(&k, sizeof(int));
 
-		// cout << "Client: sent k = " << k << endl;
+		// cerr << "Client: sent k = " << k << endl;
 
 		if(k == 0) {
-		    //cout << "connected" << endl;
-		 //   cout << "ConnectionManagerClient->setup_connection() ended." << endl;
+
+		    cerr << "ConnectionManagerClient->setup_connection() ended." << endl;
 		    return TRUE;
 		} else {
 		    // socket k is connected, breaking the "retries" loop
 		    // and moving on to the next socket.
-		    // cout << "breaking the retries loop" << endl;
+		    // cerr << "breaking the retries loop" << endl;
 		    break;
 		}
 
@@ -188,14 +194,14 @@ BOOL maliciousot::ConnectionManagerClient::setup_connection() {
 	    }
 
 	    // else, waiting 20 milliseconds before retry
-	    //cout << "sleeping 20 milliseconds" << endl;
+
 	    SleepMiliSec(20);
 	}
     }
  server_not_available:
     printf("Server not available: ");
  connect_failure:
-    cout << " (" << !m_pid << ") connection failed" << endl;
+    cerr << " (" << !m_pid << ") connection failed" << endl;
     return FALSE;
 }
 

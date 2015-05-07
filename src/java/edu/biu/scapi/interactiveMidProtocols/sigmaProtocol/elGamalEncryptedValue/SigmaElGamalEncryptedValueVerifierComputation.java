@@ -54,13 +54,13 @@ public class SigmaElGamalEncryptedValueVerifierComputation implements SigmaVerif
 	  
 	  This class uses an instance of SigmaDHProver with:
 	  
-	  		•	Common DlogGroup
-	  	In case we use knowledge of the private key:
-			•	Common input: (g,h,u,v) = (g,c1,h,c2/x) and
-			•	P’s private input: a value w <- Zq such that h=g^w and c2/x =c1^w
-		In case we use knowledge of the randomness used to encrypt:
-			•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
-			•	P’s private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
+        Common DlogGroup
+        In case we use knowledge of the private key:
+          Common input: (g,h,u,v) = (g,c1,h,c2/x) and
+          P's private input: a value w <- Zq such that h=g^w and c2/x =c1^w
+        In case we use knowledge of the randomness used to encrypt:
+          Common input: (g,h,u,v) = (g,h,c1,c2/x)
+          P's private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
 	*/	
 	
 	private SigmaDHVerifierComputation sigmaDH;	//underlying SigmaDHVerifier to use.

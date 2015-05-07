@@ -7,10 +7,11 @@ CXX=g++-4.9
 CXXFLAGS=-std=c++0x -g -fPIC
 
 # dependencies
+LIBMIRACL = ../../../install/lib/libmiracl.a
 
 INCLUDES=-I$(prefix)/include -I$(includedir) -I$(prefix)/ssl/include -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/darwin/
 LIBRARIES_DIR=-L$(prefix)/ssl/lib -L$(libdir) -L$(prefix)/lib
-LIBRARIES=$(INCLUDE_ARCHIVES_START) /usr/lib/libmiracl.a -lssl -lcrypto -lMaliciousOTExtension $(INCLUDE_ARCHIVES_END)
+LIBRARIES=$(INCLUDE_ARCHIVES_START) $(LIBMIRACL)  -lssl -lcrypto -lMaliciousOTExtension $(INCLUDE_ARCHIVES_END)
 
 # objects
 OT_JNI_OBJECTS = ConnectionManager.o OTExtensionMaliciousCommonInterface.o OTExtensionMaliciousReceiverInterface.o OTExtensionMaliciousSenderInterface.o OTExtensionMaliciousReceiver.o OTExtensionMaliciousSender.o

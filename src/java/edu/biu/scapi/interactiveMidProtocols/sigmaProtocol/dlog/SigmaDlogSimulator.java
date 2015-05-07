@@ -52,7 +52,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE a random z <- Zq
-			COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)
+			COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)
 			OUTPUT (a,e,z).	
 	*/
 
@@ -107,7 +107,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	/**
 	 * Computes the simulator computation, using the given challenge.<p>
 	 * "SAMPLE a random z <- Zq <p>
-	 *	COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)<p>
+	 *	COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)<p>
 	 *	OUTPUT (a,e,z)".	<p>
 	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @param challenge
@@ -130,7 +130,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 		//SAMPLE a random z <- Zq
 		BigInteger z = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)
+		//COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)
 		GroupElement gToZ = dlog.exponentiate(dlog.getGenerator(), z);
 		BigInteger e = new BigInteger(1, challenge);
 		BigInteger minusE = dlog.getOrder().subtract(e);
@@ -145,7 +145,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	/**
 	 * Computes the simulator computation, using random challenge.<p>
 	 * "SAMPLE a random z <- Zq<p>
-	 *	COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)<p>
+	 *	COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)<p>
 	 *	OUTPUT (a,e,z)".	<p>
 	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @return the output of the computation - (a, e, z).

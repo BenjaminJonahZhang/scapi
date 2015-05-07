@@ -9,7 +9,7 @@
 
 
 using namespace maliciousot;
-using std::cout;
+using std::cerr;
 using std::endl;
 
 int main(int argc, char** argv) {
@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
 								   numOts); // total ots
 
     receiver_interface->init_ot_receiver();
-    cout << "finished initOtReceiver." << endl;
-    cout << "Started runOtAsSender." << endl;
+    cerr << "finished initOtReceiver." << endl;
+    cerr << "Started runOtAsSender." << endl;
     
     MaskingFunction * masking_function = new XORMasking(bitLength);
     
@@ -44,18 +44,18 @@ int main(int argc, char** argv) {
     }
 
     //run the ot extension as the receiver
-    cout << "started receiver_interface->obliviously_receive()" << endl;
+    cerr << "started receiver_interface->obliviously_receive()" << endl;
     receiver_interface->obliviously_receive(choices, response, numOts, bitLength, G_OT, masking_function);
-    cout << "ended receiver_interface->obliviously_receive()" << endl;
+    cerr << "ended receiver_interface->obliviously_receive()" << endl;
 
     //prepare the out array
-    cout << "response bitvector:" << endl;
+    cerr << "response bitvector:" << endl;
     response.PrintHex();
     
     choices.delCBitVector();
     response.delCBitVector();
 
     delete masking_function;
-    cout << "ended runOtAsReceiver." << endl;
+    cerr << "ended runOtAsReceiver." << endl;
     delete receiver_interface;
 }

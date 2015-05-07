@@ -49,8 +49,8 @@ public class SigmaANDProverComputation implements SigmaProverComputation{
 
 	/*	
 	  This class computes the following calculations:
-		  	COMPUTE all first prover messages a1,…,am
-			COMPUTE all second prover messages z1,…,zm
+        COMPUTE all first prover messages a1,...,am
+        COMPUTE all second prover messages z1,...,zm
 	*/
 	
 	private ArrayList<SigmaProverComputation> provers;	// Underlying Sigma protocol's provers to the AND calculation.
@@ -107,9 +107,9 @@ public class SigmaANDProverComputation implements SigmaProverComputation{
 
 	/**
 	 * Computes the first message the protocol.<p>
-	 * "COMPUTE all first prover messages a1,…,am". 
+	 * "COMPUTE all first prover messages a1,...,am". 
 	 * @param input MUST be an instance of SigmaANDInput.
-	 * @return SigmaMultipleMsg contains a1, …, am.  
+	 * @return SigmaMultipleMsg contains a1, ..., am.  
 	 * @throws IllegalArgumentException if input is not an instance of SigmaANDInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers.
 	 */
@@ -132,9 +132,9 @@ public class SigmaANDProverComputation implements SigmaProverComputation{
 
 	/**
 	 * Computes the second message of the protocol.<p>
-	 * "COMPUTE all second prover messages z1,…,zm".
+	 * "COMPUTE all second prover messages z1,...,zm".
 	 * @param challenge
-	 * @return SigmaMultipleMsg contains z1, …, zm.
+	 * @return SigmaMultipleMsg contains z1, ..., zm.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {

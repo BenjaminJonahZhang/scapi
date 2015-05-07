@@ -59,12 +59,12 @@ public class SigmaCramerShoupEncryptedValueProverComputation implements SigmaPro
 	/*	
 	  This class uses an instance of SigmaDHExtendedProver with:
 	  
-	  		•	Common DlogGroup
-			•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
-			•	P’s private input: r
+        Common DlogGroup
+          Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
+          P-s private input: r
 
 	*/	 
-	
+
 	private SigmaDHExtendedProverComputation sigmaDH;	//underlying SigmaDHExtendedProver to use.
 	private DlogGroup dlog;					//We save the dlog because we need it to calculate the input for the underlying Sigma prover.
 	private CryptographicHash hash;			//Underlying hash function that used in the CramerShoup cryptosystem.

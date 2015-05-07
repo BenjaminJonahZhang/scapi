@@ -56,7 +56,7 @@ public class ECFpUtility {
 
 	/**
 	 * Checks if the given x and y represent a valid point on the given curve, 
-	 * i.e. if the point (x, y) is a solution of the curve’s equation.
+	 * i.e. if the point (x, y) is a solution of the curves equation.
 	 * @param params elliptic curve over Fp parameters
 	 * @param x coefficient of the point
 	 * @param y coefficient of the point
@@ -155,7 +155,7 @@ public class ECFpUtility {
 
           Let L be the length in bytes of p
 
-          Choose a random byte array r of length L – k – 2 bytes 
+          Choose a random byte array r of length L - k - 2 bytes 
 
           Prepare a string newString of the following form: r || binaryString || binaryString.length (where || denotes concatenation) (i.e., the least significant byte of newString is the length of binaryString in bytes)
 

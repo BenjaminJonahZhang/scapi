@@ -348,7 +348,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	 * It performs the actual work of pre-computation of the exponentiations for one base.
 	 * It is composed of two main elements. The group element for which the optimized computations 
 	 * are built for, called the base and a vector of group elements that are the result of 
-	 * exponentiations of order 1,2,4,8,… 
+	 * exponentiations of order 1,2,4,8,
 	 */
 	private class GroupElementsExponentiations {
 		private Vector<GroupElement> exponentiations; //vector of group elements that are the result of exponentiations

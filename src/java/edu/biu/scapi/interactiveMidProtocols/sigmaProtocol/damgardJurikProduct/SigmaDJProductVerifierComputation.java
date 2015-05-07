@@ -49,8 +49,8 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	  This class computes the following calculations:
 		  	SAMPLE a random challenge  e -< {0, 1}^t 
 			ACC IFF c1,c2,c3,a1,a2,z1,z2,z3 are relatively prime to n 
-				AND c1^e*a1 = (1+n)^z1*z2^N mod N’ 
-				AND (c2^z1)/(a2*c3^e) = z3^N mod N’
+				AND c1^e*a1 = (1+n)^z1*z2^N mod N'
+				AND (c2^z1)/(a2*c3^e) = z3^N mod N'
         
 	*/
 	
@@ -164,8 +164,8 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	/**
 	 * Computes the verification of the protocol.<p>
 	 * 	"ACC IFF c1,c2,c3,a1,a2,z1,z2,z3 are relatively prime to n <p>
-				AND c1^e*a1 = (1+n)^z1*z2^N mod N’ <p>
-				AND (c2^z1)/(a2*c3^e) = z3^N mod N’".
+				AND c1^e*a1 = (1+n)^z1*z2^N mod N'<p>
+				AND (c2^z1)/(a2*c3^e) = z3^N mod N'".
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IllegalArgumentException if the first prover message is not an instance of SigmaDJProductFirstMsg
@@ -211,7 +211,7 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 		//Convert e to BigInteger.
 		BigInteger eBI = new BigInteger(1, e);
 		
-		//Check that c1^e*a1 = (1+n)^z1*z2^N mod N’ 
+		//Check that c1^e*a1 = (1+n)^z1*z2^N mod N'
 		BigInteger c1ToE = c1.modPow(eBI, NTag);
 		BigInteger left = c1ToE.multiply(a1).mod(NTag);
 		BigInteger nPlusOneToZ1 = n.add(BigInteger.ONE).modPow(z1, NTag);
@@ -221,7 +221,7 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 		//If left and right sides of the equation are not equal, set verified to false.
 		verified = verified && left.equals(right);
 		
-		//Check that (c2^z1)/(a2*c3^e) = z3^N mod N’
+		//Check that (c2^z1)/(a2*c3^e) = z3^N mod N'
 		BigInteger numerator = c2.modPow(z1, NTag);
 		BigInteger c3ToE = c3.modPow(eBI, NTag);
 		BigInteger denominator = a2.multiply(c3ToE).mod(NTag);

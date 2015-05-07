@@ -82,7 +82,7 @@ public final class LubyRackoffPrpFromPrfVarying extends PrpFromPrfVarying {
 	 * Computes the LubyRackoff permutation.
 	 * the algorithm pseudocode is: 
 	 * Input :
-	 *		 x = inBytes – should  be of even length                                                      
+	 *		 x = inBytes  should  be of even length                                                      
 	 *		-----------------
 	 *		Let |x|=2L (i.e., the length of the input is 2L) 
 	 *		Let L0 be the first |x|/2 bits of x 

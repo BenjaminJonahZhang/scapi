@@ -93,8 +93,8 @@ public class OTOneSidedSimDDHOnByteArraySender extends OTOneSidedSimDDHSenderAbs
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	c0 = x0 XOR KDF(|x0|,k0)
-	 *		•	c1 = x1 XOR KDF(|x1|,k1)"
+	 *			c0 = x0 XOR KDF(|x0|,k0)
+	 *			c1 = x1 XOR KDF(|x1|,k1)"
 	 * @param  iput NUST be an instance of OTSOnByteArrayInput.
 	 * @param w0
 	 * @param w1

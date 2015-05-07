@@ -65,8 +65,8 @@ public class OTSemiHonestDDHOnGroupElementSender extends OTSemiHonestDDHSenderAb
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE:
-	 *		•	v0 = x0 * k0
-	 *		•	v1 = x1 * k1"
+	 *			v0 = x0 * k0
+	 *			v1 = x1 * k1"
 	 * @param input MUST be an instance of OTSOnGroupElementInput
 	 * @param k1 
 	 * @param k0 

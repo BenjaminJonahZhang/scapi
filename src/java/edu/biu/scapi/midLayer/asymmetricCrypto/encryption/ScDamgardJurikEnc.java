@@ -228,10 +228,10 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 */
 	public AsymmetricCiphertext encrypt(Plaintext plaintext) {
 		/*
-		 * We use the notation N=n^s, and N’ = n^(s+1).
+		 * We use the notation N=n^s, and N' = n^(s+1).
 		 * Pseudo-Code:
 		 * 		COMPUTE s=(|x|/(|n|-1)) + 1.
-		 * 		CHOOSE a random r in ZN’*.	
+		 * 		CHOOSE a random r in ZN'*.	
 		 */
 		
 		if(!(plaintext instanceof BigIntegerPlainText)){
@@ -269,11 +269,11 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 */
 	public AsymmetricCiphertext encrypt(Plaintext plainText, BigInteger r) {
 		/*
-		 * We use the notation N=n^s, and N’ = n^(s+1).
+		 * We use the notation N=n^s, and N' = n^(s+1).
 		 * Pseudo-Code:
 		 * 		COMPUTE s=(|x|/(|n|-1)) + 1.
 		 * 		CHECK that x is in ZN.
-		 *		COMPUTE c = (1+n)^x * r^N mod N’.
+		 *		COMPUTE c = (1+n)^x * r^N mod N'.
 		 * 		OUTPUT c.
 		 */
 		
@@ -325,13 +325,13 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	@Override
 	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException{
 		/*
-		 * We use the notation N=n^s, and N’ = n^(s+1).
+		 * We use the notation N=n^s, and N' = n^(s+1).
 		 * Pseudo-Code:
 		 * 		COMPUTE s=|c| / |n|
 		 * 		CHECK that c is in ZN'.
 		 * 		COMPUTE using the Chinese Remainder Theorem a value d, such that d = 1 mod N, and d=0 mod t. 
-		 *		COMPUTE c^d mod N’.
-		 *		COMPUTE x as the discrete logarithm of c^d to the base (1+n) modulo N’. This is done by the following computation
+		 *		COMPUTE c^d mod N'.
+		 *		COMPUTE x as the discrete logarithm of c^d to the base (1+n) modulo N'. This is done by the following computation
 		 *	 	a=c^d
 		 *		x=0
 		 *		for j = 1 to s do
@@ -340,9 +340,9 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		 *		   t2 = x
 		 *		   for k = 2 to j do
 		 *		   begin
-		 *		      x = x – 1
+		 *		      x = x - 1
 		 *		      t2 = t2 * x mod nj
-		 *		      t1 =  (t1 – (t2 * n^(k-1)) / factorial(k) )  mod n^j
+		 *		      t1 =  (t1 - (t2 * n^(k-1)) / factorial(k) )  mod n^j
 		 *		  end
 		 *		  x = t1
 		 *		end
@@ -385,7 +385,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		//Computes (cipher ^ d) mod N'
 		BigInteger a = djCipher.getCipher().modPow(d, Ntag);
 		
-		//Computes x as the discrete logarithm of c^d to the base (1+n) modulo N’. This is done by the algorithm shown above.
+		//Computes x as the discrete logarithm of c^d to the base (1+n) modulo N'. This is done by the algorithm shown above.
 		BigInteger x = BigInteger.ZERO;
 		BigInteger t1, t2;
 		BigInteger nPowJ, factorialK, temp;

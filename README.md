@@ -6,7 +6,7 @@ What is SCAPI?
 
 SCAPI is an open-source Java library for implementing secure two-party and multiparty computation protocols (SCAPI stands for the "Secure Computation API"). It provides a reliable, efficient, and highly flexible cryptographic infrastructure.
 
-The latest release is 2.3.0 and can be found [here](http://crypto.biu.ac.il/downloads-scapi.php).
+The latest release is 2.3.0 and can be found [here](https://github.com/cryptobiu/scapi/releases/tag/SCAPI-V2-3-0).
 Alternately you can simply [clone the repository](http://scapi.readthedocs.org/en/latest/install.html#installing-scapi-from-source-on-unix-based-operating-systems) to get the latest and greatest.
 
 Where are the docs?
@@ -16,9 +16,9 @@ Go to [http://scapi.readthedocs.org/](http://scapi.readthedocs.org/)
 for a prebuilt version of the current documentation. 
 Otherwise build them yourself from the sphinx sources in the docs folder.
 
-We also added the javadoc reference under docs/javadoc/ directory, and you can view it online [here](http://crypto.biu.ac.il/scapi/SCAPI_Javadoc_V2.3.0/SCAPI_Javadoc_V2.3.0/index.html).
+We also added the javadoc reference under docs/javadoc/ directory, and you can view it online [here](http://cryptobiu.github.io/scapi/).
 
-More information about SCAPI and the motivation behind it appears in this [paper](http://crypto.biu.ac.il/scapi/scapi.pdf).
+More information about SCAPI and the motivation behind it appears in this [paper](http://eprint.iacr.org/2012/629.pdf).
 
 What if I need help?
 --------------------

@@ -178,8 +178,8 @@ public class OTFullSimDDHOnByteArrayReceiver implements OTReceiver, Malicious, S
 	 *	SEND (g,h) to S<p>
 	 *	WAIT for messages (u0,c0) and (u1,c1) from S<p>
 	 *	IF  NOT<p>
-	 *	•	u0, u1 in G, AND<p>
-	 *	•	c0, c1 are binary strings of the same length<p>
+	 *		u0, u1 in G, AND<p>
+	 *		c0, c1 are binary strings of the same length<p>
 	 *		   REPORT ERROR<p>
 	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)<p>
 	 */
