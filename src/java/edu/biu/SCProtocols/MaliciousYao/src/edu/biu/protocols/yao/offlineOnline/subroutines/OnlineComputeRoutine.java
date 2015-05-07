@@ -42,7 +42,9 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 	
 	// The output of the compute step.
 	private HashMap<Integer, byte[]> computedOutputWires;
+	private HashMap<Integer, byte[]> translations;
 	private SecretKey proofOfCheating;
+	private int correctCircuit = -1;
 	
 	/**
 	 * A constructor that sets the given parameters.
@@ -67,6 +69,7 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 		this.outputLabels = garbledCircuits[0].getOutputWireIndices(); 
 		
 		this.computedOutputWires = new HashMap<Integer, byte[]>();
+		this.translations = new HashMap<Integer, byte[]>();
 		this.proofOfCheating = null;
 		this.numOfThreads = primitives.getNumOfThreads();
 	}
@@ -151,6 +154,7 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 			try {
 				//Compute the circuit.
 				byte[] output = garbledCircuits[i].compute();
+				
 				//Save the garbled output in the outputs map.
 				synchronized (computedOutputWires) {
 					computedOutputWires.put(i, output);
@@ -163,6 +167,11 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 
 	@Override
 	public CircuitEvaluationResult runOutputAnalysis() {
+		for (int i=0; i<garbledCircuits.length; i++){
+			
+			translations.put(i, garbledCircuits[i].translate(computedOutputWires.get(i)));
+		}
+		
 		// For each output wire
 		for (int i = 0; i < outputLabels.length; i++) {
 			// Get the set of valid outputs received on this wire.
@@ -188,7 +197,11 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 	public byte[] getOutput() {
 		//If there was no cheating, all circuits output the same result. 
 		//Take it from the first circuit.
-		return garbledCircuits[0].translate(computedOutputWires.get(0));
+		return translations.get(correctCircuit);
+	}
+	
+	public void setCorrectCircuit(int j){
+		correctCircuit = j;
 	}
 	
 	/**
@@ -197,6 +210,10 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 	 */
 	public SecretKey getProofOfCheating() {
 		return proofOfCheating;
+	}
+	
+	public byte[] getComputedOutputWires(int circuitIndex) {
+		return computedOutputWires.get(circuitIndex);
 	}
 	
 	/**
@@ -221,7 +238,7 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 		//Use the generated proof in order to get the hashed result and check if it matches the received one.
 		for (int j = 0; j < numCircuits; j++) {
 			//Get the index of the output.
-			int wireValue = getWireValue(wireIndex, j);
+			int wireValue = translations.get(j)[wireIndex];
 			byte[] computedWire = new byte[keyLength];
 			//Copy the output of this wire in this circuit.
 			System.arraycopy(computedOutputWires.get(j), keyLength*wireIndex, computedWire, 0, keyLength);
@@ -236,7 +253,7 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 			//If there is a different circuit that return a different key, use them to get the proof of cheating.
 			if ((null != k0) && (null != k1)) {
 				byte[] c0 = proofCiphers[wireIndex][j0][0];
-				byte[] c1 = proofCiphers[wireIndex][j1][0];
+				byte[] c1 = proofCiphers[wireIndex][j1][1];
 				
 				byte[] p0 = new byte[keyLength];
 				byte[] p1 = new byte[keyLength];
@@ -244,7 +261,7 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 					p0[i] = (byte) (k0[i] ^ c0[i]);
 					p1[i] = (byte) (k1[i] ^ c1[i]);
 				}
-				
+					
 				SecretKey proof = null;
 				try {
 					proof = KeyUtils.xorKeys(new SecretKeySpec(p0, ""), new SecretKeySpec(p1, ""));
@@ -257,27 +274,8 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 				if (KeyUtils.compareKeys(hashOnProof, hashedProof)) {
 					return proof;
 				}
-				return null;
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the signal bit of the given wire and the given circuit.
-	 * @param w index of the wire.
-	 * @param j Index of the circuit.
-	 */
-	private byte getWireValue(int w, int j) {
-		byte[] translationTable = garbledCircuits[j].getTranslationTable();
-		//Get the signal bit of the wire.
-		byte signalBit = translationTable[w];
-		
-		//Get the last bit of the wire.
-		byte permutationBitOnWire = (byte) (computedOutputWires.get(j)[keyLength*w + keyLength - 1] & (byte) 1);
-     
-		//Calculate the resulting value.
-		byte wireValue = (byte) (signalBit ^ permutationBitOnWire);
-		return wireValue;
 	}
 }
