@@ -22,7 +22,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTExtensionM
 
 public class OfflineAppP2ForBatch {	
 	private static final int PARTY = 2;
-	private static final String HOME_DIR = "C:/GitHub/Development/MaliciousYaoProtocol/MaliciousYao";
+	private static final String HOME_DIR = "C:/MaliciousYao";
 	private static final String COMM_CONFIG_FILENAME = HOME_DIR + "/assets/conf/Parties1.properties";
 
 	public static void main(String[] args) throws IOException{
@@ -49,6 +49,10 @@ public class OfflineAppP2ForBatch {
 		Boolean addFileTitle = new Boolean(args[counter++]); 
 		Boolean addThreadsTitle = new Boolean(args[counter++]);
 		Boolean newLine = new Boolean(args[counter++]);
+		Boolean saveToDisk = new Boolean(args[counter++]);
+		System.out.println("N1 = " + N1+ " B1 = "+ B1 + " s1 = "+ s1 + " p1 = "+ p1 + " N2 = " + N2+ " B2 = "+ B2 + 
+				" s2 = " + s2+ " p2 = "+ p2 + "numOfThread = " + numOfThread);
+		System.out.println("addFileTitle =  "+ addFileTitle + " addThreadsTitle = "+ addThreadsTitle+ " newLine = "+ newLine+ " SaveToDisk = "+ saveToDisk);
 		
 		CommunicationConfig commConfig = null;
 		try {
@@ -110,7 +114,8 @@ public class OfflineAppP2ForBatch {
 		FileWriter output = new FileWriter(outputFile, true);
 		
 		if (addFileTitle){
-			output.append("parameters = " + N1 + "_" + B1 + "_" + s1 + "_" + p1 + "_" + N2 + "_" + B2 + "_" + s2 + "_" + p2+ "\n");
+			output.append("parameters: N1 = " + N1+ " B1 = "+ B1 + " s1 = "+ s1 + " p1 = "+ p1 + " N2 = " + N2+ " B2 = "+ B2 + 
+					" s2 = " + s2+ " p2 = "+ p2 + "\n");
 			output.append("Threads number\n");
 		}
 		
@@ -140,27 +145,29 @@ public class OfflineAppP2ForBatch {
 		
 		output.close();
 		
-		System.out.println(String.format("Saving buckets to files..."));
-		start = System.nanoTime();
-		
-		BucketList<LimitedBundle> mainBuckets = protocol.getMainBuckets();
-		BucketList<LimitedBundle> crBuckets = protocol.getCheatingRecoveryBuckets();
-		try {
-			mainBuckets.saveToFiles(mainBucketsPrefix);
-			crBuckets.saveToFiles(crBucketsPrefix);
-			KProbeResistantMatrix.saveToFile(protocol.getMainProbeResistantMatrix(), mainMatrixFile);
-			KProbeResistantMatrix.saveToFile(protocol.getCheatingRecoveryProbeResistantMatrix(), crMatrixFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (saveToDisk){
+			System.out.println(String.format("Saving buckets to files..."));
+			start = System.nanoTime();
+			
+			BucketList<LimitedBundle> mainBuckets = protocol.getMainBuckets();
+			BucketList<LimitedBundle> crBuckets = protocol.getCheatingRecoveryBuckets();
+			try {
+				mainBuckets.saveToFiles(mainBucketsPrefix);
+				crBuckets.saveToFiles(crBucketsPrefix);
+				KProbeResistantMatrix.saveToFile(protocol.getMainProbeResistantMatrix(), mainMatrixFile);
+				KProbeResistantMatrix.saveToFile(protocol.getCheatingRecoveryProbeResistantMatrix(), crMatrixFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			end = System.nanoTime();
+			runtime = (end - start) / 1000000;
+			System.out.println("Saving buckets took " + runtime + " miliseconds.");
 		}
-		
-		end = System.nanoTime();
-		runtime = (end - start) / 1000000;
-		System.out.println("Saving buckets took " + runtime + " miliseconds.");
 		
 		commConfig.close();
 	}

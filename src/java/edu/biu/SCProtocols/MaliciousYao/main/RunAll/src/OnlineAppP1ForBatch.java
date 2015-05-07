@@ -19,7 +19,7 @@ import edu.biu.scapi.exceptions.CircuitFileFormatException;
 
 public class OnlineAppP1ForBatch {
 	private static final int PARTY = 1;
-	private static final String HOME_DIR = "C:/GitHub/Development/MaliciousYaoProtocol/MaliciousYao";
+	private static final String HOME_DIR = "C:/MaliciousYao";
 	private static final String COMM_CONFIG_FILENAME = HOME_DIR + "/assets/conf/Parties0.properties";
 	private static int BUCKET_ID = 0;
 	
@@ -104,7 +104,8 @@ public class OnlineAppP1ForBatch {
 		int numThreads = 0;
 		
 		FileWriter output = new FileWriter(outputFile, true);
-		output.append("parameters = " + N1 + "_" + B1 + "_" + s1 + "_" + p1 + "_" + N2 + "_" + B2 + "_" + s2 + "_" + p2+ "\n");
+		output.append("parameters: N1 = " + N1+ " B1 = "+ B1 + " s1 = "+ s1 + " p1 = "+ p1 + " N2 = " + N2+ " B2 = "+ B2 + 
+				" s2 = " + s2+ " p2 = "+ p2 + "\n");
 		output.append("Threads number\n");
 		
 		for (int j=0; j<3; j++){
