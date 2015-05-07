@@ -260,7 +260,7 @@ public class BundleBuilder {
 		//			 w1 = w0 ^ delta
 		//			 z1 = z0 ^ delta
 		//4. set (k0, k1) to be one set of keys to Y0 and (z0,z1) to bw set of keys to Y2.
-		for (int i = 0; i < inputLabelsP2.length; i++) {
+		for (int i = 0; i < inputLabelsY2.length; i++) {
 			//get Y0, y1.
 			System.arraycopy(inputWiresY, i*2*keySize, y0, 0, keySize);
 			System.arraycopy(inputWiresY, (i*2+1)*keySize, y1, 0, keySize);

@@ -68,7 +68,13 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 		byte[] masterKey = new byte[keySize];
 		System.arraycopy(wireValues.getAllInputWireValues(), (2*inputLabelsP1.length+1)*keySize, masterKey, 0, keySize);
 		
-		generateYKeys(masterKey, proofOfCheating.asByteArray());
+		//Calculate the delta used in the circuit.
+		byte[] delta = new byte[keySize];
+		for (int i=0; i<keySize; i++){
+			delta[i] = (byte) (inputWiresX[i] ^ inputWiresX[keySize+i]);
+		}
+				
+		generateYKeys(masterKey, proofOfCheating.asByteArray(), delta);
 		
 		//Split P2 keys into Y1 and Y2 keys.
 		splitKeys();
@@ -84,7 +90,7 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 	 * @param masterKey The one key of P1.
 	 * @param sigmaArray bytes of proof of cheating.
 	 */
-	private void generateYKeys(byte[] masterKey, byte[] sigmaArray) {
+	private void generateYKeys(byte[] masterKey, byte[] sigmaArray, byte[] delta) {
 		
 		int numShares = inputLabelsY2.length;	//number of P2 input wires.
 		int lastIndex = numShares - 1;
@@ -97,7 +103,12 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 		for (int i = 0; i < lastIndex; i++) {
 			//Generate two random keys.
 			byte[] key0 = mesP2InputKeys.generateKey().getEncoded();
-			byte[] key1 = mesP2InputKeys.generateKey().getEncoded();
+			byte[] key1 = null;
+			try {
+				key1 = BinaryUtils.xorArrays(key0, delta);
+			} catch (InvalidInputException e1) {
+				throw new IllegalStateException(e1);
+			}//mesP2InputKeys.generateKey().getEncoded();
 			System.arraycopy(key0, 0, inputWiresY, i*2*keySize, keySize);
 			System.arraycopy(key1, 0, inputWiresY, (i*2+1)*keySize, keySize);
 			
@@ -123,7 +134,7 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 		//The last pair of keys is the Xor of all sigma keys with the master key and a random key.
 		try {
 			lastSharePair[sigmaArray[lastIndex]] = BinaryUtils.xorArrays(xorOfShares, masterKey);
-			lastSharePair[1-sigmaArray[lastIndex]] = mesP2InputKeys.generateKey().getEncoded(); // The other share is random
+			lastSharePair[1-sigmaArray[lastIndex]] = BinaryUtils.xorArrays(lastSharePair[sigmaArray[lastIndex]], delta);//mesP2InputKeys.generateKey().getEncoded(); // The other share is random
 			
 		} catch (InvalidInputException e) {
 			throw new IllegalStateException(e);
