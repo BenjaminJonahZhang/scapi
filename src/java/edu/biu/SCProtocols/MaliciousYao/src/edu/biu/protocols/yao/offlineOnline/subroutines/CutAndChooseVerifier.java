@@ -443,6 +443,13 @@ public class CutAndChooseVerifier {
 				throw new CheatAttemptException("decommitment of commitmentMask does not match the decommitted seed!");
 			}
 			
+			if (!checkEquality(circuitBundle.getGarbledTables().toDoubleByteArray(), (garbledTables[j].toDoubleByteArray()))) {
+				throw new CheatAttemptException("garbled tables does not match the decommitted seed!");
+			}
+			
+			if (!Arrays.equals(circuitBundle.getTranslationTable(), translationTables[j])) {
+				throw new CheatAttemptException("translation tables does not match the decommitted seed!");
+			}
 			//Verify the keys commitments.
 			circuitBundle.getCommitmentsX().verifyCommitmentsAreEqual(commitmentsX[j]);
 			//In case this is a cheating recovery circuit, we know the secret and can verify the commitments order.
@@ -460,6 +467,25 @@ public class CutAndChooseVerifier {
 		}
 	}
 	
+	private boolean checkEquality(byte[][] array1, byte[][] array2) {
+		if (array1.length != array2.length){
+			return false;
+		}
+		for (int i=0; i<array1.length; i++){
+			if (array1[i].length != array2[i].length){
+				return false;
+			}
+			for (int j=0; j<array1[i].length; j++){
+				if (array1[i][j] != array2[i][j]){
+					return false;
+				}
+			}
+		}
+		
+		return true;
+			
+	}
+
 	/**
 	 * Checks that both commitment objects are equal. If they are not equal - throw an exception.
 	 * @param m1 The first commitment to check.
