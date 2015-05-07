@@ -154,7 +154,7 @@ public class MajoriryComputeRoutine implements ComputeCircuitsRoutine {
 			//Get the output of this eval circuit.
 			byte[] output = allOutputs.get(j);
 			//For each wire index,
-			for (Integer w : outputIndices) { 
+			for (int w = 0; w<outputIndices.length; w++) { 
 				Byte wireValue = new Byte(output[w]);
 				
 				// If this index is first encountered, init the counters map for that label.
@@ -182,7 +182,7 @@ public class MajoriryComputeRoutine implements ComputeCircuitsRoutine {
 		//Put the majority output in the majorityOutput array.
 		majorityOutput = new byte[outputIndices.length];
 		//For each output wire, get the map containing the optional outputs and put in the majority array the output with the highest counter.
-		for (Integer w : outputIndices) {
+		for (int w = 0; w<outputIndices.length; w++) {
 			HashMap<Byte, Integer> counters = counterMap.get(w);
 			majorityOutput[w] = getKeyWithMaxValue(counters);
 		}
