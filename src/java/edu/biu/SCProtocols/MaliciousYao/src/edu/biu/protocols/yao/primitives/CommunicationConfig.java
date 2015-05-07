@@ -66,7 +66,7 @@ public class CommunicationConfig {
 			commSetup = new NativeSocketCommunicationSetup(me, otherParty);
 			
 			// Connects to the other party. We need one channel between the parties.
-			connections = commSetup.prepareForCommunication(numberOfChannels, 200000);
+			connections = commSetup.prepareForCommunication(numberOfChannels, 20000000);
 		} catch (DuplicatePartyException e) {
 			// If both parties are equal, throw an exception.
 			throw new IllegalStateException();
