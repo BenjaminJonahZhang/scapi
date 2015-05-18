@@ -1,7 +1,7 @@
 /**
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* Copyright (c) 2014 - SCAPI (http://crypto.biu.ac.il/scapi)
 * This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
@@ -22,41 +22,45 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtendedStatistical;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedProver.<p>
+ *
+ * Proves knowledge of y (of size N) s.t. y=log_u1 v1=log_u2 v2=...=log_un vn mod N
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
-	
-	public void setLengthParameter(int s);
-	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+public class SigmaDHExtendedStatisticalProverInput implements SigmaProverInput{
+
+	private SigmaDHExtendedStatisticalCommonInput params;
+	private BigInteger w;
 	
 	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 * Sets the input for the prover. <p>
+	 * The prover gets w s.t. y=log_u1 v1=log_u2 v2=...=log_un vn mod N
+	 * @param gArray  Array of u's
+	 * @param hArray  Array of v's
+	 * @param w       Value w
 	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	public SigmaDHExtendedStatisticalProverInput(BigInteger N, ArrayList<BigInteger> gArray, ArrayList<BigInteger> hArray, BigInteger w){
+		params = new SigmaDHExtendedStatisticalCommonInput(N, gArray, hArray);
+		this.w = w;
+	}
+	
+	public BigInteger getW(){
+		return w;
+	}
+	
+	@Override
+	public SigmaDHExtendedStatisticalCommonInput getCommonParams() {
+		
+		return params;
+	}  
 }

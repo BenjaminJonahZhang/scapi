@@ -68,6 +68,8 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	private DamgardJurikPrivateKey privateKey;
 	private SecureRandom random;
 	private boolean isKeySet;
+	
+	private int consts = -1;
 
 
 	/**
@@ -217,6 +219,14 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		throw new UnsupportedOperationException("Use generateKey function with DJKeyGenParameterSpec");
 	}
 	
+	/**
+	 * Fix the length parameter for the encryption
+	 * @param s  Length parameter
+	 */
+	public void setLengthParameter(int s) {
+		this.consts = s;
+	}
+	
 	/** 
 	 * This function performs the encryption of he given plain text
 	 * @param plainText MUST be an instance of BigIntegerPlainText.
@@ -241,15 +251,27 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger x = ((BigIntegerPlainText)plaintext).getX();
 		
 		//Calculates the length parameter s.
-		int s = (x.bitLength()/(publicKey.getModulus().bitLength() - 1)) + 1;
+		int s = (consts!=-1)?consts:((x.bitLength()/(publicKey.getModulus().bitLength() - 1)) + 1);
 		
 		BigInteger Ntag = publicKey.getModulus().pow(s+1);
 		BigInteger NtagMinus1 = Ntag.subtract(BigInteger.ONE);
+		
 		//Chooses a random r in ZNtag*, this can be done by choosing a random value between 1 and Ntag -1 
 		//which is with overwhelming probability in Zntag*.
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ONE, NtagMinus1, random);
 		
 		return encrypt(plaintext, r);
+	}
+	
+	/**
+	 * Generate randomness for encryption/addition/multiplication by constant/
+	 * re-randomisation (setS should be used to set the length parameter)
+	 * @return   Generated randomness
+	 */
+	public BigInteger generateEncryptionRandomness() {
+		BigInteger Ntag = publicKey.getModulus().pow(consts+1);
+		BigInteger NtagMinus1 = Ntag.subtract(BigInteger.ONE);
+		return BigIntegers.createRandomInRange(BigInteger.ONE, NtagMinus1, random);		
 	}
 	
 	/** 
@@ -290,7 +312,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger x = ((BigIntegerPlainText)plainText).getX();
 		
 		//Calculates the length parameter s.
-		int s = (x.bitLength()/(publicKey.getModulus().bitLength() - 1)) + 1;
+		int s = (consts!=-1)?consts:((x.bitLength()/(publicKey.getModulus().bitLength() - 1)) + 1);
 		
 		BigInteger N = publicKey.getModulus().pow(s);
 		
@@ -361,7 +383,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = |cipher| / |n|
-		int s = (djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:((djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength());
 
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1)
 		BigInteger n = publicKey.getModulus();
@@ -446,12 +468,11 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = |cipher| / |n|.
-		int s = (djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:((djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength());
 
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1).
 		BigInteger n = publicKey.getModulus();
 		BigInteger Ntag = n.pow(s+1);
-		
 		
 		BigInteger NtagMinus1 = Ntag.subtract(BigInteger.ONE);
 		//Chooses a random r in ZNtag*, this can be done by choosing a random value between 1 and Ntag -1 
@@ -485,7 +506,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = |cipher| / |n|.
-		int s = (djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:((djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength());
 
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1).
 		BigInteger n = publicKey.getModulus();
@@ -533,7 +554,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		
 		//n is the modulus in the public key.
 		//Calculates s = |cipher|/ |n|.
-		int s = c.bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:(c.bitLength() / publicKey.getModulus().bitLength());
 		
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1).
 		BigInteger n = publicKey.getModulus();
@@ -582,8 +603,8 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 				
 		//n is the modulus in the public key.
 		//Calculates s = |cipher|/ |n|.
-		int s1 = c1.bitLength() / publicKey.getModulus().bitLength();
-		int s2 = c2.bitLength() / publicKey.getModulus().bitLength();
+		int s1 = (consts!=-1)?consts:(c1.bitLength() / publicKey.getModulus().bitLength());
+		int s2 = (consts!=-1)?consts:(c2.bitLength() / publicKey.getModulus().bitLength());
 		if(s1 != s2){
 			throw new IllegalArgumentException("Sizes of ciphertexts do not match");
 		}
@@ -639,7 +660,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = |cipher| / |n|.
-		int s = (djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:((djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength());
 				
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1).
 		BigInteger n = publicKey.getModulus();
@@ -688,7 +709,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = |cipher| / |n|.
-		int s = (djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength();
+		int s = (consts!=-1)?consts:((djCipher).getCipher().bitLength() / publicKey.getModulus().bitLength());
 
 		//Calculates N and N' based on s: N = n^s, N' = n^(s+1).
 		BigInteger n = publicKey.getModulus();

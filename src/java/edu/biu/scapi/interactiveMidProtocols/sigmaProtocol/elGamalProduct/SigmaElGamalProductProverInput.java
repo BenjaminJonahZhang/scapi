@@ -22,41 +22,54 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalProduct;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueProver.<p>
+ * In SigmaElGamalCommittedValue protocol, the prover gets an ElGamal commitment message, 
+ * the value committed x and the value r in Zq such that c1=g^r and c2 =h^r*x.
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+public class SigmaElGamalProductProverInput implements SigmaProverInput{
 	
-	public void setLengthParameter(int s);
-	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	private SigmaElGamalProductCommonInput params;
+	private BigInteger x2, r2, r3;
 	
 	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 * Sets the given public key, commitment, committed value and random value used to commit.
+	 * @param publicKey used to commit
+	 * @param commitment actual commitment value outputed from the commitment scheme on the given committed value.
+	 * @param x committed value
+	 * @param r random value used to commit.
 	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	public SigmaElGamalProductProverInput(ElGamalPublicKey publicKey,
+			ElGamalOnGroupElementCiphertext a, 
+			ElGamalOnGroupElementCiphertext b, 
+			ElGamalOnGroupElementCiphertext ab, 
+			BigInteger x2,
+			BigInteger r2,
+			BigInteger r3){
+		params = new SigmaElGamalProductCommonInput(publicKey, a, b, ab);
+		this.x2 = x2;
+		this.r2 = r2;
+		this.r3 = r3;
+	}
+	
+	public BigInteger getX2() { return x2; }
+	public BigInteger getR2() { return r2; }
+	public BigInteger getR3() { return r3; }
+
+	@Override
+	public SigmaElGamalProductCommonInput getCommonParams() {
+		return params;
+	}
+	
 }

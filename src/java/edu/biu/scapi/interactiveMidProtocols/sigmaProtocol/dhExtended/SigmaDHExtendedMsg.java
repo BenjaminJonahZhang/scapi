@@ -42,11 +42,11 @@ class SigmaDHExtendedMsg implements SigmaProtocolMsg {
 	
 	private ArrayList<GroupElementSendableData> aArray;
 	
-	SigmaDHExtendedMsg(ArrayList<GroupElementSendableData> aArray){
+	public SigmaDHExtendedMsg(ArrayList<GroupElementSendableData> aArray){
 		this.aArray = aArray;
 	}
 	
-	ArrayList<GroupElementSendableData> getArray(){
+	public ArrayList<GroupElementSendableData> getArray(){
 		return aArray;
 	} 
 

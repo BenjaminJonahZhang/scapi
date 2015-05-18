@@ -22,41 +22,31 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtendedStatistical;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaProtocol message. 
+ * This message contains an array of GroupElementSendableData and used when the DHExtended prover sends the first message to the verifier.
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+class SigmaDHExtendedStatisticalMsg implements SigmaProtocolMsg {
+
+	private static final long serialVersionUID = -501270711276791758L;
+	private ArrayList<BigInteger> aArray;
 	
-	public void setLengthParameter(int s);
+	SigmaDHExtendedStatisticalMsg(ArrayList<BigInteger> aArray){
+		this.aArray = aArray;
+	}
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
-	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	ArrayList<BigInteger> getArray(){
+		return aArray;
+	} 
+
 }

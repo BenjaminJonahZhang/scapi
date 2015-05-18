@@ -22,41 +22,39 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalProduct;
 
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
-
-import java.math.BigInteger;
-
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation SigmaProtocol message. <p>
+ * This message contains two GroupElement sendable data and used when the DH prover send the first message to the verifier.
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+public class SigmaElGamalProductAnnouncement implements SigmaProtocolMsg {
+
+	private static final long serialVersionUID = 1208840175220495797L;
 	
-	public void setLengthParameter(int s);
+	private GroupElementSendableData a1;
+	private GroupElementSendableData a2;
+	private GroupElementSendableData a3;
+	private GroupElementSendableData a4;
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	public SigmaElGamalProductAnnouncement(GroupElementSendableData a1,
+			                                      GroupElementSendableData a2,
+			                                      GroupElementSendableData a3,
+			                                      GroupElementSendableData a4) {
+		this.a1 = a1;
+		this.a2 = a2;
+		this.a3 = a3;
+		this.a4 = a4;
+	}
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	public GroupElementSendableData getA1() { return a1; }
+	public GroupElementSendableData getA2() { return a2; }
+	public GroupElementSendableData getA3() { return a3; }
+	public GroupElementSendableData getA4() { return a4; }
 }

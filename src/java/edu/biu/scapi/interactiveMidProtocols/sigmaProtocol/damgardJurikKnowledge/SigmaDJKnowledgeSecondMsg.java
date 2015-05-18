@@ -1,7 +1,7 @@
 /**
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* Copyright (c) 2014 - SCAPI (http://crypto.biu.ac.il/scapi)
 * This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
@@ -22,41 +22,37 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikKnowledge;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaProtocol message. 
+ * This message contains three BigIntegers and used when the DamgardJurikProduct2 prover send the second message to the verifier.
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Eindhoven University of Technology (Meilof Veeningen)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+class SigmaDJKnowledgeSecondMsg implements SigmaProtocolMsg{
 	
-	public void setLengthParameter(int s);
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	private static final long serialVersionUID = 1194972045393269648L;
+	private BigInteger z1;
+	private BigInteger z2;
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	SigmaDJKnowledgeSecondMsg(BigInteger z1, BigInteger z2){
+		this.z1 = z1;
+		this.z2 = z2;
+	}
+	
+	BigInteger getZ1(){
+		return z1;
+	}
+	
+	BigInteger getZ2(){
+		return z2;
+	}
+
 }

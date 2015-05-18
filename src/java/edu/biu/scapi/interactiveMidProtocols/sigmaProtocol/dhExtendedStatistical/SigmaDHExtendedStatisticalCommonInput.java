@@ -1,7 +1,7 @@
 /**
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* Copyright (c) 2014 - SCAPI (http://crypto.biu.ac.il/scapi)
 * This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
@@ -22,41 +22,63 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtendedStatistical;
 
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
-
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedStatistical verifier and simulator.<p>
+ * In SigmaProtocolDHStatisticalExtended, the common input contains lists u, v such that y=log_u1 v1=log_u2 v2=...=log_un vn mod N
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * @author Eindhoven University of Technology (Meilof Veeningen)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+public class SigmaDHExtendedStatisticalCommonInput implements SigmaCommonInput{
+
+	private static final long serialVersionUID = 1908006771270405668L;
 	
-	public void setLengthParameter(int s);
+	private BigInteger N;
 	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	private ArrayList<BigInteger> gArray;
+	private ArrayList<BigInteger> hArray;
 	
 	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 * Sets the input arrays.
+	 * @param gArray
+	 * @param hArray
 	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	public SigmaDHExtendedStatisticalCommonInput(BigInteger N, ArrayList<BigInteger> gArray, ArrayList<BigInteger> hArray){
+		this.N = N;
+		this.gArray = gArray;
+		this.hArray = hArray;
+	}
+	
+	public BigInteger getN() {
+		return N;
+	}
+	
+	public ArrayList<BigInteger> getGArray(){
+		return gArray;
+	}
+	
+	public ArrayList<BigInteger> getHArray(){
+		return hArray;
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        int gSize = gArray.size();
+		for(int i=0; i<gSize; i++){
+			out.writeObject(gArray.get(i));
+		}
+		
+		int hSize = hArray.size();
+		for(int i=0; i<hSize; i++){
+			out.writeObject(hArray.get(i));
+		}
+    }  
 }

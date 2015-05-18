@@ -1,7 +1,7 @@
 /**
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* Copyright (c) 2014 - SCAPI (http://crypto.biu.ac.il/scapi)
 * This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
@@ -22,41 +22,58 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikKnowledge;
 
-
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
-
-import java.math.BigInteger;
-
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaBIMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
- * By definition, this encryption scheme is CPA-secure and Indistinguishable.
+ * Concrete implementation of SigmaSimulatorOutput, used by SigmaDamgardJurikProduct2Simulator.<p>
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ * It contains the a, e, z types used in the above mentioned concrete simulator.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
+public class SigmaDJKnowledgeSimulatorOutput implements SigmaSimulatorOutput{
 	
-	public void setLengthParameter(int s);
-	
-	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
-	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	private SigmaBIMsg a;
+	private byte[] e;
+	private SigmaDJKnowledgeSecondMsg z;
 	
 	/**
-	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
-	 * it is also an encryption of originalPlaintext.<p>
-	 * @param cipher
-	 * @param r The random source to use in the function.
-	 * @throws IllegalStateException if no public key was set.
-	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 * Sets the given messages and challenge.
+	 * @param a protocol's first message 
+	 * @param e protocol's challenge
+	 * @param z protocol's second message 
 	 */
-	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
+	public SigmaDJKnowledgeSimulatorOutput(SigmaBIMsg a, byte[] e, SigmaDJKnowledgeSecondMsg z){
+		this.a = a;
+		this.e = e;
+		this.z = z;
+	}
+
+	/**
+	 * Returns the protocol's first message.
+	 * @return protocol's first message.
+	 */
+	public SigmaBIMsg getA() {
+		return a;
+	}
+
+	/**
+	 * Returns the protocol's challenge.
+	 * @return protocol's challenge.
+	 */
+	public byte[] getE() {
+		return e;
+	}
+
+	/**
+	 * Returns the protocol's second message.
+	 * @return protocol's second message.
+	 */
+	public SigmaDJKnowledgeSecondMsg getZ() {
+		return z;
+	}
 }
