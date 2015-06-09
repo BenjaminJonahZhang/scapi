@@ -67,8 +67,14 @@ export SHARED_LIB_EXT
 export JNI_LIB_EXT
 
 # target names
-CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension clean-malotext clean-ntl clean-openssl clean-opengarble clean-bouncycastle
-CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-malotext clean-jni-ntl clean-jni-openssl clean-jni-opengarble clean-jni-assets
+CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension \
+				clean-malotext clean-ntl clean-openssl clean-scgarbledcircuit \
+				clean-scgarbledcircuitnofixedkey clean-bouncycastle
+CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension \
+					clean-jni-malotext clean-jni-ntl clean-jni-openssl \
+					clean-jni-scgarbledcircuit clean-jni-scgarbledcircuitnofixedkey \
+					clean-jni-assets
+					
 
 # target names of jni shared libraries
 JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(JNI_LIB_EXT)
@@ -77,8 +83,9 @@ JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(J
 JNI_MALOTEXT:=src/jni/MaliciousOtExtensionJavaInterface/libMaliciousOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
-JNI_OPENGARBLE:=src/jni/OpenGarbleJavaInterface/libOpenGarbleJavaInterface$(JNI_LIB_EXT)
-JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-ntl #jni-opengarble
+JNI_SCGARBLEDCIRCUIT:=src/jni/ScGarbledCircuitJavaInterface/libScGarbledCircuitJavaInterface$(JNI_LIB_EXT)
+JNI_SCGARBLEDCIRCUITNOFIXEDKEY:=src/jni/ScGarbledCircuitNoFixedKeyJavaInterface/libScGarbledCircuitNoFixedKeyJavaInterface$(JNI_LIB_EXT)
+JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-ntl jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
@@ -107,7 +114,9 @@ SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-openssl compile-otextension compile-malotext compile-ntl
 
 ## targets
-all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
+#all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
+all: $(JNI_TARGETS)
+
 
 # compile and install the crypto++ lib:
 # first compile the default target (test program + static lib)
@@ -177,12 +186,19 @@ compile-openssl:
 	@$(MAKE) -C $(builddir)/OpenSSL install
 	@touch compile-openssl
 
-compile-opengarble:
-	@echo "Compiling the OpenGarble library..."
-	@cp -r lib/OpenGarble $(builddir)/OpenGarble
-	@$(MAKE) -C $(builddir)/OpenGarble
-	@$(MAKE) -C $(builddir)/OpenGarble install
-	@touch compile-opengarble
+compile-scgarbledcircuit:
+	@echo "Compiling the ScGarbledCircuit library..."
+	@cp -r lib/ScGarbledCircuit $(builddir)/ScGarbledCircuit
+	@$(MAKE) -C $(builddir)/ScGarbledCircuit
+	@$(MAKE) -C $(builddir)/ScGarbledCircuit install
+	@touch compile-scgarbledcircuit
+
+compile-scgarbledcircuitnofixedkey:
+	@echo "Compiling the ScGarbledCircuitNoFixedKey library..."
+	@cp -r lib/ScGarbledCircuitNoFixedKey $(builddir)/ScGarbledCircuitNoFixedKey
+	@$(MAKE) -C $(builddir)/ScGarbledCircuitNoFixedKey
+	@$(MAKE) -C $(builddir)/ScGarbledCircuitNoFixedKey install
+	@touch compile-scgarbledcircuitnofixedkey	
 
 compile-bouncycastle: $(JAR_BOUNCYCASTLE)
 compile-scapi: $(JAR_SCAPI)
@@ -195,7 +211,8 @@ jni-otextension: $(JNI_OTEXTENSION)
 jni-malotext: $(JNI_MALOTEXT)
 jni-ntl: $(JNI_NTL)
 jni-openssl: $(JNI_OPENSSL)
-jni-opengarble: $(JNI_OPENGARBLE)
+jni-scgarbledcircuit: $(JNI_SCGARBLEDCIRCUIT)
+jni-scgarbledcircuitnofixedkey: $(JNI_SCGARBLEDCIRCUITNOFIXEDKEY)
 
 # jni real targets
 $(JNI_CRYPTOPP): compile-cryptopp
@@ -228,11 +245,16 @@ $(JNI_OPENSSL): compile-openssl
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface
 	@cp $@ assets/
 
-$(JNI_OPENGARBLE): compile-opengarble
-	@echo "Compiling the OpenGarble jni interface..."
-	@$(MAKE) -C src/jni/OpenGarbleJavaInterface
+$(JNI_SCGARBLEDCIRCUIT): compile-scgarbledcircuit
+	@echo "Compiling the ScGarbledCircuit jni interface..."
+	@$(MAKE) -C src/jni/ScGarbledCircuitJavaInterface
 	@cp $@ assets/
 
+$(JNI_SCGARBLEDCIRCUITNOFIXEDKEY): compile-scgarbledcircuitnofixedkey
+	@echo "Compiling the ScGarbledCircuitNoFixedKey jni interface..."
+	@$(MAKE) -C src/jni/ScGarbledCircuitNoFixedKeyJavaInterface
+	@cp $@ assets/
+	
 # TODO: for now we avoid re-compiling bouncy castle, since it is very unstable,
 # and it does not compile on MAC OS X correctly.
 $(JAR_BOUNCYCASTLE):
@@ -305,11 +327,16 @@ clean-openssl:
 	@rm -rf $(builddir)/OpenSSL
 	@rm -f compile-openssl
 
-clean-opengarble:
-	@echo "Cleaning the opengarble build dir..."
-	@rm -rf $(builddir)/OpenGarble
-	@rm -f compile-opengarble
+clean-scgarbledcircuit:
+	@echo "Cleaning the ScGarbledCircuit build dir..."
+	@rm -rf $(builddir)/ScGarbledCircuit
+	@rm -f compile-scgarbledcircuit
 
+clean-scgarbledcircuitnofixedkey:
+	@echo "Cleaning the ScGarbledCircuitNoFixedKey build dir..."
+	@rm -rf $(builddir)/ScGarbledCircuitNoFixedKey
+	@rm -f compile-scgarbledcircuitnofixedkey
+	
 clean-bouncycastle:
 	@echo "Cleaning the bouncycastle build dir..."
 	@rm -rf $(builddir)/BouncyCastle
@@ -340,10 +367,14 @@ clean-jni-openssl:
 	@echo "Cleaning the OpenSSL jni build dir..."
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface clean
 
-clean-jni-opengarble:
-	@echo "Cleaning the OpenGarble jni build dir..."
-	@$(MAKE) -C src/jni/OpenGarbleJavaInterface clean
+clean-jni-scgarbledcircuit:
+	@echo "Cleaning the ScGarbledCircuit jni build dir..."
+	@$(MAKE) -C src/jni/ScGarbledCircuitJavaInterface clean
 
+clean-jni-scgarbledcircuitnofixedkey:
+	@echo "Cleaning the ScGarbledCircuitNoFixedKey jni build dir..."
+	@$(MAKE) -C src/jni/ScGarbledCircuitNoFixedKeyJavaInterface clean
+	
 clean-jni-assets:
 	@echo "Cleaning the JNI assets..."
 	@rm -f assets/*$(JNI_LIB_EXT)
