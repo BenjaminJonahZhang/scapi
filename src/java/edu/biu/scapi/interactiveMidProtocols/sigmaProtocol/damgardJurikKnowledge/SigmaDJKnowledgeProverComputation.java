@@ -53,7 +53,7 @@ public class SigmaDJKnowledgeProverComputation implements SigmaProverComputation
 	/*	
 	  This class computes the following calculations:
 	        SAMPLE random values a <- ZN, u <- Z*n
-	        COMPUTE B=(1+n)^a u^N'
+	        COMPUTE B=(1+n)^a u^N mod N'
 	        COMPUTE t=floor((a+cy)/N), d=a+cy mod N, e=u r^c (1+n)^t mod N'  
 	*/	
 	
@@ -161,7 +161,7 @@ public class SigmaDJKnowledgeProverComputation implements SigmaProverComputation
 	/**
 	 * Computes the first message of the protocol.<p>
 	 * 	 SAMPLE random values a <- ZN, u <- Z*n
-	 *   COMPUTE B=(1+n)^a u^N'
+	 *   COMPUTE B=(1+n)^a u^N mod N'
 	 * @param input MUST be an instance of SigmaDJKnowledgeProverInput.
 	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProduct2ProverInput.

@@ -37,12 +37,10 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
  * 
- * This protocol is used for a party to prove that 3 ciphertexts c1,c2,c3 are encryptions of values x1,x2,x3 s.t. x1*x2=x3 mod N.<p>
- * 
  * This protocol is due to Cramer, Damg{\aa}rd, and Nielsen, "Multiparty Computation from Threshold Homomorphic Encryption"
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
- *
+ * @author Eindhoven University of Technology (Meilof Veeningen)
+ * 
  */
 public class SigmaDJKnowledgeVerifierComputation implements SigmaVerifierComputation, DJBasedSigma{
 

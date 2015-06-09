@@ -32,8 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * 
  * It contains the a, e, z types used in the above mentioned concrete simulator.
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
- *
+ * @author Eindhoven University of Technology (Meilof Veeningen)
  */
 public class SigmaDJKnowledgeSimulatorOutput implements SigmaSimulatorOutput{
 	
