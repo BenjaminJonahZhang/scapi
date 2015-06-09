@@ -48,17 +48,25 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
 public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 
 	
+	public static enum CircuitType {
+		
+		FREE_XOR_HALF_GATES,
+		FREE_XOR_ROW_REDUCTION,
+		FREE_XOR_STANDARD,
+		STANDARD
+	}
+	
+	
 	private static final int SCAPI_NATIVE_KEY_SIZE = 16;//The number of bytes in each just garbled key 
 	private long garbledCircuitPtr = 0; //Pointer to the native garbledCircuit object
 	private int numberOfParties;
 	private int[] inputsIndices;
 	private int[] outputWireIndices;
 	private int[] numOfInputsForEachParty;
-	private boolean isFreeXor;
-	private boolean isRowReduction;
 	private byte[] garbledInputs;
+	private boolean isNonXorOutputsRequired;
 	
-	private native long createGarbledcircuit(String fileName, boolean isFreeXor, boolean isRowReduction,boolean isNonXorOutputsRequired);//Creates a garbled. It returns the pointer to that circuit saved in the dll memory 
+	private native long createGarbledcircuit(String fileName, int type, boolean isNonXorOutputsRequired);//Creates a garbled. It returns the pointer to that circuit saved in the dll memory 
 	private native int[] getOutputIndicesArray(long ptr);//Returns the output indices taken from the circuit file.
 	private native int[] getInputIndicesArray(long ptr);//Returns the input indices taken from the circuit file..
 	private native int[] getNumOfInputsForEachParty(long ptr);//Returns an array that stores the number of inputs for each party
@@ -84,7 +92,7 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	private native long garble( byte[] inputKeys, byte[] outputKeys, byte[] translationTable, byte[] seed, long ptr);//Does the garbling of the circuit, returns the input keys and the output keys that were generated
 																			  //by the circuit. The input and the output keys are converted to the structures that are defined 
 																			  //in the SCAPI circuit
-	private native byte[] compute(long ptr, byte[] inputKeys, boolean isFreeXor, boolean isRowReduction);//Does the compute and returns the output keys that are the results.
+	private native byte[] compute(long ptr, byte[] inputKeys);//Does the compute and returns the output keys that are the results.
 	private native boolean verify(long ptr, byte[] bothInputKeys);//Does the compute and returns the output keys that are the results.
 	private native boolean internalVerify(long ptr, byte[] bothInputKeys, byte[] emptyBothOutputKeys);//does the verify without checking the translation table
 	private native byte[] translate(long ptr, byte[] ouyputKeys);
@@ -103,14 +111,12 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	 * @param isFreeXor a flag indicating the use of the optimization of FreeXor
 	 * @param isRowReduction a flag indicating the use of the optimization of Row Reduction
 	 */
-	public ScNativeGarbledBooleanCircuit(String fileName, boolean isFreeXor, boolean isRowReduction, boolean isNonXorOutputsRequired){
+	public ScNativeGarbledBooleanCircuit(String fileName, CircuitType type, boolean isNonXorOutputsRequired){
 
-		this.isFreeXor = isFreeXor;
-		this.isRowReduction = isRowReduction;
-		
+		this.isNonXorOutputsRequired = isNonXorOutputsRequired;
 		
 		//create an object in the native code
-		garbledCircuitPtr = createGarbledcircuit(fileName, isFreeXor, isRowReduction,isNonXorOutputsRequired);
+		garbledCircuitPtr = createGarbledcircuit(fileName, type.ordinal(),isNonXorOutputsRequired);
 	
 		outputWireIndices =  getOutputIndicesArray(garbledCircuitPtr);//Returns the output indices taken from the circuit file.
 		inputsIndices = getInputIndicesArray(garbledCircuitPtr);//Returns the input indices taken from the circuit file..
@@ -230,7 +236,7 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 				throw new NotAllInputsSetException();
 			}
 		
-		byte[] result = compute(garbledCircuitPtr, garbledInputs, isFreeXor, isRowReduction);
+		byte[] result = compute(garbledCircuitPtr, garbledInputs);
 		
 		//PATCH should be removed after jni problems are solved.
 		//temp.getTime();
@@ -251,6 +257,10 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
      */
 	@Override
 	public boolean verify(byte[] allInputWireValues) {
+		
+		if(isNonXorOutputsRequired==true){
+			throw new IllegalStateException("cannot verify without seed");
+		}
 		return verify(garbledCircuitPtr, allInputWireValues);
 		
 	}
@@ -268,6 +278,9 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	@Override
 	public boolean internalVerify(byte[] allInputWireValues, byte[] allOutputWireValues) {
 		
+		if(isNonXorOutputsRequired==true){
+			throw new IllegalStateException("cannot verify without seed");
+		}
 		return internalVerify(garbledCircuitPtr, allInputWireValues, allOutputWireValues);
 	}
 	
@@ -394,7 +407,8 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	}
 	@Override
 	public int getNumberOfInputs(int partyNumber) throws NoSuchPartyException {
-		return inputsIndices.length;
+		
+		return numOfInputsForEachParty[partyNumber-1];
 	}
 	@Override
 	public int getNumberOfParties() {
@@ -415,6 +429,11 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	@Override
 	public int getKeySize() {
 		return SCAPI_NATIVE_KEY_SIZE;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		deleteCircuit(garbledCircuitPtr);
 	}
 	
 	static {
