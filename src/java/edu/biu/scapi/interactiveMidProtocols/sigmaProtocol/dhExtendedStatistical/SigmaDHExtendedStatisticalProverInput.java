@@ -30,11 +30,11 @@ import java.util.ArrayList;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedProver.<p>
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedStatisticalProver.<p>
  *
  * Proves knowledge of y (of size N) s.t. y=log_u1 v1=log_u2 v2=...=log_un vn mod N
  * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ * @author Eindhoven University of Technology (Meilof Veeningen)
  *
  */
 public class SigmaDHExtendedStatisticalProverInput implements SigmaProverInput{
