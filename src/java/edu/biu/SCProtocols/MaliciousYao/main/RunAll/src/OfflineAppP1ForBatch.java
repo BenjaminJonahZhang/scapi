@@ -14,6 +14,7 @@ import edu.biu.protocols.yao.primitives.CryptoPrimitives;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Party;
 import edu.biu.scapi.exceptions.CircuitFileFormatException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
@@ -92,11 +93,11 @@ public class OfflineAppP1ForBatch {
 		}
 			
 		for (int i=0; i<mainGbc.length; i++){
-			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, true, false, true);
+			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		for (int i=0; i<crGbc.length; i++){
-			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, true, false, true);
+			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 			
@@ -157,6 +158,7 @@ public class OfflineAppP1ForBatch {
 			runtime = (end - start) / 1000000;
 			System.out.println("Saving buckets took " + runtime + " miliseconds.");
 		}
+		
 		commConfig.close();
 	}
 	
