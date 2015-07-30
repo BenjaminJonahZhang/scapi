@@ -41,7 +41,7 @@ public class OfflineProtocolP2 {
 	private BucketList<LimitedBundle> mainBuckets;		//Contain the main circuits.
 	private BucketList<LimitedBundle> crBuckets;		//Contain the cheating recovery circuits.
 	private OTExtensionMaliciousReceiver maliciousOtReceiver;		//The malicious OT used to transfer the keys.
-	
+	private boolean writeToFile;
 	/**
 	 * Constructor that sets the parameters. 
 	 * @param mainExecution Parameters of the main circuit.
@@ -50,21 +50,23 @@ public class OfflineProtocolP2 {
 	 * @param communication Configuration of communication between parties.
 	 */
 	public OfflineProtocolP2(ExecutionParameters mainExecution, ExecutionParameters crExecution, CryptoPrimitives primitives, 
-			CommunicationConfig communication, OTExtensionMaliciousReceiver maliciousOtReceiver) {
+			CommunicationConfig communication, OTExtensionMaliciousReceiver maliciousOtReceiver, boolean writeToFile) {
 		this.mainExecution = mainExecution;
 		this.crExecution = crExecution;
 		this.primitives = primitives;
 		this.channels = communication.getChannels();		// Get the channel from the communication configuration.
 		this.maliciousOtReceiver = maliciousOtReceiver;
+		this.writeToFile = writeToFile;
 	}
 	
 	/**
 	 * Runs the second party in the offline phase of the malicious Yao protocol.
 	 */
 	public void run() {
-		//LogTimer timer = new LogTimer("selecting and sending probe resistant matrices");
+		//LogTimer timer = new LogTimer("Offline protocol P2");
 		try {
 			int crInputSizeY = primitives.getMultiKeyEncryptionScheme().getCipherSize()*8;
+			//timer.reset("selecting and sending probe resistant matrices");
 			
 			// Selecting E and sending it to P1.
 			mainMatrix = selectAndSendProbeResistantMatrix(mainExecution);
@@ -72,33 +74,32 @@ public class OfflineProtocolP2 {
 			crMatrix = selectAndSendProbeResistantMatrix(crInputSizeY, crExecution.statisticalParameter()); 
 			//timer.stop();
 			
-		//	timer.reset("runCutAndChooseProtocol(AES)");
+			//timer.reset("runCutAndChooseProtocol(AES)");
 			//Create the main bundleBuilder from the main circuit.
 			//Use the first circuit only because there is no use of thread in this party and therefore, only one circuit is needed.
 			BundleBuilder mainBundleBuilder = new BundleBuilder(mainExecution.getCircuit(0), mainMatrix, primitives, channels);
 			
 			//Run Cut and Choose protocol on the main circuit.
-			mainBuckets = runCutAndChooseProtocol(mainExecution, mainMatrix, mainBundleBuilder); 
-		//	timer.stop();
+			mainBuckets = runCutAndChooseProtocol(mainExecution, mainMatrix, mainBundleBuilder, ((writeToFile == false) ? null : "main")); 
+			//timer.stop();
 			
-		//	timer.reset("runCutAndChooseProtocol(CR)");
+			//timer.reset("runCutAndChooseProtocol(CR)");
 			//Create the cheating recovery bundleBuilder from the main circuit.
 			//Use the first circuit only because there is no use of thread in this party and therefore, only one circuit is needed.
 			BundleBuilder crBundleBuilder = new CheatingRecoveryBundleBuilder(crExecution.getCircuit(0), crMatrix, 
 					primitives, channels, primitives.getMultiKeyEncryptionScheme().generateKey());
 			//Run Cut and Choose protocol on the cheating recovery circuit.
-			crBuckets = runCutAndChooseProtocol(crExecution, crMatrix, crBundleBuilder, getSecretSharingLabels(crInputSizeY)); 
-		//	timer.stop();
+			crBuckets = runCutAndChooseProtocol(crExecution, crMatrix, crBundleBuilder, getSecretSharingLabels(crInputSizeY), ((writeToFile == false) ? null :"cr")); 
+			//timer.stop();
 			
-		//	timer.reset("runObliviousTransferOnP2Keys(AES)");
+			//timer.reset("runObliviousTransferOnP2Keys(AES)");
 			//Run OT on p2 keys of the main circuit.
 			runObliviousTransferOnP2Keys(mainExecution, mainMatrix, mainBuckets);
-		//	timer.stop();
-			
-		//	timer.reset("runObliviousTransferOnP2Keys(CR)");
+			//timer.stop();
+			//timer.reset("runObliviousTransferOnP2Keys(CR)");
 			//Run OT on p2 keys of the cheating recovery circuit.
 			runObliviousTransferOnP2Keys(crExecution, crMatrix, crBuckets);
-		//	timer.stop();
+			//timer.stop();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (CheatAttemptException e) {
@@ -181,9 +182,9 @@ public class OfflineProtocolP2 {
 	 * @throws CheatAttemptException
 	 */
 	private BucketList<LimitedBundle> runCutAndChooseProtocol(ExecutionParameters execution, 
-			KProbeResistantMatrix matrix, BundleBuilder bundleBuilder) throws IOException, CheatAttemptException {
+			KProbeResistantMatrix matrix, BundleBuilder bundleBuilder, String garbledTablesFilePrefix) throws IOException, CheatAttemptException {
 		//Call the other function with Y2 input indices = null.
-		return runCutAndChooseProtocol(execution, matrix, bundleBuilder, null);
+		return runCutAndChooseProtocol(execution, matrix, bundleBuilder, null, garbledTablesFilePrefix);
 	}
 	
 	/**
@@ -197,10 +198,10 @@ public class OfflineProtocolP2 {
 	 * @throws CheatAttemptException
 	 */
 	private BucketList<LimitedBundle> runCutAndChooseProtocol(ExecutionParameters execution, KProbeResistantMatrix matrix, 
-			BundleBuilder bundleBuilder, int[] inputLabelsY2) throws IOException, CheatAttemptException {
+			BundleBuilder bundleBuilder, int[] inputLabelsY2, String garbledTablesFilePrefix) throws IOException, CheatAttemptException {
 		//Create the cut and choose verifier.
 		CutAndChooseVerifier verifier = new CutAndChooseVerifier(execution, primitives, channels, 
-				bundleBuilder, matrix, inputLabelsY2);
+				bundleBuilder, matrix, inputLabelsY2, garbledTablesFilePrefix);
 		//Run the cut and choose protocol.
 		verifier.run();
 		//Return the buckets that were generated in the cut and choose protocol.
