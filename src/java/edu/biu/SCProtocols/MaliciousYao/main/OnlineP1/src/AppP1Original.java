@@ -14,6 +14,7 @@ import edu.biu.protocols.yao.primitives.CryptoPrimitives;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 
 public class AppP1Original {
 	private static final int PARTY = 1;
@@ -70,24 +71,24 @@ public class AppP1Original {
 //			double p2 = 0.64; //0.6;
 			
 			int N1 = 32;
-			int B1 = 8;
+			int B1 = 7;
 			int s1 = 40;
-			double p1 = 0.73;
+			double p1 = 0.62;
 			
 			int N2 = 32;
-			int B2 = 24;
+			int B2 = 20;
 			int s2 = 40;
-			double p2 = 0.8;
+			double p2 = 0.71;
 			
 //			int N1 = 128;
-//			int B1 = 6;
-//			int s1 = 40;
+//			int B1 = 12;
+//			int s1 = 80;
 //			double p1 = 0.77;
 //			
 //			int N2 = 128;
-//			int B2 = 14;
-//			int s2 = 40;
-//			double p2 = 0.76;
+//			int B2 = 28;
+//			int s2 = 80;
+//			double p2 = 0.75;
 			
 //			int N1 = 1024;
 //			int B1 = 4;
@@ -107,13 +108,11 @@ public class AppP1Original {
 			
 			
 			for (int i=0; i<B1; i++){
-				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, true, false, true);
-//				mainGbc[i] = new ScNativeGarbledBooleanCircuitNoFixedKey(CIRCUIT_FILENAME, true, false, true,true);
+				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 			for (int i=0; i<B2; i++){
-				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, true, false, true);
-//				crGbc[i] = new ScNativeGarbledBooleanCircuitNoFixedKey(CIRCUIT_CHEATING_RECOVERY, true, false, true,true);
+				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 			ExecutionParameters mainExecution = new ExecutionParameters(mainCircuit, mainGbc, N1, s1, B1, p1);
@@ -146,7 +145,7 @@ public class AppP1Original {
 //			System.out.println("enter something...");
 //			System.in.read();
 			int numThreads = 0;
-			for (int j=0; j<1; j++){
+			for (int j=0; j<10; j++){
 				primitives = CryptoPrimitives.defaultPrimitives(numThreads);
 				System.out.println("start execute 1000 times with "+ numThreads +" threads.");
 	
