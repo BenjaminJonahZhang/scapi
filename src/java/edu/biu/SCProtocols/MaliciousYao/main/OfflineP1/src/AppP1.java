@@ -12,13 +12,13 @@ import edu.biu.protocols.yao.primitives.CryptoPrimitives;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Party;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTExtensionMaliciousSender;
 
 public class AppP1 {
 	private static final int PARTY = 1;
 	private static final String HOME_DIR = "C:/GitHub/Development/MaliciousYaoProtocol/MaliciousYao";
-//	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/AES/AES_Final-2.txt";
 	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/AES/NigelAes.txt";
 	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/AES/AESPartyOneInputs.txt";
 //	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/ADD/NigelAdd32.txt";
@@ -27,6 +27,8 @@ public class AppP1 {
 //	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/SHA1/SHA1PartyOneInputs.txt";
 //	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/SHA256/NigelSHA256.txt";
 //	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/SHA256/SHA256PartyOneInputs.txt";
+//	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/MinCut/NigelMinCircuit.txt";
+//	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/MinCut/MinCutPartyOneInputs.txt";
 	private static final String COMM_CONFIG_FILENAME = HOME_DIR + "/assets/conf/Parties0.properties";
 	
 	private static final String CIRCUIT_CHEATING_RECOVERY = HOME_DIR + "/assets/circuits/CheatingRecovery/UnlockP1Input.txt";
@@ -40,6 +42,9 @@ public class AppP1 {
 //	private static final String BUCKETS_PREFIX_CR = HOME_DIR + "/data/P1/shaCr";
 //	private static final String CIRCUIT_CHEATING_RECOVERY = HOME_DIR + "/assets/circuits/CheatingRecovery/UnlockP1InputSHA256.txt";
 //	private static final String BUCKETS_PREFIX_MAIN = HOME_DIR + "/data/P1/sha256";
+//	private static final String BUCKETS_PREFIX_CR = HOME_DIR + "/data/P1/cr";
+//	private static final String CIRCUIT_CHEATING_RECOVERY = HOME_DIR + "/assets/circuits/CheatingRecovery/UnlockP1InputMinCut.txt";
+//	private static final String BUCKETS_PREFIX_MAIN = HOME_DIR + "/data/P1/minCut";
 //	private static final String BUCKETS_PREFIX_CR = HOME_DIR + "/data/P1/cr";
 	
 	public static void main(String[] args) {
@@ -84,24 +89,24 @@ public class AppP1 {
 //			double p2 = 0.85;
 			
 			int N1 = 32;
-			int B1 = 8;
+			int B1 = 7;
 			int s1 = 40;
-			double p1 = 0.73;
+			double p1 = 0.62;
 			
 			int N2 = 32;
-			int B2 = 24;
+			int B2 = 20;
 			int s2 = 40;
-			double p2 = 0.8;
+			double p2 = 0.71;
 			
 //			int N1 = 128;
-//			int B1 = 6;
-//			int s1 = 40;
+//			int B1 = 12;
+//			int s1 = 80;
 //			double p1 = 0.77;
 //			
 //			int N2 = 128;
-//			int B2 = 14;
-//			int s2 = 40;
-//			double p2 = 0.76;
+//			int B2 = 28;
+//			int s2 = 80;
+//			double p2 = 0.75; 
 			
 //			int N1 = 1024;
 //			int B1 = 4;
@@ -126,11 +131,12 @@ public class AppP1 {
 			}
 				
 			for (int i=0; i<mainGbc.length; i++){
-				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, true, false, true);
+				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 			for (int i=0; i<crGbc.length; i++){
-				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, true, false, true);
+				
+				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 				

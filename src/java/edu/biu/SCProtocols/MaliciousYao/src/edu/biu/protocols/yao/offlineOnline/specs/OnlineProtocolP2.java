@@ -31,8 +31,6 @@ import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Wire;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
-import edu.biu.scapi.circuits.garbledCircuit.GarbledTablesHolder;
-import edu.biu.scapi.circuits.garbledCircuit.JustGarbledGarbledTablesHolder;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolInput;
@@ -381,7 +379,6 @@ public class OnlineProtocolP2 implements Protocol {
 			KProbeResistantMatrix matrix, byte[] y2, int from, int to) {
 		//The labels are equal in all circuits.
 		int[] inputLabelsY2 = bucket.get(0).getInputLabelsY2();
-		int[] inputLabelsY1Extended = bucket.get(0).getInputLabelsY1Extended();
 		
 		int hashSize = primitives.getCryptographicHash().getHashedMsgSize();
 		
@@ -393,19 +390,15 @@ public class OnlineProtocolP2 implements Protocol {
 			CommitmentBundle commitmentBundleY2 = circuitBundle.getCommitmentsY2();
 			
 			//Get the extended keys generated in the offline phase.
-			HashMap<Integer, SecretKey> inputKeysY1Extended = circuitBundle.getY1ExtendedInputKeys();
+			byte[] inputKeysY1Extended = circuitBundle.getY1ExtendedInputKeys();
+			byte[] cloneY1Extended = new byte[inputKeysY1Extended.length];
+			System.arraycopy(inputKeysY1Extended, 0, cloneY1Extended, 0, inputKeysY1Extended.length);
 			
-			//Copy the extended keys to a one dimension array in order to get better performance in the native implementation.
-			int size = inputLabelsY1Extended.length;
-			byte[] inputKeysY1ExtendedArray = new byte[keyLength*size];
-			for (int i=0; i<size; i++){
-				System.arraycopy(inputKeysY1Extended.get(inputLabelsY1Extended[i]).getEncoded(), 0, inputKeysY1ExtendedArray, keyLength*i, keyLength);
-			}
 			// Call the native method that xor the commitment mask with Y1 extended keys received in offline phase.
-			xorKeysWithMask(inputKeysY1ExtendedArray, commitmentMask, size);
+			xorKeysWithMask(cloneY1Extended, commitmentMask, inputKeysY1Extended.length/keyLength);
 			
 			//Restore the original y1 keys using the given probe resistant matrix and the result of xoring the commitment mask with Y1 extended keys.
-			byte[] y1Keys = matrix.restoreKeys(inputKeysY1ExtendedArray);
+			byte[] y1Keys = matrix.restoreKeys(cloneY1Extended);
 		
 			//Copy the commitments, values and random values to a one dimension array in order to get better performance in the native implementation.
 			byte[] commitments = new byte[inputLabelsY2.length*hashSize];
@@ -501,9 +494,10 @@ public class OnlineProtocolP2 implements Protocol {
 		for (int i = 0; i < modifiedD2.length; i++) {
 			modifiedD2[i] = (byte) (d2[i] ^ maskOnD2[i]);
 		}
-		
 		//Call the function that verifies with the xor result.
 		receiveAndVerifyY2InputKeys(bucket, evaluationPackage, matrix, modifiedD2);
+		
+		
 	}
 	
 	/**

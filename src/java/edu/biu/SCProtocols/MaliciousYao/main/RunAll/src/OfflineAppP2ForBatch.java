@@ -15,6 +15,7 @@ import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Party;
 import edu.biu.scapi.exceptions.CircuitFileFormatException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
@@ -50,6 +51,7 @@ public class OfflineAppP2ForBatch {
 		Boolean addThreadsTitle = new Boolean(args[counter++]);
 		Boolean newLine = new Boolean(args[counter++]);
 		Boolean saveToDisk = new Boolean(args[counter++]);
+		Boolean writeTablesToDisk = new Boolean(args[counter++]);
 		System.out.println("N1 = " + N1+ " B1 = "+ B1 + " s1 = "+ s1 + " p1 = "+ p1 + " N2 = " + N2+ " B2 = "+ B2 + 
 				" s2 = " + s2+ " p2 = "+ p2 + "numOfThread = " + numOfThread);
 		System.out.println("addFileTitle =  "+ addFileTitle + " addThreadsTitle = "+ addThreadsTitle+ " newLine = "+ newLine+ " SaveToDisk = "+ saveToDisk);
@@ -63,7 +65,6 @@ public class OfflineAppP2ForBatch {
 		
 		CryptoPrimitives primitives = CryptoPrimitives.defaultPrimitives(numOfThread);
 		commConfig.connectToOtherParty(1 + primitives.getNumOfThreads());
-		
 		BooleanCircuit mainCircuit = null;
 		CircuitInput input = null;
 		// we read the circuit and this party's input from file
@@ -99,11 +100,11 @@ public class OfflineAppP2ForBatch {
 			
 		}
 		for (int i=0; i<mainGbc.length; i++){
-			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, true, false, true);
+			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		for (int i=0; i<crGbc.length; i++){
-			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, true, false, true);
+			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		ExecutionParameters mainExecution = new ExecutionParameters(mainCircuit, mainGbc, N1, s1, B1, p1);
@@ -127,7 +128,7 @@ public class OfflineAppP2ForBatch {
 		long start = System.nanoTime();
 		
 		// and run the protocol
-		protocol = new OfflineProtocolP2(mainExecution, crExecution, primitives, commConfig, otReceiver);
+		protocol = new OfflineProtocolP2(mainExecution, crExecution, primitives, commConfig, otReceiver, writeTablesToDisk);
 		
 		
 		System.out.println(String.format("Starting Offline protocol (P2)"));
@@ -142,7 +143,6 @@ public class OfflineAppP2ForBatch {
 		if (newLine){
 			output.append("\n");
 		}
-		
 		output.close();
 		
 		if (saveToDisk){
@@ -168,7 +168,6 @@ public class OfflineAppP2ForBatch {
 			runtime = (end - start) / 1000000;
 			System.out.println("Saving buckets took " + runtime + " miliseconds.");
 		}
-		
 		commConfig.close();
 	}
 	

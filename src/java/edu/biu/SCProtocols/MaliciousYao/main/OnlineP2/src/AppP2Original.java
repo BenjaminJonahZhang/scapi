@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.biu.protocols.yao.common.LogTimer;
 import edu.biu.protocols.yao.offlineOnline.primitives.BucketList;
+import edu.biu.protocols.yao.offlineOnline.primitives.Bundle;
 import edu.biu.protocols.yao.offlineOnline.primitives.ExecutionParameters;
 import edu.biu.protocols.yao.offlineOnline.primitives.LimitedBundle;
 import edu.biu.protocols.yao.offlineOnline.specs.OnlineProtocolP2;
@@ -16,6 +17,7 @@ import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolOutput;
 import edu.biu.scapi.exceptions.CheatAttemptException;
@@ -91,24 +93,26 @@ public class AppP2Original {
 //			double p2 = 0.64; //0.6;
 			
 			int N1 = 32;
-			int B1 = 8;
+			int B1 = 7;
 			int s1 = 40;
-			double p1 = 0.73;
+			double p1 = 0.62;
 			
 			int N2 = 32;
-			int B2 = 24;
+			int B2 = 20;
 			int s2 = 40;
-			double p2 = 0.8;
+			double p2 = 0.71;
 			
+			
+
 //			int N1 = 128;
-//			int B1 = 6;
-//			int s1 = 40;
+//			int B1 = 12;
+//			int s1 = 80;
 //			double p1 = 0.77;
 //			
 //			int N2 = 128;
-//			int B2 = 14;
-//			int s2 = 40;
-//			double p2 = 0.76;
+//			int B2 = 28;
+//			int s2 = 80;
+//			double p2 = 0.75;
 			
 //			int N1 = 1024;
 //			int B1 = 4;
@@ -125,11 +129,11 @@ public class AppP2Original {
 			
 			
 			for (int i=0; i<B1; i++){
-				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, true, false, true);
+				mainGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_FILENAME, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 			for (int i=0; i<B2; i++){
-				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, true, false, true);
+				crGbc[i] = new ScNativeGarbledBooleanCircuit(CIRCUIT_CHEATING_RECOVERY, CircuitType.FREE_XOR_HALF_GATES, true);
 			}
 			
 //			FastGarbledBooleanCircuit[] mainGbc = new ScNativeGarbledBooleanCircuitNoFixedKey[B1];
@@ -172,12 +176,13 @@ public class AppP2Original {
 
 			// only now we start counting the running time 
 			LogTimer timer = new LogTimer("Online protocol (P2)", true);
-			
+			ArrayList<LimitedBundle> tempmainBucket = mainBuckets.get(0);
+			ArrayList<LimitedBundle> tempcrBucket = crBuckets.get(0);
 			int numberOfTimes = 1;
 			long[] average = new long[numberOfTimes];
 
 			int numThreads = 0;
-			for (int j=0; j<1; j++){
+			for (int j=0; j<10; j++){
 				primitives = CryptoPrimitives.defaultPrimitives(numThreads);
 				System.out.println("start execute "+ numberOfTimes +" times with "+ numThreads +" threads.");
 				
@@ -192,6 +197,16 @@ public class AppP2Original {
 
 						ArrayList<LimitedBundle> mainBucket = mainBuckets.get(i);
 						ArrayList<LimitedBundle> crBucket = crBuckets.get(i);
+						
+						if (i==0){
+							System.out.println("starting comparing");
+							if (!tempmainBucket.equals(mainBucket)){
+								System.out.println("temp is different from the main bucket");
+							}
+							if (!tempcrBucket.equals(crBucket)){
+								System.out.println("temp is different from the cr bucket");
+							}
+						}
 						protocol = new OnlineProtocolP2(mainExecution, crExecution, primitives, commConfig, mainBucket, crBucket, mainMatrix, crMatrix);
 						protocol.start(input);
 						protocol.run();

@@ -1,7 +1,6 @@
 package edu.biu.protocols.yao.offlineOnline.primitives;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,7 +14,9 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash.CmtSimpleHashCommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash.CmtSimpleHashCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash.CmtSimpleHashDecommitmentMessage;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
 
@@ -64,12 +65,15 @@ public class CommitmentBundleBuilder {
 	 * @return the created CommitmentBundle.
 	 */
 	public CommitmentBundle build(byte[] wires, int[] labels, byte[] commitmentMask, byte[] placementMask) {
-		HashMap<Integer, CmtCCommitmentMsg[]> commitments = new HashMap<Integer, CmtCCommitmentMsg[]>();
-		HashMap<Integer, CmtCDecommitmentMessage[]> decommitments = new HashMap<Integer, CmtCDecommitmentMessage[]>();
+		int cmtSize = 20;
+		int keySize = 16;
+		byte[] commitments = new byte[labels.length * 2 * cmtSize];
+		long[] commitmentIds = new long[labels.length * 2];
+		byte[] decommitments = new byte[labels.length *2 *keySize];
+		byte[] decommitmentsRandoms = new byte[labels.length *2 *cmtSize];
 		
 		// For each wire w (indexed with i)
 		for (int i = 0; i < labels.length; i++) {
-			int w = labels[i];
 			SecretKey[] keys = new SecretKey[2];
 			keys[0] = new SecretKeySpec(wires, i*keyLength*2, keyLength, "");
 			keys[1] = new SecretKeySpec(wires, (i*2+1)*keyLength, keyLength, "");
@@ -82,8 +86,6 @@ public class CommitmentBundleBuilder {
 			}
 			
 			// Generate Com(K0), Com(K1), Decom(K0), Decom(K1) according to the ordering in B[j].
-			CmtCCommitmentMsg[] com = new CmtCCommitmentMsg[2];
-			CmtCDecommitmentMessage[] decom = new CmtCDecommitmentMessage[2];
 			for (int k = 0; k < keys.length; k++) {
 				CmtCommitValue commitValue;
 				SecretKey effectiveKey = keys[k];
@@ -101,15 +103,19 @@ public class CommitmentBundleBuilder {
 				} catch (CommitValueException e) {
 					throw new IllegalStateException(e);
 				}
-				com[k] = committer.generateCommitmentMsg(commitValue, commitLabel);
-				decom[k] = committer.generateDecommitmentMsg(commitLabel);
+				
+				CmtCCommitmentMsg commitment = committer.generateCommitmentMsg(commitValue, commitLabel);
+				CmtCDecommitmentMessage decommitment = committer.generateDecommitmentMsg(commitLabel);
+				System.arraycopy(((CmtSimpleHashCommitmentMessage)commitment).getCommitment(), 0, commitments, i*2*cmtSize+k*cmtSize, cmtSize);
+				commitmentIds[i*2+k] = ((CmtSimpleHashCommitmentMessage)commitment).getId();
+				System.arraycopy(((CmtSimpleHashDecommitmentMessage)decommitment).getX(), 0, decommitments, i*2*keySize+k*keySize, keySize);
+				System.arraycopy(((CmtSimpleHashDecommitmentMessage)decommitment).getR().getR(), 0, decommitmentsRandoms, i*2*cmtSize+k*cmtSize, cmtSize);
+				
 				commitLabel++;
 			}
-			commitments.put(w, com);
-			decommitments.put(w, decom);
 		}
 
-		return new CommitmentBundle(labels, commitments, decommitments);
+		return new CommitmentBundle(commitments, commitmentIds, decommitments, decommitmentsRandoms);
 	}
 	
 	/**

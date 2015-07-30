@@ -1,6 +1,16 @@
 package edu.biu.protocols.yao.offlineOnline.subroutines;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.FileOutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +76,7 @@ public class CutAndChooseVerifier {
 	
 	private GarbledTablesHolder[] garbledTables;		//Will hold the garbled table of each circuit.
 	private byte[][] translationTables;					//Will hold the translation table of each circuit.
-	
+	private String filePrefix;
 	/*
 	 * wires' indices.
 	 */
@@ -100,9 +110,9 @@ public class CutAndChooseVerifier {
 	 * @param bundleBuilders Contains the circuit parameters and used to build the circuit.
 	 * @param matrix Used to transform p1 inputs to the extended inputs. 
 	 */
-	public CutAndChooseVerifier(ExecutionParameters execution, CryptoPrimitives primitives, Channel[] channels, BundleBuilder bundleBuilder, KProbeResistantMatrix matrix) {
+	public CutAndChooseVerifier(ExecutionParameters execution, CryptoPrimitives primitives, Channel[] channels, BundleBuilder bundleBuilder, KProbeResistantMatrix matrix, String filePrefix) {
 		//Call the other constructor with no input indices.
-		this(execution, primitives, channels, bundleBuilder, matrix, null);
+		this(execution, primitives, channels, bundleBuilder, matrix, null, filePrefix);
 	}
 	
 	/**
@@ -115,7 +125,7 @@ public class CutAndChooseVerifier {
 	 * @param inputLabelsY2 The input wires' indices of p2. Sometimes these indices are not the same as in the given circuit.
 	 */
 	public CutAndChooseVerifier(ExecutionParameters execution, CryptoPrimitives primitives, Channel[] channels, 
-			BundleBuilder bundleBuilder, KProbeResistantMatrix matrix, int[] inputLabelsY2) {
+			BundleBuilder bundleBuilder, KProbeResistantMatrix matrix, int[] inputLabelsY2, String filePrefix) {
 		
 		//Sets the class member s using the given values.
 		this.execution = execution;
@@ -158,7 +168,7 @@ public class CutAndChooseVerifier {
 		this.commitmentsOutput = new CmtCCommitmentMsg[numCircuits];
 		this.decommitmentsOutput = new CmtCDecommitmentMessage[numCircuits];
 		this.diffCommitments = new DifferenceCommitmentReceiverBundle[numCircuits];
-		
+		this.filePrefix = filePrefix;
 	}
 	
 	/**
@@ -180,44 +190,47 @@ public class CutAndChooseVerifier {
 	public void run() throws IOException, CheatAttemptException {
 		
 		//Receive all garbled circuits from the cut and choose prover.
-	//	LogTimer timer = new LogTimer("receiveGarbledCircuits");
+		//LogTimer timer = new LogTimer("receiveGarbledCircuits");
+		//System.out.println("receiveGarbledCircuits...");
 		receiveGarbledCircuits();
-	//	timer.stop();
+		//timer.stop();
 		//Send the commitments of the circuits selection and mapping.
 		//	timer.reset("commitToCutAndChoose");
 		commitToCutAndChoose();
-	//	timer.stop();
+		//timer.stop();
 		
 		//Receive the commitments needed by the protocol (on keys, masks, seed, etc).
-	//	timer.reset("receiveCommitments");
+		//timer.reset("receiveCommitments");
 		receiveCommitments();
-	//	timer.stop();
+		//timer.stop();
 		
 		//Send to the cut and choose prover the circuit selection and mapping.
-	//	timer.reset("revealCutAndChoose");
+		//timer.reset("revealCutAndChoose");
 		revealCutAndChoose();
-	//	timer.stop();
+		//timer.stop();
 		
 		//Verify the checked circuits by verifying the commitments of the seeds, masks, keys of the checked circuits.
-	//	timer.reset("verifyCheckCircuits");
+		//timer.reset("verifyCheckCircuits");
 		verifyCheckCircuits();
-	//	timer.stop();
+		//timer.stop();
 		
 		//Put all evaluated circuits in buckets according to the received mapping.
-	//	timer.reset("putCircuitsInBuckets");
+		//timer.reset("putCircuitsInBuckets");
 		putCircuitsInBuckets();
-	//	timer.stop();
+		//timer.stop();
 		
 		//Verify the placement masks by verifying the decommitments of the diff protocol.
-	//	timer.reset("verifyCorrectnessOfPlacementMasks");
+		//timer.reset("verifyCorrectnessOfPlacementMasks");
 		verifyCorrectnessOfPlacementMasks();
-	//	timer.stop();
+		//timer.stop();
 	}
 	
 	/**
 	 * Returns the buckets that include the evaluated circuits.
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public BucketList<LimitedBundle> getBuckets() {
+	public BucketList<LimitedBundle> getBuckets() throws FileNotFoundException, IOException {
 		//In case the buckets were not created yet, create them.
 		if (null == buckets) {
 			putCircuitsInBuckets();
@@ -228,8 +241,10 @@ public class CutAndChooseVerifier {
 	
 	/**
 	 * Put the evaluated circuits in buckets, according to the mapping algorithm received from the cut and choose verifier.
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	private void putCircuitsInBuckets() {
+	private void putCircuitsInBuckets() throws FileNotFoundException, IOException {
 		Preconditions.checkNotNull(bucketMapping);
 		
 		//Create the bucket list and add each evaluated circuit.
@@ -237,8 +252,25 @@ public class CutAndChooseVerifier {
 		for (int j : selection.evalCircuits()) {
 			//Create a LimitedBundle from the received garbled table, translation table, wires' indices and commitments.
 			LimitedBundle.Builder bundleBuilder = new LimitedBundle.Builder();
-			LimitedBundle bundle = bundleBuilder.circuit(garbledTables[j], translationTables[j])
-			.labels(inputLabelsX, inputLabelsY1Extended, inputLabelsY2, outputLabels)
+		
+			if (filePrefix == null){
+				bundleBuilder = bundleBuilder.circuit(garbledTables[j], translationTables[j], null);
+//			} else{
+//				//Open the file.
+//				File file = new File(filePrefix+"GarbledTables."+j+".txt");
+//				ObjectInput garbledTableFile = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+//				try {
+//					garbledTable = (GarbledTablesHolder) garbledTableFile.readObject();
+//					garbledTableFile.close();
+//					file.delete();
+//				} catch (ClassNotFoundException e) {
+//					// Should not occur since the file contains GarbledTablesHolder.
+//				}
+			} else{ 
+				bundleBuilder = bundleBuilder.circuit(null, translationTables[j], filePrefix+"GarbledTables."+j);
+			}
+			
+			LimitedBundle bundle = bundleBuilder.labels(inputLabelsX, inputLabelsY1Extended, inputLabelsY2, outputLabels)
 			.commitments(commitmentsX[j], commitmentsY1Extended[j], commitmentsY2[j], commitmentsOutput[j], decommitmentsOutput[j], diffCommitments[j])
 			.build();
 			buckets.add(bundle, j);
@@ -277,7 +309,9 @@ public class CutAndChooseVerifier {
 	private void receiveGarbledCircuits() throws CheatAttemptException, IOException {
 		
 		//Create place to hold all tables.
-		garbledTables = new GarbledTablesHolder[numCircuits];
+		if (filePrefix ==null){
+			garbledTables = new GarbledTablesHolder[numCircuits];
+		}
 		translationTables = new byte[numCircuits][];
 				
 		//Get the number of threads to use in the protocol.
@@ -316,6 +350,7 @@ public class CutAndChooseVerifier {
 				receiveCircuit(j, 0);
 			}
 		}
+		
 	}
 	
 	/**
@@ -329,7 +364,6 @@ public class CutAndChooseVerifier {
 		private int from;	// The first circuit in the circuit list that should be created.
 		private int to;		// The last circuit in the circuit list that should be created.
 		private int i;		// The index of the thread.
-		
 		/**
 		 * Constructor that sets the parameters.
 		 * @param i The index of the thread.
@@ -363,7 +397,14 @@ public class CutAndChooseVerifier {
 		Expector translationTableExpector = new Expector(channels[i], byte[].class);
 		
 		//Receive the garbled and translation tables of each circuit.
-		garbledTables[j] = (GarbledTablesHolder) garbledTablesExpector.receive();
+		if (filePrefix == null){
+			garbledTables[j] = (GarbledTablesHolder) garbledTablesExpector.receive();
+			
+		} else{
+			ObjectOutput garbledTableFile = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePrefix + "GarbledTables."+j+".txt")));
+			garbledTableFile.writeObject((GarbledTablesHolder) garbledTablesExpector.receive());
+			garbledTableFile.close();		
+		}
 		translationTables[j] = (byte[]) translationTableExpector.receive();
 		
 	}
@@ -386,9 +427,9 @@ public class CutAndChooseVerifier {
 			commitmentToSeed[j] = commitments.getSeedCmt();
 			commitmentToCommitmentMask[j] = commitments.getMaskCmt();
 			
-			commitmentsX[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsX(), inputLabelsX);
-			commitmentsY1Extended[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsY1Extended(), inputLabelsY1Extended);
-			commitmentsY2[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsY2(), inputLabelsY2);
+			commitmentsX[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsX(), commitments.getCommitmentXIds());
+			commitmentsY1Extended[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsY1Extended(), commitments.getCommitmentY1ExtendedIds());
+			commitmentsY2[j] = CommitmentBundle.setCommitments(commitments.getCommitmentsY2(), commitments.getCommitmentY2Ids());
 			commitmentsOutput[j] = commitments.getCommitmentsOutputKeys();
 		}
 		//Receive the commitments  of the diff protocol.
@@ -443,9 +484,25 @@ public class CutAndChooseVerifier {
 				throw new CheatAttemptException("decommitment of commitmentMask does not match the decommitted seed!");
 			}
 			
-			if (!checkEquality(circuitBundle.getGarbledTables().toDoubleByteArray(), (garbledTables[j].toDoubleByteArray()))) {
+			GarbledTablesHolder garbledTable = null;
+			if (filePrefix == null){
+				garbledTable = garbledTables[j];
+			} else{
+				//Open the file.
+				File file = new File(filePrefix + "GarbledTables."+j+".txt");
+				ObjectInput garbledTableFile = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+				try {
+					garbledTable = (GarbledTablesHolder) garbledTableFile.readObject();
+					garbledTableFile.close();
+					file.delete();
+				} catch (ClassNotFoundException e) {
+					// Should not occur since the file contains GarbledTablesHolder.
+				}
+			}
+			if (!checkEquality(circuitBundle.getGarbledTables().toDoubleByteArray(), (garbledTable.toDoubleByteArray()))) {
 				throw new CheatAttemptException("garbled tables does not match the decommitted seed!");
 			}
+			
 			
 			if (!Arrays.equals(circuitBundle.getTranslationTable(), translationTables[j])) {
 				throw new CheatAttemptException("translation tables does not match the decommitted seed!");

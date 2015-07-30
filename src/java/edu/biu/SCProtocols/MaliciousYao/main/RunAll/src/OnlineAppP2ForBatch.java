@@ -18,6 +18,7 @@ import edu.biu.protocols.yao.primitives.KProbeResistantMatrix;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
 import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolOutput;
 import edu.biu.scapi.exceptions.CheatAttemptException;
@@ -56,8 +57,7 @@ public class OnlineAppP2ForBatch {
 		int s2 = new Integer(args[counter++]); 
 		double p2 = new Double(args[counter++]); 
 		String outputFile = HOME_DIR + args[counter++];
-		
-		
+		boolean readEachTime = new Boolean(args[counter++]);
 		CommunicationConfig commConfig = null;
 		try {
 			 commConfig = new CommunicationConfig(COMM_CONFIG_FILENAME);
@@ -68,7 +68,6 @@ public class OnlineAppP2ForBatch {
 		commConfig.connectToOtherParty(1 + primitives.getNumOfThreads());
 		System.out.println("N1 = " + N1+ " B1 = "+ B1 + " s1 = "+ s1 + " p1 = "+ p1 + " N2 = " + N2+ " B2 = "+ B2 + 
 				" s2 = " + s2+ " p2 = "+ p2);
-		
 		// we read the circuit and this party's input from file
 		BooleanCircuit mainCircuit = null;
 		CircuitInput input = null;
@@ -88,11 +87,11 @@ public class OnlineAppP2ForBatch {
 		FastGarbledBooleanCircuit[] crGbc = new ScNativeGarbledBooleanCircuit[B2];
 		
 		for (int i=0; i<B1; i++){
-			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, true, false, true);
+			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		for (int i=0; i<B2; i++){
-			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, true, false, true);
+			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		ExecutionParameters mainExecution = new ExecutionParameters(mainCircuit, mainGbc, N1, s1, B1, p1);
@@ -115,18 +114,19 @@ public class OnlineAppP2ForBatch {
 		ArrayList<ArrayList<LimitedBundle>> mainBuckets = new ArrayList<ArrayList<LimitedBundle>>();
 		ArrayList<ArrayList<LimitedBundle>> crBuckets = new ArrayList<ArrayList<LimitedBundle>>();
 		
-		int size =N1; 
-		
-		for ( int i=0; i<N1; i++){
+		if (!readEachTime){
+			for ( int i=0; i<N1; i++){
 
-			try {
-				mainBuckets.add(BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", mainBucketsPrefix, BUCKET_ID)));
-				crBuckets.add(BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", crBucketsPrefix, BUCKET_ID++)));
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				try {
+					mainBuckets.add(BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", mainBucketsPrefix, BUCKET_ID)));
+					crBuckets.add(BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", crBucketsPrefix, BUCKET_ID++)));
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
+		int size = N1; 
 		
 		// only now we start counting the running time 
 		LogTimer timer = new LogTimer("Online protocol (P2)", true);
@@ -150,6 +150,22 @@ public class OnlineAppP2ForBatch {
 				long[] times = new long[size];
 								
 				for(int i=0; i<size; i++){
+
+					ArrayList<LimitedBundle> mainBucket = null;
+					ArrayList<LimitedBundle> crBucket = null;
+					if (readEachTime){
+						try {
+							mainBucket = BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", mainBucketsPrefix, i));
+							crBucket = BucketList.loadLimitedBucketFromFile(String.format("%s.%d.cbundle", crBucketsPrefix, i));
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} else{
+						mainBucket = mainBuckets.get(i);
+						crBucket = crBuckets.get(i);
+					}
+					
 					try {
 						commConfig.getChannels()[0].receive();
 					} catch (ClassNotFoundException e) {
@@ -158,16 +174,12 @@ public class OnlineAppP2ForBatch {
 					}
 					commConfig.getChannels()[0].send("reset times");
 					long startinner = System.nanoTime();
-
-					ArrayList<LimitedBundle> mainBucket = mainBuckets.get(i);
-					ArrayList<LimitedBundle> crBucket = crBuckets.get(i);
 					protocol = new OnlineProtocolP2(mainExecution, crExecution, primitives, commConfig, mainBucket, crBucket, mainMatrix, crMatrix);
 					protocol.start(input);
 					protocol.run();
 					
 					long endinner = System.nanoTime();
 					times[i] = (endinner - startinner) / 1000000 ;
-					
 					//System.out.println("exe no. " +i +" took " + times[i] + " milis.");
 				}
 				

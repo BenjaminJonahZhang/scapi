@@ -1,12 +1,14 @@
 package edu.biu.protocols.yao.offlineOnline.primitives;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 import edu.biu.protocols.yao.common.Preconditions;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash.CmtSimpleHashCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash.CmtSimpleHashDecommitmentMessage;
 
 /**
  * A CommitmentBundle is a struct that holds the parameters pf the commitments on the keys. <P>
@@ -21,36 +23,37 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMe
 public class CommitmentBundle implements Serializable {
 	private static final long serialVersionUID = 8023872699392337021L;
 	
-	private final int[] labels;											// Wires' indices.
-	private final HashMap<Integer, CmtCCommitmentMsg[]> commitments;	// Commitments on all wires' keys.
-	private HashMap<Integer, CmtCDecommitmentMessage[]> decommitments;	// Decommitments on all wires' keys.
-
+//	private CmtCDecommitmentMessage[] decommitments;// Decommitments on all wires' keys.
+	
+	private byte[] commitments;
+	private long[] commitmentIds;
+	private byte[] decommitments;
+	private byte[] decommitmentRandoms;
+	
+	int commitmentSize = 20;
+	int keySize = 16;
+	
 	/**
 	 * A constructor that sets the given arguments.
 	 * @param labels The wires' indices.
 	 * @param commitments Commitments on all wires' keys.
 	 * @param decommitments Decommitments on all wires' keys.
 	 */
-	public CommitmentBundle(int[] labels, HashMap<Integer, CmtCCommitmentMsg[]> commitments, HashMap<Integer, CmtCDecommitmentMessage[]> decommitments) {
-		this.labels = labels;
+	public CommitmentBundle(byte[] commitments, long[] commitmentsIds, byte[] decommitments, byte[] decommitmentRandoms) {
 		this.commitments = commitments;
+		this.commitmentIds = commitmentsIds;
 		this.decommitments = decommitments;
+		this.decommitmentRandoms = decommitmentRandoms;
 	}
+	
 	
 	/**
 	 * A constructor that sets the given arguments.
 	 * @param labels The wires' indices.
 	 * @param commitments Commitments on all wires' keys.
 	 */
-	public CommitmentBundle(int[] labels, HashMap<Integer, CmtCCommitmentMsg[]> commitments) {
-		this(labels, commitments, null);
-	}
-	
-	/**
-	 * Returns the wires' indices.
-	 */
-	public int[] getLabels() {
-		return labels;
+	public CommitmentBundle(byte[] commitments, long[] commitmentIds) {
+		this(commitments, commitmentIds, null, null);
 	}
 	
 	/**
@@ -62,8 +65,10 @@ public class CommitmentBundle implements Serializable {
 		//Check that the sigma is 0/1.
 		Preconditions.checkBinary(sigma);
 	
-		//Return the commitment that matches the given sigma of the given wire index.
-		return commitments.get(labels[wireIndex])[sigma];
+		//Return the commitment that matches the given sigma of the given wire index.\
+		byte[] commitment = new byte[commitmentSize];
+		System.arraycopy(commitments, wireIndex*2*commitmentSize+sigma*commitmentSize, commitment, 0, commitmentSize);
+		return new CmtSimpleHashCommitmentMessage(commitment, commitmentIds[wireIndex*2+sigma]);
 		
 		
 	}
@@ -78,7 +83,14 @@ public class CommitmentBundle implements Serializable {
 		Preconditions.checkBinary(sigma);
 		
 		//Return the decommitment that matches the given sigma of the given wire index.
-		return decommitments.get(labels[wireIndex])[sigma];
+		byte[] r = new byte[commitmentSize];
+		byte[] x = new byte[keySize];
+		System.arraycopy(decommitmentRandoms, wireIndex*2*commitmentSize + sigma*commitmentSize, r, 0, commitmentSize);
+		System.arraycopy(decommitments, wireIndex*2*keySize + sigma*keySize, x, 0, keySize);
+				
+		//Create and return a CmtCDecommitmentMessage from the copied x, r.
+		return new CmtSimpleHashDecommitmentMessage(new ByteArrayRandomValue(r), x);
+		//return decommitments[wireIndex *2 + sigma];
 		
 		
 	}
@@ -86,19 +98,24 @@ public class CommitmentBundle implements Serializable {
 	/**
 	 * Returns all commitments in a CmtCCommitmentMsg[][] structure.
 	 */
-	public CmtCCommitmentMsg[][] getCommitments() {
+	public byte[] getCommitments() {
 		//Create a CmtCCommitmentMsg[][] structure.
-		CmtCCommitmentMsg[][] commitmentsArr = null;
-		
-		commitmentsArr = new CmtCCommitmentMsg[labels.length][];
-		
-		//Get both commitments of each wire index and put them in the right place in the two-dimensions array.
-		for (int i = 0; i < labels.length; i++) {
-			commitmentsArr[i] = commitments.get(labels[i]);
-		}
-		
-		return commitmentsArr;
+//		CmtCCommitmentMsg[][] commitmentsArr = null;
+//		
+//		commitmentsArr = new CmtCCommitmentMsg[labels.length][];
+//		
+//		//Get both commitments of each wire index and put them in the right place in the two-dimensions array.
+//		for (int i = 0; i < labels.length; i++) {
+//			commitmentsArr[i] = commitments.get(labels[i]);
+//		}
+//		
+//		return commitmentsArr;
+		return commitments;
 
+	}
+	
+	public long[] getCommitmentsIds(){
+		return commitmentIds;
 	}
 	
 	/**
@@ -107,19 +124,20 @@ public class CommitmentBundle implements Serializable {
 	 * @param labels Indices of the wires.
 	 * @return A new created commitment bundle.
 	 */
-	public static CommitmentBundle setCommitments(CmtCCommitmentMsg[][] commitmentsArr, int[] labels) {
+	public static CommitmentBundle setCommitments(byte[] commitmentsArr, long[] commitmentIds) {
 		//Create a new hashmap to hold the commitments.
-		HashMap<Integer, CmtCCommitmentMsg[]> commitments = new HashMap<Integer, CmtCCommitmentMsg[]>();
-		
-		//For each wire index get the commitments and put them in the map.
-		for (int i = 0; i < labels.length; i++) {
-			CmtCCommitmentMsg[] com = commitmentsArr[i];
-			
-			commitments.put(labels[i], com);
-		}
-		
-		//Create and return a new CommitmentBundle with the given indices and created map.
-		return new CommitmentBundle(labels, commitments);
+//		HashMap<Integer, CmtCCommitmentMsg[]> commitments = new HashMap<Integer, CmtCCommitmentMsg[]>();
+//		
+//		//For each wire index get the commitments and put them in the map.
+//		for (int i = 0; i < labels.length; i++) {
+//			CmtCCommitmentMsg[] com = commitmentsArr[i];
+//			
+//			commitments.put(labels[i], com);
+//		}
+//		
+//		//Create and return a new CommitmentBundle with the given indices and created map.
+//		return new CommitmentBundle(labels, commitments);
+		return new CommitmentBundle(commitmentsArr, commitmentIds);
 	}
 	
 	/**
@@ -128,19 +146,18 @@ public class CommitmentBundle implements Serializable {
 	 * @throws CheatAttemptException in case the given bundle is different than this one.
 	 */
 	public void verifyCommitmentsAreEqual(CommitmentBundle other) throws CheatAttemptException {
-		
+		int size = commitmentIds.length/2; 
 		//For each wire's index in the labels array:
-		for (int i = 0; i < labels.length; i++) {
+		for (int i = 0; i < size; i++) {
 			//Get the index and the matching commitments.
-			int w = labels[i];
-			CmtCCommitmentMsg[] com = commitments.get(w);
+			//CmtCCommitmentMsg[] com = commitments[i];
 			//Check that both commitments are equal.
 			for (int k = 0; k < 2; k++) {
-				String c1 = com[k].toString();
+				String c1 = getCommitment(i, k).toString();
 				String c2 = other.getCommitment(i, k).toString();
 				if (!c1.equals(c2)) {
 					//In case the commitments are different, throw an exception.
-					throw new CheatAttemptException(String.format("commitments differ for label=%d and sigma=%d: c1 = %s, c2 = %s", w, k, c1, c2));
+					throw new CheatAttemptException(String.format("commitments differ for index=%d and sigma=%d: c1 = %s, c2 = %s", i, k, c1, c2));
 				}
 			}
 		}
