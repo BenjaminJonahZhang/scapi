@@ -1,7 +1,6 @@
 package edu.biu.protocols.yao.offlineOnline.subroutines;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -127,7 +126,7 @@ public class OfflineOtReceiverRoutine {
 		byte[] output = ((OTOnByteArrayROutput) out).getXSigma();
 		
 		//Get the Y1 extended garbled keys.
-		ArrayList<HashMap<Integer, SecretKey>> receivedKeysY1Extended = breakOtOutputArray(output, bucketId); 
+		ArrayList<byte[]> receivedKeysY1Extended = breakOtOutputArray(output, bucketId); 
 		
 		//Set each circuit in this bucket with the received garbled keys.
 		for (int j = 0; j < bucketSize; j++) {
@@ -142,12 +141,12 @@ public class OfflineOtReceiverRoutine {
 	 * @return The garbled output.
 	 * @throws CheatAttemptException In case the given output was not verified using the commitment.
 	 */
-	private ArrayList<HashMap<Integer, SecretKey>> breakOtOutputArray(byte[] output, int bucketId) throws CheatAttemptException {
+	private ArrayList<byte[]> breakOtOutputArray(byte[] output, int bucketId) throws CheatAttemptException {
 		
 		//Will hold the garbled input of each input wire.
-		ArrayList<HashMap<Integer, SecretKey>> receivedKeys = new ArrayList<HashMap<Integer,SecretKey>>();
+		ArrayList<byte[]> receivedKeys = new ArrayList<byte[]>();
 		for (int j = 0; j < bucketSize; j++) {
-			receivedKeys.add(new HashMap<Integer, SecretKey>());
+			receivedKeys.add(new byte[m*keySize]);
 		}
 		
 		int pos = 0;
@@ -179,7 +178,8 @@ public class OfflineOtReceiverRoutine {
 				//In case the commitment was verified, create a SecretKey from the key array.
 				SecretKey kSigma = new SecretKeySpec(key, "");
 				//Put the created secret key in the receivedKeys map.
-				receivedKeys.get(j).put(i, kSigma);
+				//receivedKeys.get(j).put(i, kSigma);
+				System.arraycopy(kSigma.getEncoded(), 0, receivedKeys.get(j), i*keySize, keySize);
 			}
 		}
 		return receivedKeys;
