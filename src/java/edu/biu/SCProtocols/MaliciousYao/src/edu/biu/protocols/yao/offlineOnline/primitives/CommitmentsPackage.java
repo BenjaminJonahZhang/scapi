@@ -70,89 +70,50 @@ public class CommitmentsPackage implements Serializable {
 		return new CmtSimpleHashCommitmentMessage(maskCmt, maskIds);
 	}
 	
-	public CmtCCommitmentMsg[][] getCommitmentsX() {
-		//Create and return a CmtCCommitmentMsg[][] from the commitmentsX and commitmentsXIds members.
-		int size = commitmentsX.length/2/cmtSize;
-		CmtSimpleHashCommitmentMessage[][] coms = new CmtSimpleHashCommitmentMessage[size][];
-		for (int k=0; k<size; k++){
-			CmtSimpleHashCommitmentMessage[] innerComs = new CmtSimpleHashCommitmentMessage[2];
-			for (int i=0; i<2; i++){
-				byte[] commitment = new byte[cmtSize];
-				System.arraycopy(commitmentsX, k*2*cmtSize+i*cmtSize, commitment, 0, cmtSize);
-				innerComs[i] = new CmtSimpleHashCommitmentMessage(commitment, commitmentsXIds[k*2+i]);
-			}
-			coms[k] = innerComs;
-		}
-		return coms;
+	public byte[] getCommitmentsX() {
+		return commitmentsX;
 		
 	}
+	
+	public long[] getCommitmentXIds(){
+		return commitmentsXIds;
+	}
 
-	public void setCommitmentsX(CmtCCommitmentMsg[][] commitmentsX) {
-		//Set the given commitmentsX in the commitmentsX and commitmentsXIds members.
-		this.commitmentsX = new byte[commitmentsX.length*2*cmtSize];
-		this.commitmentsXIds = new long[commitmentsX.length*2];
-		for (int i=0; i<commitmentsX.length; i++){
-			for (int k=0; k<2; k++){
-				System.arraycopy(((CmtSimpleHashCommitmentMessage)commitmentsX[i][k]).getCommitment(), 0, this.commitmentsX, i*2*cmtSize+k*cmtSize, cmtSize);
-				commitmentsXIds[i*2+k] = commitmentsX[i][k].getId();
-			}
-		}
+	public void setCommitmentsX(byte[] commitmentsX, long[] commitmentsXIds) {
+		
+		this.commitmentsX = commitmentsX;
+		this.commitmentsXIds = commitmentsXIds;
 	}
 	
-	public CmtCCommitmentMsg[][] getCommitmentsY1Extended() {
-		//Create and return a CmtCCommitmentMsg[][] from the commitmentsY1Extended and commitmentsY1ExtendedIds members.
-		int size = commitmentsY1Extended.length/2/cmtSize;
-		CmtSimpleHashCommitmentMessage[][] coms = new CmtSimpleHashCommitmentMessage[size][];
-		for (int k=0; k<size; k++){
-			CmtSimpleHashCommitmentMessage[] innerComs = new CmtSimpleHashCommitmentMessage[2];
-			for (int i=0; i<2; i++){
-				byte[] commitment = new byte[cmtSize];
-				System.arraycopy(commitmentsY1Extended, k*2*cmtSize+i*cmtSize, commitment, 0, cmtSize);
-				innerComs[i] = new CmtSimpleHashCommitmentMessage(commitment, commitmentsY1ExtendedIds[k*2+i]);
-			}
-			coms[k] = innerComs;
-		}
-		return coms;
+	public byte[] getCommitmentsY1Extended() {
+		
+		return commitmentsY1Extended;
+	}
+	
+	public long[] getCommitmentY1ExtendedIds(){
+		return commitmentsY1ExtendedIds;
 	}
 
-	public void setCommitmentsY1Extended(CmtCCommitmentMsg[][] commitmentsY1Extended) {
-		//Set the given commitmentsX in the commitmentsY1Extended and commitmentsY1ExtendedIds members.
-		this.commitmentsY1Extended = new byte[commitmentsY1Extended.length*2*cmtSize];
-		this.commitmentsY1ExtendedIds = new long[commitmentsY1Extended.length*2];
-		for (int i=0; i<commitmentsY1Extended.length; i++){
-			for (int k=0; k<2; k++){
-				System.arraycopy(((CmtSimpleHashCommitmentMessage)commitmentsY1Extended[i][k]).getCommitment(), 0, this.commitmentsY1Extended, i*2*cmtSize+k*cmtSize, cmtSize);
-				commitmentsY1ExtendedIds[i*2+k] = commitmentsY1Extended[i][k].getId();
-			}
-		}
+
+	public void setCommitmentsY1Extended(byte[] commitmentsY1Extended, long[] commitmentsY1ExtendedIds) {
+		
+		this.commitmentsY1Extended = commitmentsY1Extended;
+		this.commitmentsY1ExtendedIds = commitmentsY1ExtendedIds;
 	}
 
-	public CmtCCommitmentMsg[][] getCommitmentsY2() {
-		//Create and return a CmtCCommitmentMsg[][] from the commitmentsY2 and commitmentsY2Ids members.
-		int size = commitmentsY2.length/2/cmtSize;
-		CmtSimpleHashCommitmentMessage[][] coms = new CmtSimpleHashCommitmentMessage[size][];
-		for (int k=0; k<size; k++){
-			CmtSimpleHashCommitmentMessage[] innerComs = new CmtSimpleHashCommitmentMessage[2];
-			for (int i=0; i<2; i++){
-				byte[] commitment = new byte[cmtSize];
-				System.arraycopy(commitmentsY2, k*2*cmtSize+i*cmtSize, commitment, 0, cmtSize);
-				innerComs[i] = new CmtSimpleHashCommitmentMessage(commitment, commitmentsY2Ids[k*2+i]);
-			}
-			coms[k] = innerComs;
-		}
-		return coms;
+	public byte[] getCommitmentsY2() {
+		
+		return commitmentsY2;
+	}
+	
+	public long[] getCommitmentY2Ids(){
+		return commitmentsY2Ids;
 	}
 
-	public void setCommitmentsY2(CmtCCommitmentMsg[][] commitmentsY2) {
-		//Set the given commitmentsX in the commitmentsY2 and commitmentsY2Ids members.
-		this.commitmentsY2 = new byte[commitmentsY2.length*2*cmtSize];
-		this.commitmentsY2Ids = new long[commitmentsY2.length*2];
-		for (int i=0; i<commitmentsY2.length; i++){
-			for (int k=0; k<2; k++){
-				System.arraycopy(((CmtSimpleHashCommitmentMessage)commitmentsY2[i][k]).getCommitment(), 0, this.commitmentsY2, i*2*cmtSize+k*cmtSize, cmtSize);
-				commitmentsY2Ids[i*2+k] = commitmentsY2[i][k].getId();
-			}
-		}
+	public void setCommitmentsY2(byte[] commitmentsY2, long[] commitmentsY2Ids) {
+		
+		this.commitmentsY2 = commitmentsY2;
+		this.commitmentsY2Ids = commitmentsY2Ids;
 	}
 
 	public CmtCCommitmentMsg getCommitmentsOutputKeys() {

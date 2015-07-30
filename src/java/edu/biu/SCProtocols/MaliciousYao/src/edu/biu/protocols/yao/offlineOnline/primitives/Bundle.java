@@ -224,7 +224,7 @@ public class Bundle implements Serializable {
 	
 	public GarbledTablesHolder getGarbledTables() {
 		GarbledTablesHolder temp = garbledTables;
-		//garbledTables = null;
+		garbledTables = null;
 		return temp;
 	}
 
@@ -302,9 +302,9 @@ public class Bundle implements Serializable {
 	 * @param pack CommitmentsPackage that should be filled with the commitments.
 	 */
 	public void getCommitments(CommitmentsPackage pack)  {
-		pack.setCommitmentsX(commitmentsX.getCommitments());
-		pack.setCommitmentsY1Extended(commitmentsY1Extended.getCommitments());
-		pack.setCommitmentsY2(commitmentsY2.getCommitments());
+		pack.setCommitmentsX(commitmentsX.getCommitments(), commitmentsX.getCommitmentsIds());
+		pack.setCommitmentsY1Extended(commitmentsY1Extended.getCommitments(), commitmentsY1Extended.getCommitmentsIds());
+		pack.setCommitmentsY2(commitmentsY2.getCommitments(), commitmentsY2.getCommitmentsIds());
 		pack.setCommitmentsOutputKeys(commitment);
 	}
 
@@ -320,6 +320,7 @@ public class Bundle implements Serializable {
 		return secret;
 	}
 	
+
 	/**
 	 * This function overrides the function from the Serializable interface because we want only part of the 
 	 * members to be written to file.
