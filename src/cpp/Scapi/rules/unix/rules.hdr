@@ -1,0 +1,82 @@
+
+OBJ_EXT:= o
+EXE_EXT:= exe # for portability sake, just use .exe as an executable name on all platforms.
+LIB_EXT:= a
+DLL_EXT:= so
+
+CLEAN_FILES += $(OBJDIR)*.$(OBJ_EXT) $(BINDIR)*.$(EXE_EXT) $(LIBDIR)*.$(LIB_EXT) $(LIBDIR)*.$(DLL_EXT)
+
+ifneq ("$(MAKECMDGOALS)","clean")
+
+-include make.dependencies
+
+make.dependencies::  $(wildcard $(SRCDIR)*.c $(SRCDIR)*.cpp $(SRCDIR)*.cxx)
+	$(HIDE)echo Updating $(CURDIR) $@
+	$(HIDE)for f in $(foreach f,$+,$(basename $f)) ; do echo include .make/$$f.d ; done >$@ 
+	$(HIDE)sed -i -e 's/^include/-include/1' $@
+endif
+
+
+ifeq ("$(BUILD_DLL)", "true")
+DLL_OPTIONS += -fPIC
+DLL_LINK_OPTIONS += -shared -Wl,-soname,$@
+endif
+
+
+DEBOPT = $(subst Optimized,-O2,$(subst Debug,-g3 -fno-inline -O0,$(OPT_LEVEL)))
+
+
+# the following variables must not be defined using := or +=  
+RAW_COMPILE.cpp  =  g++ $(DEBOPT) -o$@ $(patsubst %, -I%, $(INCLUDES)) -I $(MAKE_RULES_DIR) $(CPP_OPTIONS) $(DLL_OPTIONS) -c  $<
+RAW_LINK.cpp     =  g++ $(DEBOPT) -o$@ $(filter %.$(OBJ_EXT),$+) $(filter %.$(LIB_EXT),$+) $(filter %.$(DLL_EXT),$+) $(CPP_LINK_OPTIONS) 
+RAW_LINK.c       =  gcc $(DEBOPT) -o$@ $(filter %.$(OBJ_EXT),$+) $(filter %.$(LIB_EXT),$+) $(filter %.$(DLL_EXT),$+) $(C_LINK_OPTIONS)
+RAW_COMPILE.c    =  gcc $(DEBOPT) -o$@ $(patsubst %, -I%, $(INCLUDES)) -I $(MAKE_RULES_DIR) $(C_OPTIONS) $(DLL_OPTIONS) -c $<
+RAW_LIB.c        =  $(HIDE)rm -f $@; ar cvq $@  $^
+LINK.cpp         =  $(RAW_LINK.cpp)
+LINK.c           =  $(RAW_LINK.c)
+LINK.cxx         =  $(RAW_LINK.cpp)  # same as cpp
+COMPILE.c        =  $(RAW_COMPILE.c)   -MMD -MF .make/$(notdir $(basename $@)).d
+COMPILE.cpp      =  $(RAW_COMPILE.cpp) -MMD -MF .make/$(notdir $(basename $@)).d
+COMPILE.cxx      =  $(COMPILE.cpp)  # yep, they are the same
+LIB.c            =  $(RAW_LIB.c)
+LIB.cpp          =  $(RAW_LIB.c)  # yep the same
+LIB.cxx          =  $(RAW_LIB.c)  # yep the same
+
+$(OBJDIR)%.$(OBJ_EXT):   $(SRCDIR)%.cpp   ; $(HIDE)echo Compiling $@ ; $(COMPILE.cpp)
+$(OBJDIR)%.$(OBJ_EXT):   $(SRCDIR)%.cxx   ; $(HIDE)echo Compiling $@ ; $(COMPILE.cxx)
+$(OBJDIR)%.$(OBJ_EXT):   $(SRCDIR)%.c     ; $(HIDE)echo Compiling $@ ; $(COMPILE.c)
+$(BINDIR)%.exe: $(OBJDIR)%.$(OBJ_EXT)     ; $(HIDE)echo Linking   $@ ; $(LINK.cpp)
+
+clean::
+	$(HIDE)rm -f $(OBJDIR)*.$(OBJ_EXT)
+	$(HIDE)rm -f $(BINDIR)*.$(EXE_EXT)
+	$(HIDE)rm -f $(BINDIR)*.$(DLL_EXT)
+	$(HIDE)rm -f $(LIBDIR)*.$(LIB_EXT)
+	$(HIDE)rm -f $(LIBDIR)*.$(DLL_EXT)
+	$(HIDE)rm -f .make/*.*
+	$(HIDE)rm -fr $(CLEAN_FILES)
+	$(HIDE)rm -fr .make make.dependencies
+
+prebuild::
+ifneq ("$(MAKECMDGOALS)","nothing")
+ifneq ("$(MAKECMDGOALS)","clean")
+	$(HIDE)mkdir -p .make
+endif
+endif
+
+backup:
+	cd $(CURDIR)/.. ; \
+	zip -r $(notdir $(CURDIR)).zip $(notdir $(CURDIR)) 
+
+CAT=   cat
+RMALL= rm -f 
+RMDIR= rm -fr
+CPDIR= cp -r 
+CP=    cp
+MV=    mv    
+MKDIR= mkdir -p
+FILE_COMPARE= diff --strip-trailing-cr -bw
+ECHO=echo
+MKLIB=$(HIDE)rm -f $@; ar cvq $@  $^
+MKDLL=$(HIDE)rm -f $@; g++ $(DLL_LINK_OPTIONS) -o$@ $(filter %.$(OBJ_EXT),$+) $(filter %.$(LIB_EXT),$+) $(filter %.$(DLL_EXT),$+) $(CPP_LINK_OPTIONS)
+SLASH=/

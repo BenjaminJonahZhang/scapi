@@ -21,6 +21,10 @@ target/*
 bin/*
 *.suo
 *.idb
+*.suo
+*.sdf
+*.opensdf
+*.ipch
 *pdb
 *.tlog
 *.lastbuildstate
@@ -30,3 +34,6 @@ bin/*
 *.ilk
 *.exe
 *.ipch
+*.obj
+make.dependencies
+*.exe

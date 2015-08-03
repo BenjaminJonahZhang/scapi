@@ -1,0 +1,97 @@
+
+make.config.dir= $(CURDIR)
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+
+
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in current directory, look at parent
+#
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in parent directory, look at grandparent
+#
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in grand parent directory, look at great-grandparent
+#
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in great grand parent directory, look at great-great-grandparent
+#
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in great grand parent directory, look at great-great-great-grandparent
+#
+
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+ifeq ("$(make.config.file)","")
+#
+#  did not find make.config in great grand parent directory, look at great-great-great-grandparent
+#
+
+make.config.dir:=$(patsubst %/,%,$(dir $(make.config.dir)))
+make.config.file:=$(wildcard $(make.config.dir)/make.conf*g)
+ifeq ("$(make.config.file)","")
+#
+#  giving up and using current directory anyway
+#
+
+PROJECT_TOP_DIR:=$(CURDIR)
+
+else
+# using great great great great grand parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using great great great grand parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using great great grand parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using great grand parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using grand parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using parent as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+else
+# using current dir as top dir
+PROJECT_TOP_DIR:=$(make.config.dir)
+endif
+
+#
+#  make sure there is a trailing / on the end of the project top dir name
+#
+
+PROJECT_TOP_DIR:=$(PROJECT_TOP_DIR)/
