@@ -17,3 +17,7 @@ install/*
 *.log
 target/*
 .settings
+*.suo
+*.sdf
+*.opensdf
+*.ipch
