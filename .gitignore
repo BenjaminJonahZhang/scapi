@@ -21,3 +21,6 @@ target/*
 *.sdf
 *.opensdf
 *.ipch
+*.obj
+make.dependencies
+*.exe
