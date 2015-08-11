@@ -24,7 +24,7 @@
     <ClCompile Include="src\Dlog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test\tests.cpp">
+    <ClCompile Include="src\tests.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>
