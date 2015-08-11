@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E46DDD8B-4801-4333-B7DA-D6A8B0F49C53}</ProjectGuid>
+    <ProjectGuid>{9C703BA5-F97D-4C6A-9655-CD1305889089}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -63,14 +63,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
-    <NMakeOutput>Main.exe</NMakeOutput>
+    <NMakeOutput>ScapiTests.exe</NMakeOutput>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <IncludePath>C:\Program Files %28x86%29\Boost\boost_1_58_0;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)obj\</OutDir>
+    <IntDir>obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
-    <NMakeOutput>ScapiPrimitives.exe</NMakeOutput>
+    <NMakeOutput>ScapiTests.exe</NMakeOutput>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
@@ -79,10 +82,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
-    <Text Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="src\Dlog.cpp" />
+    <ClCompile Include="test\tests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\catch.hpp" />
+    <ClInclude Include="include\Dlog.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
