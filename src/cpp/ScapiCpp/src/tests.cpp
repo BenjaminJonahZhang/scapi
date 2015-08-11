@@ -6,3 +6,8 @@ TEST_CASE("Factorials are computed", "[factorial]") {
 	DlogGroup dg;
 	REQUIRE(dg.getGroupType() == "no no");
 }
+
+TEST_CASE("Factorials are computed2", "[factorial]") {
+	DlogGroup dg;
+	REQUIRE(dg.getOrder() == 3);
+}
