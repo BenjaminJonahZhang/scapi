@@ -1,6 +1,9 @@
+BOOST_ROOT= "/program files (x86)/Boost/boost_1_58_0"
+
 include ./rules/make.hdr
 
-INCLUDES+= "/program files (x86)/Boost/boost_1_58_0"
+INCLUDES+= $(BOOST_ROOT)
+CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/libs"
 
 Program=ScapiTests.$(EXE_EXT)
 CPP_FILES :=$(wildcard src/*.cpp)
