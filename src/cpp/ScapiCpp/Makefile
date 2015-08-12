@@ -1,10 +1,16 @@
 BOOST_ROOT= "/program files (x86)/Boost/boost_1_58_0"
+GMP_DIR = "/code/gmp_static"
 
 include ./rules/make.hdr
 
 INCLUDES+= $(BOOST_ROOT)
-#CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/stage/lib"
+INCLUDES+= $(GMP_DIR)
 
+CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/stage/lib"
+CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/stage/lib"
+CPP_LINK_OPTIONS+= /LIBPATH:/code/gmp-static
+
+LIBS = gmp.lib
 Program=ScapiTests.$(EXE_EXT)
 CPP_FILES :=$(wildcard src/*.cpp)
 
