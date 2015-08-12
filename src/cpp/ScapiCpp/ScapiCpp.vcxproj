@@ -67,9 +67,10 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>C:\Program Files %28x86%29\Boost\boost_1_58_0;$(IncludePath)</IncludePath>
+    <IncludePath>C:\code\gmp-static;C:\Program Files %28x86%29\Boost\boost_1_58_0;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)obj\</OutDir>
     <IntDir>obj\</IntDir>
+    <LibraryPath>C:\code\gmp-static;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
