@@ -3,11 +3,13 @@
 #include "../include/Dlog.hpp"
 
 TEST_CASE("Factorials are computed", "[factorial]") {
-	DlogGroup dg;
-	REQUIRE(dg.getGroupType() == "no no");
+	//DlogGroup dg;
+	//REQUIRE(dg.getGroupType() == "no no");
+	REQUIRE(1 == 1);
 }
 
 TEST_CASE("Factorials are computed2", "[factorial]") {
-	DlogGroup dg;
-	REQUIRE(dg.getOrder() == 3);
+	//DlogGroup dg;
+	//REQUIRE(dg.getOrder() == 3);
+	REQUIRE(1 == 2);
 }

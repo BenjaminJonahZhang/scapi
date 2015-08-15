@@ -1,8 +1,10 @@
 #include <string>
-#include <boost/multiprecision/gmp.hpp> 
+#include <boost/multiprecision/cpp_int.hpp> 
 
 // Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
 namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+typedef boost::multiprecision::int1024_t biginteger;
+
 
 using namespace std;
 
@@ -50,7 +52,7 @@ private:
 	static const long serialVersionUID = -2073134974201958294L;
 
 protected:
-	mp::mpz_int q; //the group order
+	biginteger q; //the group order
 
 
 public:
@@ -58,7 +60,7 @@ public:
 	* Returns the group order, which is the number of elements in the group
 	* @return the order of the group
 	*/
-	mp::mpz_int getQ() { return q; }
+	biginteger getQ() { return q; }
 	virtual ~GroupParams() = 0;
 };
 
@@ -92,7 +94,7 @@ public:
 	*
 	* @return the order of this Dlog group
 	*/
-	virtual mp::mpz_int getOrder() = 0;
+	virtual biginteger getOrder() = 0;
 
 	/**
 	*
@@ -154,7 +156,7 @@ public:
 	* @return the result of the exponentiation
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * exponentiate(const GroupElement& base, mp::mpz_int exponent) = 0;
+	virtual GroupElement * exponentiate(const GroupElement& base, biginteger exponent) = 0;
 
 	/**
 	* Multiplies two GroupElements
@@ -188,7 +190,7 @@ public:
 	* @return the generated GroupElement
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * generateElement(bool bCheckMembership, vector<mp::mpz_int> values) = 0;
+	virtual GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) = 0;
 
 
 	/**
@@ -209,7 +211,7 @@ public:
 	* @param exponentiations
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * simultaneousMultipleExponentiations(vector<GroupElement> groupElements, vector<mp::mpz_int> exponentiations) = 0;
+	virtual GroupElement * simultaneousMultipleExponentiations(vector<GroupElement> groupElements, vector<biginteger> exponentiations) = 0;
 
 	/**
 	* Computes the product of several exponentiations of the same base
@@ -222,7 +224,7 @@ public:
 	* @param exponent
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * exponentiateWithPreComputedValues(const GroupElement& base, mp::mpz_int exponent) = 0;
+	virtual GroupElement * exponentiateWithPreComputedValues(const GroupElement& base, biginteger exponent) = 0;
 
 	/**
 	* This function cleans up any resources used by exponentiateWithPreComputedValues for the requested base.
