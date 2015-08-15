@@ -24,3 +24,9 @@ target/*
 *.obj
 make.dependencies
 *.exe
+*.tlog
+*.pdb
+.ilk
+.lastbuildstate
+*.ilk
+*.idb
