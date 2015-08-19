@@ -27,12 +27,21 @@
     <ClCompile Include="src\tests.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DlogCryptopp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Dlog.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SecurityLevel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DlogCryptopp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

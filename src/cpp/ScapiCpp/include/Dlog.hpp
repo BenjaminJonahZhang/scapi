@@ -1,19 +1,17 @@
 #include <unordered_map>
 #include <string>
-#include <boost/multiprecision/gmp.hpp> 
+//#include <boost/multiprecision/gmp.hpp> 
 #include <boost/multiprecision/random.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include "SecurityLevel.hpp"
 
 using namespace std;
 // Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
 namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
-using biginteger = boost::multiprecision::mpz_int;
+using biginteger = boost::multiprecision::cpp_int;
 boost::mt19937 prime_gen(clock()); // prg for prime checking
-boost::mt19937 random_element_gen(clock()); // prg for random element
 
-
-
+int find_log2_floor(biginteger);
 
 /**
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.
@@ -312,6 +310,8 @@ class DlogGroupAbs : public primeOrderSubGroup {
 protected:
 	GroupParams * groupParams;  //group parameters
 	GroupElement * generator;	//generator of the group
+	boost::mt19937 random_element_gen; 
+
 	int k; //k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
 
 	/*
@@ -362,7 +362,8 @@ private:
 		*/
 		GroupElement * getExponentiation(biginteger size);
 	};
-    std::unordered_map<GroupElement *, GroupElementsExponentiations *> exponentiationsMap;// = new HashMap<GroupElement, GroupElementsExponentiations>(); //map for multExponentiationsWithSameBase calculations
+	// using pointer as key mean different element ==> different keys even if they are 'equal' in other sense
+    std::unordered_map<GroupElement *, GroupElementsExponentiations *> exponentiationsMap; //map for multExponentiationsWithSameBase calculations
 
 	/*
 	* Computes the loop the repeats in the algorithm.
@@ -458,7 +459,7 @@ public:
 	/* 
 	* @see edu.biu.scapi.primitives.dlog.DlogGroup#endExponentiateWithPreComputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
 	*/
-	void endExponentiateWithPreComputedValues(GroupElement * base) { exponentiationsMap.remove(base); }
+	void endExponentiateWithPreComputedValues(GroupElement * base) { exponentiationsMap.erase(base); }
 };
 
 /**********DlogZP hierechy***********************/
@@ -467,6 +468,44 @@ public:
 * Marker interface. Every class that implements it is signed as Zp*
 */
 class DlogZp : public DlogGroup {};
+
+/**
+* This class holds the parameters of a Dlog group over Zp*.
+*/
+class ZpGroupParams : public GroupParams{ //TODO serializable ! - XXX
+private:
+	static const long serialVersionUID = 1458597565512141731L;
+	biginteger p; //modulus
+	biginteger xG; //generator value
+
+public:
+	/**
+	* constructor that sets the order, generator and modulus
+	* @param q - order of the group
+	* @param xG - generator of the group
+	* @param p - modulus of the group
+	*/
+	ZpGroupParams(biginteger q_, biginteger xG_, biginteger p_) {
+		q = q_;
+		xG = xG_;
+		p = p_;
+	}
+
+	/**
+	* Returns the prime modulus of the group
+	* @return p
+	*/
+	biginteger getP() { return p; }
+
+	/**
+	* Returns the generator of the group
+	* @return xG - the generator value
+	*/
+	biginteger getXg() { return xG; }
+	
+	/* For Serlialization */
+	string toString() { return "ZpGroupParams [p=" + (string) p + ", g=" + (string) xG + ", q=" + (string) q + "]"; }
+};
 
 /**
 * Marker interface. Every class that implements it is signed as Zp* group were p is a safe prime.

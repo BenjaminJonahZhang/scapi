@@ -8,9 +8,9 @@ INCLUDES+= $(GMP_DIR)
 
 CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/stage/lib"
 CPP_LINK_OPTIONS+= /LIBPATH:"/program files (x86)/Boost/boost_1_58_0/stage/lib"
-CPP_LINK_OPTIONS+= /LIBPATH:/code/gmp-static
+CPP_LINK_OPTIONS+= /LIBPATH:/code/scapi/assets/gmp/lib
 
-LIBS = gmp.lib
+LIBS = libgmp-10
 Program=ScapiTests.$(EXE_EXT)
 CPP_FILES :=$(wildcard src/*.cpp)
 

@@ -80,11 +80,12 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\code\scapi\lib\CryptoPP;C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\assets\gmp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -97,11 +98,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Dlog.cpp" />
+    <ClCompile Include="src\DlogCryptopp.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
+    <ClInclude Include="include\DlogCryptopp.h" />
+    <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
