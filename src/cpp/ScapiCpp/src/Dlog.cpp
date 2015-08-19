@@ -1,20 +1,17 @@
 #include <iostream>
 #include "../include/Dlog.hpp"
+#include <math.h> /* pow */
 
 using namespace std;
 
-
-void DlogGroupAbs::GroupElementsExponentiations::prepareExponentiations(biginteger size)
+int find_log2_floor(biginteger bi)
 {
-	//find log of the number - this is the index of the size-exponent in the exponentiation array 
-//	float res = boost::multiprecision::log<biginteger>(size);
-	float index; //XXX
-
-	/* calculates the necessary exponentiations and put them in the exponentiations vector */
-	for (int i = exponentiations.size(); i <= index; i++) {
-		GroupElement * multI = parent->exponentiate(exponentiations[i - 1], biginteger(2));
-		exponentiations.push_back(multI);
+	int r = 0;
+	while (bi >>= 1) // unroll for more speed...
+	{
+		r++;
 	}
+	return r;
 }
 
 DlogGroupAbs::GroupElementsExponentiations::GroupElementsExponentiations(DlogGroupAbs * parent_, GroupElement * base_) {
@@ -31,6 +28,19 @@ DlogGroupAbs::GroupElementsExponentiations::GroupElementsExponentiations(DlogGro
 	}
 }
 
+void DlogGroupAbs::GroupElementsExponentiations::prepareExponentiations(biginteger size)
+{
+	//find log of the number - this is the index of the size-exponent in the exponentiation array 
+	int index = find_log2_floor(size);
+
+	/* calculates the necessary exponentiations and put them in the exponentiations vector */
+	/* size of the vector stars with 4 in the constructor so we can always subtract */
+	for (int i = exponentiations.size(); i <= index; i++) {
+		GroupElement * multI = parent->exponentiate(exponentiations[i - 1], biginteger(2));
+		exponentiations.push_back(multI);
+	}
+}
+
 GroupElement * DlogGroupAbs::GroupElementsExponentiations::getExponentiation(biginteger size) {
 	/**
 	* The exponents in the exponents vector are all power of 2.
@@ -38,8 +48,7 @@ GroupElement * DlogGroupAbs::GroupElementsExponentiations::getExponentiation(big
 	* and continue the calculations from there.
 	*/
 	// find the the closest power 2 exponent
-	//int index = size.bitLength() - 1;
-	int index; //XXX
+	int index = find_log2_floor(size);
 
 	GroupElement * exponent = NULL;
 	/* if the requested index out of the vector bounds, the exponents have not been calculated yet, so calculates them.*/
@@ -47,7 +56,8 @@ GroupElement * DlogGroupAbs::GroupElementsExponentiations::getExponentiation(big
 		prepareExponentiations(size);
 
 	exponent = exponentiations[index]; //get the closest exponent in the exponentiations vector
-									   /* if size is not power 2, calculates the additional multiplications */
+	
+	/* if size is not power 2, calculates the additional multiplications */
 	biginteger lastExp = boost::multiprecision::pow(biginteger(2), index);
 	biginteger difference = size - lastExp;
 	if (difference > 0) {
@@ -63,15 +73,13 @@ bool DlogGroupAbs::isPrimeOrder() {
 }
 
 bool DlogGroupAbs::isOrderGreaterThan(int numBits) {
-	if (getOrder() > boost::multiprecision::pow(biginteger(2), numBits))
-		return true;
-	else return false;
+	return (getOrder() > boost::multiprecision::pow(biginteger(2), numBits));
 }
 
 GroupElement * DlogGroupAbs::createRandomElement() {
-		//This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
-		//However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
-		//Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
+	//This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
+	//However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
+	//Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
 	boost::random::uniform_int_distribution<biginteger> ui(0, groupParams->getQ() - 1);
 	biginteger randNum = ui(random_element_gen);
 	// compute g^x to get a new element
@@ -90,103 +98,36 @@ GroupElement * DlogGroupAbs::createRandomGenerator() {
 }
 
 GroupElement * DlogGroupAbs::computeLoop(vector<biginteger> exponentiations, int w, int h, vector<vector<GroupElement *>> preComp, GroupElement * result, int bitIndex){
-	int n = groupElements.length; //number of bases and exponents
-	vector<GroupElement> exponentsResult = new vector<GroupElement>(n); //holds the exponentiations result
-
-	// raises each element to the corresponding power
-	for (int i = 0; i < n; i++) {
-		exponentsResult[i] = exponentiate(groupElements[i], exponentiations[i]);
-	}
-
-	GroupElement * result = NULL; //holds the multiplication of all the exponentiations
-	result = getIdentity(); //initialized to the identity element
-
-	//multiplies every exponentiate
-	for (int i = 0; i<n; i++) {
-		result = multiplyGroupElements(exponentsResult[i], result);
-	}
-
-	//return the final result
-	return result;
-}
-
-vector<vector<GroupElement *>> DlogGroupAbs::createLLPreCompTable(vector<vector<GroupElement *>> createLLPreCompTable(vector<GroupElement *> groupElements, int w, int h){
-	int n = groupElements.length; //number of bases and exponents
-
-									//get the biggest exponent
-	BigInteger bigExp = BigInteger.ZERO;
-	for (int i = 0; i<exponentiations.length; i++)
-		if (bigExp.compareTo(exponentiations[i])<0)
-			bigExp = exponentiations[i];
-
-	int t = bigExp.bitLength(); //num bits of the biggest exponent.
-	int w = 0; //window size
-
-				//choose w according to the value of t
-	w = getLLW(t);
-
-	//h = n/w
-	int h;
-	if ((n % w) == 0) {
-		h = n / w;
-	}
-	else {
-		h = ((int)(n / w)) + 1;
-	}
-
-	//create pre computation table
-	GroupElement[][] preComp = createLLPreCompTable(groupElements, w, h);
-
-	/*for (int i=0; i<h; i++)
-	for (int j=0; j<Math.pow(2, w); j++)
-	System.out.println(((ECElement) preComp[i][j]).getX());
-	*/
-	GroupElement result = null; //holds the computation result
-	result = getIdentity();
-
-	//computes the first loop of the algorithm. This loop returns in the next part of the algorithm with one single tiny change. 
-	result = computeLoop(exponentiations, w, h, preComp, result, t - 1);
-
-	//computes the third part of the algorithm
-	for (int j = t - 2; j >= 0; j--) {
-		//Y = Y^2
-		result = exponentiate(result, new BigInteger("2"));
-
-		//computes the inner loop
-		result = computeLoop(exponentiations, w, h, preComp, result, j);
-	}
-
-	return result;
-}
-
-
-GroupElement DlogGroupAbs::computeLoop(BigInteger[] exponentiations, int w, int h, GroupElement[][] preComp, GroupElement result, int bitIndex) {
 	int e = 0;
 	for (int k = 0; k<h; k++) {
 		for (int i = k*w; i<(k * w + w); i++) {
-			if (i < exponentiations.length) {
+			if (i < exponentiations.size()) {
 				//if the bit is set, change the e value
-				if (exponentiations[i].testBit(bitIndex) == true) {
-					int twoPow = (int)(Math.pow(2, i - k*w));
+				if (boost::multiprecision::bit_test(exponentiations[i], bitIndex)){
+				//if (exponentiations[i].testBit(bitIndex) == true) {
+					int twoPow = (int)(pow(2, i - k*w));
 					e += twoPow;
 				}
 			}
 		}
 		//multiply result with preComp[k][e]
 		result = multiplyGroupElements(result, preComp[k][e]);
-
 		e = 0;
 	}
-
 	return result;
 }
 
-private GroupElement[][] DlogGroupAbs::createLLPreCompTable(GroupElement[] groupElements, int w, int h) {
-	int twoPowW = (int)(Math.pow(2, w));
+vector<vector<GroupElement *>> DlogGroupAbs::createLLPreCompTable(vector<GroupElement *> groupElements, int w, int h){
+	int twoPowW = (int)(pow(2, w));
 	//create the pre-computation table of size h*(2^(w))
-	GroupElement[][] preComp = new GroupElement[h][twoPowW];
+	vector<vector<GroupElement *>> preComp; //	GroupElement[][] preComp = new GroupElement[h][twoPowW];
+	for (int i = 0; i < h; ++i) {
+		preComp.push_back(vector<GroupElement*>());
+		preComp[preComp.size() - 1].resize(twoPowW, NULL);
+	}
 
-	GroupElement base = null;
+
+	GroupElement * base = NULL;
 	int baseIndex;
 
 	//fill the table
@@ -196,7 +137,7 @@ private GroupElement[][] DlogGroupAbs::createLLPreCompTable(GroupElement[] group
 
 			for (int i = 0; i<w; i++) {
 				baseIndex = k*w + i;
-				if (baseIndex < groupElements.length) {
+				if (baseIndex < groupElements.size()) {
 					base = groupElements[baseIndex];
 					//if bit i in e is set, change preComp[k][e]
 					if ((e & (1 << i)) != 0) { //bit i is set
@@ -241,17 +182,92 @@ int DlogGroupAbs::getLLW(int t) {
 		return w;
 }
 
-GroupElement DlogGroupAbs::exponentiateWithPreComputedValues(GroupElement groupElement, BigInteger exponent) {
+GroupElement * DlogGroupAbs::exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent){
 	//extracts from the map the GroupElementsExponentiations object corresponding to the accepted base
-	GroupElementsExponentiations exponentiations = exponentiationsMap.get(groupElement);
-
+	std::unordered_map<GroupElement *, GroupElementsExponentiations *>::iterator it = exponentiationsMap.find(groupElement);
+	
 	// if there is no object that matches this base - create it and add it to the map
-	if (exponentiations == null) {
-		exponentiations = new GroupElementsExponentiations(groupElement);
-		exponentiationsMap.put(groupElement, exponentiations);
+	if (it == exponentiationsMap.end()) {
+		GroupElementsExponentiations *exponentiations = new GroupElementsExponentiations(this, groupElement);
+		//TODO: free allocated memory
+		exponentiationsMap[groupElement] = exponentiations;
 	}
+	
 	// calculates the required exponent
-	return exponentiations.getExponentiation(exponent);
+	return exponentiationsMap.find(groupElement)->second->getExponentiation(exponent);
 }
 
+GroupElement * DlogGroupAbs::computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
+{
+	int n = groupElements.size; //number of bases and exponents
+	vector<GroupElement *> exponentsResult; //holds the exponentiations result
+
+	// raises each element to the corresponding power
+	for (int i = 0; i < n; i++) {
+		exponentsResult[i] = exponentiate(groupElements[i], exponentiations[i]);
+	}
+
+	GroupElement * result = NULL; //holds the multiplication of all the exponentiations
+	result = getIdentity(); //initialized to the identity element
+
+	//multiplies every exponentiate
+	for (int i = 0; i<n; i++) {
+		result = multiplyGroupElements(exponentsResult[i], result);
+	}
+
+	//return the final result
+	return result;
+}
+
+GroupElement * DlogGroupAbs::computeLL(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
+{
+	int n = groupElements.size; //number of bases and exponents
+
+    //get the biggest exponent
+	biginteger bigExp = 0;
+	for (int i = 0; i<exponentiations.size; i++)
+		if (bigExp < exponentiations[i])
+			bigExp = exponentiations[i];
+
+	int t = find_log2_floor(bigExp)+1; //num bits of the biggest exponent.
+	int w = 0; //window size
+
+	//choose w according to the value of t
+	w = getLLW(t);
+
+	//h = n/w
+	int h;
+	if ((n % w) == 0) {
+		h = n / w;
+	}
+	else {
+		h = ((int)(n / w)) + 1;
+	}
+
+	//create pre computation table
+	vector<vector<GroupElement *>> preComp = createLLPreCompTable(groupElements, w, h);
+
+	/*for (int i=0; i<h; i++)
+	for (int j=0; j<Math.pow(2, w); j++)
+	System.out.println(((ECElement) preComp[i][j]).getX());
+	*/
+	GroupElement * result = getIdentity(); //holds the computation result
+
+	//computes the first loop of the algorithm. This loop returns in the next part of the algorithm with one single tiny change. 
+	result = computeLoop(exponentiations, w, h, preComp, result, t - 1);
+
+	//computes the third part of the algorithm
+	for (int j = t - 2; j >= 0; j--) {
+		//Y = Y^2
+		result = exponentiate(result, 2);
+
+		//computes the inner loop
+		result = computeLoop(exponentiations, w, h, preComp, result, j);
+	}
+
+	return result;
+}
+/**********************************************/
+/*END of DlogGroupAbs Implementation *********************************/
+/**********************************************/
 
