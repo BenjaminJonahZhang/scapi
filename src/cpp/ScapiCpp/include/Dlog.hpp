@@ -1,21 +1,25 @@
+#include <unordered_map>
 #include <string>
-#include <boost/multiprecision/cpp_int.hpp> 
-
-// Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
-namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
-typedef boost::multiprecision::int1024_t biginteger;
-
+#include <boost/multiprecision/gmp.hpp> 
+#include <boost/multiprecision/random.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 using namespace std;
+// Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
+namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+using biginteger = boost::multiprecision::mpz_int;
+boost::mt19937 prime_gen(clock()); // prg for prime checking
+boost::mt19937 random_element_gen(clock()); // prg for random element
+
+
+
 
 /**
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.
 *
 */
-class GroupElementSendableData
-{
-
-};
+class GroupElementSendableData {};
 
 /**
 * This is the main interface of the Group element hierarchy.<p>
@@ -54,7 +58,6 @@ private:
 protected:
 	biginteger q; //the group order
 
-
 public:
 	/*
 	* Returns the group order, which is the number of elements in the group
@@ -64,8 +67,28 @@ public:
 	virtual ~GroupParams() = 0;
 };
 
-
-
+/**
+* This is the general interface for the discrete logarithm group. Every class in the DlogGroup family implements this interface.
+* <p>
+* The discrete logarithm problem is as follows: given a generator g of a finite
+* group G and a random element h in G, find the (unique) integer x such that
+* g^x = h.<p>
+* In cryptography, we are interested in groups for which the discrete logarithm problem (Dlog for short) is assumed to be hard.<p>
+* The two most common classes are the group Zp* for a large p, and some Elliptic curve groups.<p>
+*
+* Another issue pertaining elliptic curves is the need to find a suitable mapping that will convert an arbitrary message (that is some binary string) to an element of the group and vice-versa.<p>
+* Only a subset of the messages can be effectively mapped to a group element in such a way that there is a one-to-one injection that converts the string to a group element and vice-versa.<p>
+* On the other hand, any group element can be mapped to some string.<p>
+* In this case, the operation is not invertible. This functionality is implemented by the functions:<p>
+*  - {@code encodeByteArrayToGroupElement(byte[] binaryString) : GroupElement}<p>
+*  - {@code decodeGroupElementToByteArray(GroupElement element) : byte[]}<p>
+*  - {@code mapAnyGroupElementToByteArray(GroupElement element) : byte[]}<p>
+*
+*  The first two work as a pair and decodeGroupElementToByteArray is the inverse of encodeByteArrayToGroupElement, whereas the last one works alone and does not have an inverse.
+*
+* @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+*
+*/
 class DlogGroup
 {
 public:
@@ -156,7 +179,7 @@ public:
 	* @return the result of the exponentiation
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * exponentiate(const GroupElement& base, biginteger exponent) = 0;
+	virtual GroupElement * exponentiate(GroupElement* base, biginteger exponent) = 0;
 
 	/**
 	* Multiplies two GroupElements
@@ -165,7 +188,7 @@ public:
 	* @return the multiplication result
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * multiplyGroupElements(const GroupElement& groupElement1, const GroupElement& groupElement2) = 0;
+	virtual GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) = 0;
 
 	/**
 	* Creates a random member of this Dlog group
@@ -274,4 +297,210 @@ public:
 	* @return a byte array representation of the given group element
 	*/
 	virtual vector<unsigned char> mapAnyGroupElementToByteArray(const GroupElement& groupElement) = 0;
+};
+
+/**
+* Marker interface for Dlog groups that has a prime order sub-group.
+*/
+class primeOrderSubGroup : public DlogGroup {};
+
+/**
+* DlogGroupAbs is an abstract class that implements common functionality of the Dlog group.
+*/
+class DlogGroupAbs : public primeOrderSubGroup {
+
+protected:
+	GroupParams * groupParams;  //group parameters
+	GroupElement * generator;	//generator of the group
+	int k; //k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
+
+	/*
+	* Computes the simultaneousMultiplyExponentiate using a naive algorithm
+	*/
+	GroupElement * computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations);
+	
+	/*
+	* Compute the simultaneousMultiplyExponentiate by LL algorithm.
+	* The code is taken from the pseudo code of LL algorithm in http://dasan.sejong.ac.kr/~chlim/pub/multi_exp.ps.
+	*/
+	GroupElement * computeLL(vector<GroupElement *> groupElements, vector<biginteger> exponentiations);
+
+private:
+	/**
+	* The class GroupElementExponentiations is a nested class of DlogGroupAbs.<p>
+	* It performs the actual work of pre-computation of the exponentiations for one base.
+	* It is composed of two main elements. The group element for which the optimized computations
+	* are built for, called the base and a vector of group elements that are the result of
+	* exponentiations of order 1,2,4,8,
+	*/
+	class GroupElementsExponentiations {
+	private:
+		vector<GroupElement* > exponentiations; //vector of group elements that are the result of exponentiations
+		GroupElement * base;  //group element for which the optimized computations are built for
+		DlogGroupAbs * parent;
+		/**
+		* Calculates the necessary additional exponentiations and fills the exponentiations vector with them.
+		* @param size - the required exponent
+		* @throws IllegalArgumentException
+		*/
+		void prepareExponentiations(biginteger size);
+
+	public:
+		/**
+		* The constructor creates a map structure in memory.
+		* Then calculates the exponentiations of order 1,2,4,8 for the given base and save them in the map.
+		* @param base
+		* @throws IllegalArgumentException
+		*/
+		GroupElementsExponentiations(DlogGroupAbs * parent_, GroupElement * base_);
+
+		/**
+		* Checks if the exponentiations had already been calculated for the required size.
+		* If so, returns them, else it calls the private function prepareExponentiations with the given size.
+		* @param size - the required exponent
+		* @return groupElement - the exponentiate result
+		*/
+		GroupElement * getExponentiation(biginteger size);
+	};
+    std::unordered_map<GroupElement *, GroupElementsExponentiations *> exponentiationsMap;// = new HashMap<GroupElement, GroupElementsExponentiations>(); //map for multExponentiationsWithSameBase calculations
+
+	/*
+	* Computes the loop the repeats in the algorithm.
+	* for k=0 to h-1
+	* 		e=0
+	* 		for i=kw to kw+w-1
+	*			if the bitIndex bit in ci is set:
+	*			calculate e += 2^(i-kw)
+	*		result = result *preComp[k][e]
+	*
+	*/
+	GroupElement * computeLoop(vector<biginteger> exponentiations, int w, int h, vector<vector<GroupElement *>> preComp, GroupElement * result, int bitIndex);
+
+	/*
+	* Creates the preComputation table.
+	*/
+	vector<vector<GroupElement *>> createLLPreCompTable(vector<GroupElement *> groupElements, int w, int h);
+
+	/*
+	* returns the w value according to the given t
+	*/
+	int getLLW(int t);
+
+public:
+	/**
+	* If this group has been initialized then it returns the group's generator. Otherwise throws exception.
+	* @return the generator of this Dlog group
+	*/
+	GroupElement * getGenerator() { return generator; }
+
+	/**
+	* GroupParams are the parameters of the group that define the actual group. That is, different parameters will create a different group.
+	* @return the GroupDesc of this Dlog group
+	*/
+	GroupParams * getGroupParams() { return groupParams; }
+
+	/**
+	* If this group has been initialized then it returns the group's order. Otherwise throws exception.
+	* @return the order of this Dlog group
+	*/
+	biginteger getOrder() { return groupParams->getQ(); }
+
+	/**
+	* Checks if the order is a prime number.<p>
+	* Primality checking can be an expensive operation and it should be performed only when absolutely necessary.
+	* @return true if the order is a prime number. false, otherwise.
+	*/
+	bool isPrimeOrder();
+
+	/**
+	* Checks if the order is greater than 2^numBits
+	* @param numBits
+	* @return true if the order is greater than 2^numBits, false - otherwise.
+	*/
+	bool isOrderGreaterThan(int numBits);
+
+	/**
+	* Creates a random member of this Dlog group.
+	*
+	* @return the random element
+	*/
+	GroupElement * createRandomElement();
+
+	/**
+	* Creates a random generator of this Dlog group
+	*
+	* @return the random generator
+	*/
+	GroupElement * createRandomGenerator();
+	
+	/**
+	* @return the maximum length of a string to be converted to a Group Element of this group. If a string exceeds this length it cannot be converted.
+	*/
+	int getMaxLengthOfByteArrayForEncoding() {
+		//Return member variable k, which was calculated upon construction of this Dlog group, once the group got the p value. 
+		return k;
+	}
+
+	/*
+	* Computes the product of several exponentiations of the same base and
+	* distinct exponents. An optimization is used to compute it more quickly by
+	* keeping in memory the result of h1, h2, h4,h8,... and using it in the
+	* calculation.<p> Note that if we want a one-time exponentiation of h it is
+	* preferable to use the basic exponentiation function since there is no
+	* point to keep anything in memory if we have no intention to use it.
+	*
+	* @param groupElement
+	* @param exponent
+	* @return the exponentiation result
+	*/
+	GroupElement * exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent);
+
+	/* 
+	* @see edu.biu.scapi.primitives.dlog.DlogGroup#endExponentiateWithPreComputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
+	*/
+	void endExponentiateWithPreComputedValues(GroupElement * base) { exponentiationsMap.remove(base); }
+};
+
+/**********DlogZP hierechy***********************/
+
+/**
+* Marker interface. Every class that implements it is signed as Zp*
+*/
+class DlogZp : public DlogGroup {};
+
+/**
+* Marker interface. Every class that implements it is signed as Zp* group were p is a safe prime.
+*/
+class DlogZpSafePrime : public DlogZp {};
+
+/**
+* This is a marker interface. Every class that implements it is signed as Zp* element.
+*/
+class ZpElement : public GroupElement {
+	/**
+	* This function returns the actual "integer" value of this element; which is an element of a given Dlog over Zp*.
+	* @return integer value of this Zp element.
+	*/
+public:
+	virtual biginteger getElementValue()=0;
+};
+
+/**
+* This is a marker interface. Every class that implements it is marked as an element of a sub-group of prime order of Zp* where p is a safe prime.
+*/
+class ZpSafePrimeElement : public ZpElement {};
+
+class ZpElementSendableData : public GroupElementSendableData {
+
+private:
+	static const long serialVersionUID = -4297988366522382659L;
+
+protected:
+	biginteger x;
+
+public:
+	ZpElementSendableData(biginteger x_): GroupElementSendableData(){ x = x_; }
+	biginteger getX() { return x; }
+	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
+
 };
