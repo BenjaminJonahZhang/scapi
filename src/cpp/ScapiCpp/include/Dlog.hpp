@@ -130,7 +130,7 @@ public:
 	* 		   <code>false</code> otherwise.
 	* @throws IllegalArgumentException
 	*/
-	virtual bool isMember(const GroupElement& element) = 0;
+	virtual bool isMember(GroupElement * element) = 0;
 
 	/**
 	* Checks if the order is a prime number
@@ -232,7 +232,7 @@ public:
 	* @param exponentiations
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * simultaneousMultipleExponentiations(vector<GroupElement> groupElements, vector<biginteger> exponentiations) = 0;
+	virtual GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) = 0;
 
 	/**
 	* Computes the product of several exponentiations of the same base
@@ -277,7 +277,7 @@ public:
 	* @param groupElement the element to decode
 	* @return the decoded byte array
 	*/
-	virtual vector<unsigned char> decodeGroupElementToByteArray(const GroupElement& groupElement) = 0;
+	virtual vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) = 0;
 
 
 	/**
@@ -294,7 +294,7 @@ public:
 	* This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array.
 	* @return a byte array representation of the given group element
 	*/
-	virtual vector<unsigned char> mapAnyGroupElementToByteArray(const GroupElement& groupElement) = 0;
+	virtual vector<unsigned char> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
 };
 
 /**

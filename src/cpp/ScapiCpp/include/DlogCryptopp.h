@@ -14,10 +14,10 @@ private:
 	biginteger element;
 public:
 	/**
-	* This constructor accepts x value and DlogGroup.
+	* This constructor accepts x value and DlogGroup (represented by p).
 	* If x is valid, sets it; else, throws exception
 	* @param x
-	* @param zp
+	*  @param p - group modulus
 	* @throws IllegalArgumentException
 	*/
 	ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, bool bCheckMembership);
@@ -27,34 +27,28 @@ public:
 	* input: modulus p
 	* choose a random element between 1 to p-1
 	* calculate element^2 mod p
-	*
 	* @param p - group modulus
-	* @throws IllegalArgumentException
 	*/
-	ZpSafePrimeElementCryptoPp(biginteger elementOrP, boost::mt19937 prg = boost::mt19937(clock()), bool bUseRandom=false);
-	biginteger getElementValue(){
+	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, boost::mt19937 prg);
+	/*
+	* Constructor that simply create element using the given value
+	*/
+	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger elementValue);
+
+	biginteger getElementValue() override{
 		return element;
 	}
 	/**
 	* This function checks if this element is the identity of the Dlog group.
 	* @return <code>true</code> if this element is the identity of the group; <code>false</code> otherwise.
 	*/
-	bool isIdentity() { return element == 1; }
-	/**
-	* Checks if the given GroupElement is equal to this groupElement.
-	*
-	* @param elementToCompare
-	* @return true if the given element is equal to this element. false, otherwise.
-	*/
+	bool isIdentity() override { return element == 1; }
 	bool ZpSafePrimeElementCryptoPp::operator==(const ZpSafePrimeElementCryptoPp &other) const;
 	bool ZpSafePrimeElementCryptoPp::operator!=(const ZpSafePrimeElementCryptoPp &other) const;
 	string toString() {
 		return "ZpSafePrimeElementCryptoPp [element value=" + string(element) + "]";
 	}
-	/**
-	* @see edu.biu.scapi.primitives.dlog.GroupElement#generateSendableData()
-	*/
-	GroupElementSendableData * generateSendableData();
+	GroupElementSendableData * generateSendableData() override;
 };
 
 /**
@@ -63,18 +57,13 @@ public:
 class CryptoPpDlogZpSafePrime :public DlogGroupAbs, public DlogZpSafePrime, public DDH {
 private:
 	CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * pointerToGroup = NULL; // pointer to the native group object
-	/* basic functions for the Dlog functionality */
-	long getGenerator(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	char * getP(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	char * getQ(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	long inverseElement(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group, long element);
-	long exponentiateElement(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group, long element, char exponent[]);
-	long multiplyElements(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group, long element1, long element2);
-	void deleteDlogZp(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	bool validateZpGroup(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	bool validateZpGenerator(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group);
-	bool validateZpElement(CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * group, long element);
 	int calcK(biginteger p);
+
+protected:
+	/**
+	* deletes the related Dlog group object
+	*/
+	~CryptoPpDlogZpSafePrime();
 
 public:
 	/**
@@ -125,128 +114,21 @@ public:
 		return new ZpSafePrimeElementCryptoPp(1, ((ZpGroupParams *)groupParams)->getP, false);
 	}
 
-	/**
-	* Creates a random member of this Dlog group
-	*
-	* @return the random element
-	*/
-	GroupElement * createRandomElement() {
+	GroupElement * createRandomElement() override {
 		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
 		//It calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.
-		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams *)groupParams)->getP(), random);
-
+		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams *)groupParams)->getP(), random_element_gen);
 	}
 
-	/**
-	* Checks if the given element is member of this Dlog group
-	* @param element
-	* @return true if the given element is member of that group. false, otherwise.
-	* @throws IllegalArgumentException
-	*/
-	public boolean isMember(GroupElement element) {
-
-		// check if element is ZpElementCryptoPp
-		if (!(element instanceof ZpSafePrimeElementCryptoPp)) {
-			throw new IllegalArgumentException("element type doesn't match the group type");
-		}
-
-		return validateZpElement(pointerToGroup, ((ZpSafePrimeElementCryptoPp)element).getPointerToElement());
-
-	}
-
-	/**
-	* Checks if the given generator is indeed the generator of the group
-	* @return true, is the generator is valid, false otherwise.
-	*/
-	bool isGenerator() { return validateZpGenerator(pointerToGroup); }
-
-	/**
-	* Checks if the parameters of the group are correct.
-	* @return true if valid, false otherwise.
-	*/
-	bool validateGroup() { return validateZpGroup(pointerToGroup); }
-
-	/**
-	* Calculates the inverse of the given GroupElement
-	* @param groupElement to inverse
-	* @return the inverse element of the given GroupElement
-	* @throws IllegalArgumentException
-	*/
-	GroupElement * getInverse(GroupElement * groupElement);
-
-	/**
-	* Raises the base GroupElement to the exponent. The result is another GroupElement.
-	* @param exponent
-	* @param base
-	* @return the result of the exponentiation
-	* @throws IllegalArgumentException
-	*/
-	GroupElement * exponentiate(GroupElement * base, biginteger exponent);
-
-	/**
-	* Multiplies two GroupElements
-	*
-	* @param groupElement1
-	* @param groupElement2
-	* @return the multiplication result
-	* @throws IllegalArgumentException
-	*/
-	GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2);
-
-	/**
-	* Computes the product of several exponentiations with distinct bases
-	* and distinct exponents.
-	* Instead of computing each part separately, an optimization is used to
-	* compute it simultaneously.
-	* @param groupElements
-	* @param exponentiations
-	* @return the exponentiation result
-	*/
-	GroupElement * simultaneousMultipleExponentiations
-		(GroupElement[] groupElements, BigInteger[] exponentiations);
-
-	/* (non-Javadoc)
-	* @see DlogGroup#generateElement(boolean, java.math.BigInteger[]) @Override
-	*/
-	GroupElement * generateElement(boolean bCheckMembership, BigInteger... values);
-
-	/**
-	* deletes the related Dlog group object
-	*/
-	protected void finalize() throws Throwable {
-
-		// delete from the dll the dynamic allocation of the Integer.
-		deleteDlogZp(pointerToGroup);
-		super.finalize();
-	}
-
-
-	/**
-	* This function takes any string of length up to k bytes and encodes it to a Group Element.<p>
-	* k is calculated upon construction of this group and it depends on the length in bits of p.<p>
-	* The encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto.<p>
-	* Therefore, any string of length in bytes up to k can be encoded to a group element but not<p>
-	* every group element can be decoded to a binary string in the group of binary strings of length up to 2^k.<p>
-	* Thus, the right way to use this functionality is first to encode a byte array and the to decode it, and not the opposite.
-	* @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
-	*/
-	GroupElement * encodeByteArrayToGroupElement(char binaryString[]);
-
-	/**
-	* This function decodes a group element to a byte array.<p>
-	* This function is guaranteed to work properly ONLY if the group element was obtained as a result
-	* of encoding a binary string of length in bytes up to k. This is because the encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto.<p>
-	* Therefore, any string of length in bytes up to k can be encoded to a group element but not<p>
-	* any group element can be decoded to a binary sting in the group of binary strings of length up to 2^k.
-	* @param groupElement the GroupElement to decode
-	* @return a byte[] decoding of the group element
-	*/
-	char * decodeGroupElementToByteArray(GroupElement * groupElement);
-
-	/**
-	* This function maps a group element of this dlog group to a byte array.<p>
-	* This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array.
-	* @return a byte array representation of the given group element
-	*/
-	char * mapAnyGroupElementToByteArray(GroupElement * groupElement);
+	bool isMember(GroupElement * element) override; 
+	bool isGenerator() override;
+	bool validateGroup() override;
+	GroupElement * getInverse(GroupElement * groupElement) override;
+	GroupElement * exponentiate(GroupElement * base, biginteger exponent) override;
+	GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) override;
+	GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) override; 
+	GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) override;
+	GroupElement * encodeByteArrayToGroupElement(char binaryString[]) override;
+	char * decodeGroupElementToByteArray(GroupElement * groupElement) override;
+	char * mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
 };

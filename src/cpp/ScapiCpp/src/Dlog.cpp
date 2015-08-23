@@ -196,6 +196,77 @@ GroupElement * DlogGroupAbs::exponentiateWithPreComputedValues(GroupElement * gr
 	// calculates the required exponent
 	return exponentiationsMap.find(groupElement)->second->getExponentiation(exponent);
 }
+
+GroupElement * DlogGroupAbs::computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
+{
+	int n = groupElements.size; //number of bases and exponents
+	vector<GroupElement *> exponentsResult; //holds the exponentiations result
+
+	// raises each element to the corresponding power
+	for (int i = 0; i < n; i++) {
+		exponentsResult[i] = exponentiate(groupElements[i], exponentiations[i]);
+	}
+
+	GroupElement * result = NULL; //holds the multiplication of all the exponentiations
+	result = getIdentity(); //initialized to the identity element
+
+	//multiplies every exponentiate
+	for (int i = 0; i<n; i++) {
+		result = multiplyGroupElements(exponentsResult[i], result);
+	}
+
+	//return the final result
+	return result;
+}
+
+GroupElement * DlogGroupAbs::computeLL(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
+{
+	int n = groupElements.size; //number of bases and exponents
+
+    //get the biggest exponent
+	biginteger bigExp = 0;
+	for (int i = 0; i<exponentiations.size; i++)
+		if (bigExp < exponentiations[i])
+			bigExp = exponentiations[i];
+
+	int t = find_log2_floor(bigExp)+1; //num bits of the biggest exponent.
+	int w = 0; //window size
+
+	//choose w according to the value of t
+	w = getLLW(t);
+
+	//h = n/w
+	int h;
+	if ((n % w) == 0) {
+		h = n / w;
+	}
+	else {
+		h = ((int)(n / w)) + 1;
+	}
+
+	//create pre computation table
+	vector<vector<GroupElement *>> preComp = createLLPreCompTable(groupElements, w, h);
+
+	/*for (int i=0; i<h; i++)
+	for (int j=0; j<Math.pow(2, w); j++)
+	System.out.println(((ECElement) preComp[i][j]).getX());
+	*/
+	GroupElement * result = getIdentity(); //holds the computation result
+
+	//computes the first loop of the algorithm. This loop returns in the next part of the algorithm with one single tiny change. 
+	result = computeLoop(exponentiations, w, h, preComp, result, t - 1);
+
+	//computes the third part of the algorithm
+	for (int j = t - 2; j >= 0; j--) {
+		//Y = Y^2
+		result = exponentiate(result, 2);
+
+		//computes the inner loop
+		result = computeLoop(exponentiations, w, h, preComp, result, j);
+	}
+
+	return result;
+}
 /**********************************************/
 /*END of DlogGroupAbs Implementation *********************************/
 /**********************************************/
