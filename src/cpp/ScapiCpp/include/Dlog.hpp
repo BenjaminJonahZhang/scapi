@@ -1,15 +1,14 @@
+#ifndef SCAPI_DLOG_H
+#define SCAPI_DLOG_H
+
 #include <unordered_map>
 #include <string>
 //#include <boost/multiprecision/gmp.hpp> 
 #include <boost/multiprecision/random.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include "SecurityLevel.hpp"
+#include "MathAlgorithms.hpp"
 
-using namespace std;
-// Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
-namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
-using biginteger = boost::multiprecision::cpp_int;
-boost::mt19937 prime_gen(clock()); // prg for prime checking
 
 int find_log2_floor(biginteger);
 
@@ -62,7 +61,7 @@ public:
 	* @return the order of the group
 	*/
 	biginteger getQ() { return q; }
-	virtual ~GroupParams() = 0;
+	//virtual ~GroupParams() = 0;
 };
 
 /**
@@ -221,7 +220,7 @@ public:
 	* @param data the GroupElementSendableData from which we wish to "reconstruct" an element of this DlogGroup
 	* @return the reconstructed GroupElement
 	*/
-	virtual GroupElement * reconstructElement(bool bCheckMembership, const GroupElementSendableData& data) = 0;
+	//virtual GroupElement * reconstructElement(bool bCheckMembership, const GroupElementSendableData& data) = 0;
 
 	/**
 	* Computes the product of several exponentiations with distinct bases
@@ -245,7 +244,7 @@ public:
 	* @param exponent
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * exponentiateWithPreComputedValues(const GroupElement& base, biginteger exponent) = 0;
+	virtual GroupElement * exponentiateWithPreComputedValues(GroupElement * base, biginteger exponent) = 0;
 
 	/**
 	* This function cleans up any resources used by exponentiateWithPreComputedValues for the requested base.
@@ -253,7 +252,7 @@ public:
 	*
 	* @param base
 	*/
-	virtual void endExponentiateWithPreComputedValues(const GroupElement& base) = 0;
+	virtual void endExponentiateWithPreComputedValues(GroupElement * base) = 0;
 
 	/**
 	* This function takes any string of length up to k bytes and encodes it to a Group Element.
@@ -265,7 +264,7 @@ public:
 	* @param binaryString the byte array to encode
 	* @return the encoded group Element <B> or null </B>if element could not be encoded
 	*/
-	virtual GroupElement * encodeByteArrayToGroupElement(vector<unsigned char> binaryString) = 0;
+	virtual  GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) = 0;
 
 	/**
 	* This function decodes a group element to a byte array. This function is guaranteed to work properly ONLY if the group element was obtained as a result of
@@ -277,7 +276,7 @@ public:
 	* @param groupElement the element to decode
 	* @return the decoded byte array
 	*/
-	virtual vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) = 0;
+	virtual const vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) = 0;
 
 
 	/**
@@ -294,7 +293,7 @@ public:
 	* This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array.
 	* @return a byte array representation of the given group element
 	*/
-	virtual vector<unsigned char> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
+	virtual const vector<unsigned char> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
 };
 
 /**
@@ -392,55 +391,55 @@ public:
 	* If this group has been initialized then it returns the group's generator. Otherwise throws exception.
 	* @return the generator of this Dlog group
 	*/
-	GroupElement * getGenerator() { return generator; }
+	virtual GroupElement * getGenerator() override { return generator; };
 
 	/**
 	* GroupParams are the parameters of the group that define the actual group. That is, different parameters will create a different group.
 	* @return the GroupDesc of this Dlog group
 	*/
-	GroupParams * getGroupParams() { return groupParams; }
+	GroupParams * getGroupParams() override { return groupParams; };
 
 	/**
 	* If this group has been initialized then it returns the group's order. Otherwise throws exception.
 	* @return the order of this Dlog group
 	*/
-	biginteger getOrder() { return groupParams->getQ(); }
+	biginteger getOrder() override { return groupParams->getQ(); };
 
 	/**
 	* Checks if the order is a prime number.<p>
 	* Primality checking can be an expensive operation and it should be performed only when absolutely necessary.
 	* @return true if the order is a prime number. false, otherwise.
 	*/
-	bool isPrimeOrder();
+	bool isPrimeOrder() override;
 
 	/**
 	* Checks if the order is greater than 2^numBits
 	* @param numBits
 	* @return true if the order is greater than 2^numBits, false - otherwise.
 	*/
-	bool isOrderGreaterThan(int numBits);
+	bool isOrderGreaterThan(int numBits) override;
 
 	/**
 	* Creates a random member of this Dlog group.
 	*
 	* @return the random element
 	*/
-	GroupElement * createRandomElement();
+	GroupElement * createRandomElement() override;
 
 	/**
 	* Creates a random generator of this Dlog group
 	*
 	* @return the random generator
 	*/
-	GroupElement * createRandomGenerator();
+	GroupElement * createRandomGenerator()override;
 	
 	/**
 	* @return the maximum length of a string to be converted to a Group Element of this group. If a string exceeds this length it cannot be converted.
 	*/
-	int getMaxLengthOfByteArrayForEncoding() {
+	int getMaxLengthOfByteArrayForEncoding() override {
 		//Return member variable k, which was calculated upon construction of this Dlog group, once the group got the p value. 
 		return k;
-	}
+	};
 
 	/*
 	* Computes the product of several exponentiations of the same base and
@@ -454,12 +453,12 @@ public:
 	* @param exponent
 	* @return the exponentiation result
 	*/
-	GroupElement * exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent);
+	GroupElement * exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent) override;
 
 	/* 
 	* @see edu.biu.scapi.primitives.dlog.DlogGroup#endExponentiateWithPreComputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
 	*/
-	void endExponentiateWithPreComputedValues(GroupElement * base) { exponentiationsMap.erase(base); }
+	void endExponentiateWithPreComputedValues(GroupElement * base) override { exponentiationsMap.erase(base); }
 };
 
 /**********DlogZP hierechy***********************/
@@ -543,3 +542,6 @@ public:
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
 
 };
+
+
+#endif
