@@ -69,6 +69,7 @@ GroupElement * DlogGroupAbs::GroupElementsExponentiations::getExponentiation(big
 }
 
 bool DlogGroupAbs::isPrimeOrder() {
+	boost::mt19937 prime_gen(clock()); // prg for prime checking
 	return (miller_rabin_test(getOrder(), 40, prime_gen));
 }
 
@@ -199,7 +200,7 @@ GroupElement * DlogGroupAbs::exponentiateWithPreComputedValues(GroupElement * gr
 
 GroupElement * DlogGroupAbs::computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
 {
-	int n = groupElements.size; //number of bases and exponents
+	int n = groupElements.size(); //number of bases and exponents
 	vector<GroupElement *> exponentsResult; //holds the exponentiations result
 
 	// raises each element to the corresponding power
@@ -221,11 +222,11 @@ GroupElement * DlogGroupAbs::computeNaive(vector<GroupElement *> groupElements, 
 
 GroupElement * DlogGroupAbs::computeLL(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
 {
-	int n = groupElements.size; //number of bases and exponents
+	int n = groupElements.size(); //number of bases and exponents
 
     //get the biggest exponent
 	biginteger bigExp = 0;
-	for (int i = 0; i<exponentiations.size; i++)
+	for (int i = 0; i<exponentiations.size(); i++)
 		if (bigExp < exponentiations[i])
 			bigExp = exponentiations[i];
 

@@ -81,12 +81,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\code\scapi\lib\CryptoPP;C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\assets\gmp\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\assets\gmp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\code\scapi\lib\CryptoPP\x64\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\code\scapi\lib\CryptoPP\x64\Output\Debug\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -99,12 +104,14 @@
   <ItemGroup>
     <ClCompile Include="src\Dlog.cpp" />
     <ClCompile Include="src\DlogCryptopp.cpp" />
+    <ClCompile Include="src\MathAlgorithms.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
     <ClInclude Include="include\DlogCryptopp.h" />
+    <ClInclude Include="include\MathAlgorithms.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>
   <ItemGroup>

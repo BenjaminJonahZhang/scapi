@@ -1,10 +1,17 @@
+#ifndef SCAPI_DLOG_CryptoPP_H
+#define SCAPI_DLOG_CryptoPP_H
+
 #include "Dlog.hpp"
 // CryptoPP includes
 #include <gfpcrypt.h>
 #include <cryptlib.h>
 #include <osrng.h>
 
-
+/**********************/
+/**** Helpers *********/
+/**********************/
+biginteger cryptoppint_to_biginteger(CryptoPP::Integer cint);
+CryptoPP::Integer biginteger_to_cryptoppint(biginteger bi);
 /**
 * This class is an adapter class of Crypto++ to a ZpElement in SCAPI.<p>
 * It holds a pointer to a Zp element in Crypto++. It implements all the functionality of a Zp element.
@@ -54,7 +61,7 @@ public:
 /**
 * This class implements a Dlog group over Zp* utilizing Crypto++'s implementation.<p>
 */
-class CryptoPpDlogZpSafePrime :public DlogGroupAbs, public DlogZpSafePrime, public DDH {
+class CryptoPpDlogZpSafePrime :public DlogGroupAbs, public DDH {//public DlogZpSafePrime, 
 private:
 	CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime * pointerToGroup = NULL; // pointer to the native group object
 	int calcK(biginteger p);
@@ -63,7 +70,7 @@ protected:
 	/**
 	* deletes the related Dlog group object
 	*/
-	~CryptoPpDlogZpSafePrime();
+	virtual ~CryptoPpDlogZpSafePrime();
 
 public:
 	/**
@@ -111,7 +118,7 @@ public:
 	* @return the identity of this Zp group - 1
 	*/
 	GroupElement * getIdentity() {
-		return new ZpSafePrimeElementCryptoPp(1, ((ZpGroupParams *)groupParams)->getP, false);
+		return new ZpSafePrimeElementCryptoPp(1, ((ZpGroupParams *)groupParams)->getP(), false);
 	}
 
 	GroupElement * createRandomElement() override {
@@ -128,7 +135,9 @@ public:
 	GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) override;
 	GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) override; 
 	GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) override;
-	GroupElement * encodeByteArrayToGroupElement(char binaryString[]) override;
-	char * decodeGroupElementToByteArray(GroupElement * groupElement) override;
-	char * mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
+	GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) override;
+	const vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) override;
+	const vector<unsigned char>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
 };
+
+#endif
