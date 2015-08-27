@@ -80,8 +80,8 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\code\scapi\lib\CryptoPP;C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\assets\gmp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\code\scapi\lib\Miracl\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -90,7 +90,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\code\scapi\lib\CryptoPP\x64\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\code\scapi\lib\CryptoPP\x64\Output\Debug\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\code\scapi\lib\CryptoPP\x64\Output\Debug\cryptlib.lib;C:\code\scapi\lib\Miracl\test_folder\miracl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -104,6 +104,8 @@
   <ItemGroup>
     <ClCompile Include="src\Dlog.cpp" />
     <ClCompile Include="src\DlogCryptopp.cpp" />
+    <ClCompile Include="src\DlogElipticCurve.cpp" />
+    <ClCompile Include="src\DlogMiracl.cpp" />
     <ClCompile Include="src\MathAlgorithms.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
@@ -111,6 +113,8 @@
     <ClInclude Include="include\catch.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
     <ClInclude Include="include\DlogCryptopp.h" />
+    <ClInclude Include="include\DlogEllipticCurve.hpp" />
+    <ClInclude Include="include\DlogMiracl.hpp" />
     <ClInclude Include="include\MathAlgorithms.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>

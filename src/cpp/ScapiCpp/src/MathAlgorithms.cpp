@@ -1,6 +1,6 @@
 #include "../include/MathAlgorithms.hpp"
 
-biginteger modInverse(biginteger a, biginteger m)
+biginteger MathAlgorithms::modInverse(biginteger a, biginteger m)
 {
 	biginteger b0 = m, t, q;
 	biginteger x0 = 0, x1 = 1;
@@ -14,52 +14,39 @@ biginteger modInverse(biginteger a, biginteger m)
 	return x1;
 }
 
-biginteger MathAlgorithms::chineseRemainderTheorem(vector<biginteger> congruences, vector<biginteger> moduli)
+biginteger MathAlgorithms::chineseRemainderTheorem(const vector<biginteger> & congruences, const vector<biginteger> & moduli)
 {
 	biginteger retval = 0;
 	biginteger all = 1;
 	for (int i = 0; i < moduli.size(); i++)
 		all *= moduli[i];
-	//all = all.multiply((BigInteger)moduli.elementAt(i));
 	for (int i = 0; i < moduli.size(); i++)
 	{
 		biginteger a = moduli[i];
-		biginteger b = 1 / a; //all.divide(a);
-		biginteger b_ = modInverse(b, a);// b.modInverse(a);
-		biginteger tmp = b*b_; // b.multiply(b_);
-		tmp *= congruences[i]; //tmp = tmp.multiply((BigInteger)congruences.elementAt(i));
-		retval += tmp; // retval.add(tmp);
+		biginteger b = all / a; 
+		biginteger b_ = modInverse(b, a);
+		biginteger tmp = b*b_; 
+		tmp *= congruences[i]; 
+		retval += tmp; 	
 	}
-	return retval % all; //return retval.mod(all);
+	return retval % all; 
 }
 
-///**
-//* Computes n!  (n factorial)
-//* @param n
-//* @return n!
-//*/
-//public static int factorial(int n) {
-//	int fact = 1; // this  will be the result 
-//	for (int i = 1; i <= n; i++) {
-//		fact *= i;
-//	}
-//	return fact;
-//}
-//
-///**
-//* Computes n!  (n factorial)
-//* @param n
-//* @return n! as a BigInteger
-//*/
-//public static BigInteger factorialBI(int n) {
-//	BigInteger fact = BigInteger.ONE; // this  will be the result 
-//	for (int i = 1; i <= n; i++) {
-//		//fact *= i;
-//		fact = fact.multiply(BigInteger.valueOf(i));
-//	}
-//	return fact;
-//}
-//
+int MathAlgorithms::factorial(int n) {
+	int fact = 1; // this  will be the result 
+	for (int i = 1; i <= n; i++)
+		fact *= i;
+	return fact;
+}
+
+
+biginteger MathAlgorithms::factorialBI(int n) {
+	biginteger fact = 1 ; // this  will be the result 
+	for (int i = 1; i <= n; i++)
+		fact *= i;
+	return fact;
+}
+
 MathAlgorithms::SquareRootResults MathAlgorithms::sqrtModP_3_4(biginteger z, biginteger p) {
 	//We assume here (and we do not check for efficiency reasons) that p is a prime
 	//We do check that the prime p = 3 mod 4, if not throw exception 
@@ -68,7 +55,7 @@ MathAlgorithms::SquareRootResults MathAlgorithms::sqrtModP_3_4(biginteger z, big
 
 	biginteger exponent = (p + 1) / 4;
 	biginteger x = mp::powm(z, exponent, p);  // z.modPow(exponent, p);
-	return SquareRootResults(x, (-x) % p);// x.negate().mod(p));
+	return SquareRootResults(x, (-x + p) % p); // we want to avoid negative modolus
 }
 
 /*-------------------------------------------------------------*/

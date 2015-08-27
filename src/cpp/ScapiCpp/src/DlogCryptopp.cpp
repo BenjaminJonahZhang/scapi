@@ -34,7 +34,7 @@ ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger x, biginteger 
 		element = x;
 }
 
-ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, boost::mt19937 prg)
+ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg)
 {
 	// find a number in the range [1, ..., p-1]
 	boost::random::uniform_int_distribution<biginteger> ui(1, p - 1);
@@ -48,11 +48,13 @@ ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger elementValue)
 		element = elementValue;
 }
 
-bool ZpSafePrimeElementCryptoPp::operator==(const ZpSafePrimeElementCryptoPp &other) const {
-	return this->element == other.element;
+bool ZpSafePrimeElementCryptoPp::operator==(const GroupElement &other) const{
+	if (typeid(*this) != typeid(other))
+		return false;
+	return this->element == ((ZpSafePrimeElementCryptoPp *) &other)->element;
 }
 
-bool ZpSafePrimeElementCryptoPp::operator!=(const ZpSafePrimeElementCryptoPp &other) const {
+bool ZpSafePrimeElementCryptoPp::operator!=(const GroupElement &other) const {
 	return !(*this == other);
 }
 
@@ -66,9 +68,9 @@ GroupElementSendableData * ZpSafePrimeElementCryptoPp::generateSendableData() {
 /**** CryptoPpDlogZpSafePrime ***/
 /*************************************************/
 
-CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, boost::mt19937 prg)
+CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg)
 {
-	boost::mt19937 prime_gen(clock()); // prg for prime checking
+	mt19937 prime_gen(clock()); // prg for prime checking
 	this->random_element_gen = prg;
 	biginteger p = groupParams->getP();
 	biginteger q = groupParams->getQ();
@@ -107,7 +109,7 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, bo
 	k = calcK(p);
 }
 
-CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(int numBits, boost::mt19937 prg) {
+CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(int numBits, mt19937 prg) {
 
 	this->random_element_gen = prg;
 
@@ -259,7 +261,8 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
  GroupElement * CryptoPpDlogZpSafePrime::encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) {
 	//Any string of length up to k has numeric value that is less than (p-1)/2 - 1.
 	//If longer than k then throw exception.
-	if (binaryString.size() > k) {
+	 int bs_size = binaryString.size();
+	if (bs_size > k) {
 		throw length_error("The binary array to encode is too long.");
 	}
 
@@ -268,10 +271,17 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 	list<unsigned char> newString(binaryString.begin(), binaryString.end());
 	newString.push_front(1);
 
+	byte *bstr = new byte[bs_size + 1];
+	for (auto it = newString.begin(); it != newString.end(); ++it) {
+		int index = std::distance(newString.begin(), it);
+		bstr[index] = *it;
+	}
+	biginteger s = cryptoppint_to_biginteger(CryptoPP::Integer(bstr, bs_size + 1));
+
 	//Denote the string of length k by s.
 	//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
-	biginteger s(string(newString.begin(), newString.end()));
 	biginteger y = boost::multiprecision::powm((s + 1), 2, ((ZpGroupParams *)groupParams)->getP());
+
 	//There is no need to check membership since the "element" was generated so that it is always an element.
 	ZpSafePrimeElementCryptoPp * element = new ZpSafePrimeElementCryptoPp(y, ((ZpGroupParams * )groupParams)->getP(), false);
 	return element;
@@ -285,9 +295,9 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 	 //Given a group element y, find the two inverses z,-z. Take z to be the value between 1 and (p-1)/2. Return s=z-1
 	 biginteger y = zp_element->getElementValue();
 	 biginteger p = ((ZpGroupParams * ) groupParams)->getP();
-	 boost::multiprecision::sqrt(y) % p;
 
 	 MathAlgorithms::SquareRootResults roots = MathAlgorithms::sqrtModP_3_4(y, p);
+
 	 biginteger goodRoot;
 	 biginteger halfP = (p - 1) / 2;
 	 if (roots.getRoot1()>1 && roots.getRoot1() < halfP)
@@ -296,10 +306,16 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 		 goodRoot = roots.getRoot2();
 	 goodRoot -= 1;
 
+	 CryptoPP::Integer cpi = biginteger_to_cryptoppint(goodRoot);
+	 int len = ceil((cpi.BitCount() + 1) / 8.0); //ceil(find_log2_floor(goodRoot) / 8.0);
+	 byte * output = new byte[len];
+	 cpi.Encode(output, len);
+	 vector<byte> res;
+	 
 	 // Remove the padding byte at the most significant position (that was added while encoding)
-	 string sgoodRoot = string(goodRoot);
-	 sgoodRoot.erase(0, 1);
-	 return vector<unsigned char> (sgoodRoot.begin(), sgoodRoot.end());
+	 for (int i = 1; i < len; ++i)
+		 res.push_back(output[i]);
+	 return res;
  }
 
  const vector<unsigned char> CryptoPpDlogZpSafePrime::mapAnyGroupElementToByteArray(GroupElement * groupElement) {
@@ -308,4 +324,11 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 		 throw invalid_argument("element type doesn't match the group type");
 	 string res = string(zp_element->getElementValue());
 	 return vector<unsigned char>(res.begin(), res.end());
+ }
+
+ GroupElement * CryptoPpDlogZpSafePrime::reconstructElement(bool bCheckMembership, GroupElementSendableData * data) {
+	 ZpElementSendableData * zp_data = dynamic_cast<ZpElementSendableData *>(data);
+	 if (!(zp_data))
+		 throw invalid_argument("data type doesn't match the group type");
+	 return generateElement(bCheckMembership, vector<biginteger>({ zp_data->getX() }));
  }
