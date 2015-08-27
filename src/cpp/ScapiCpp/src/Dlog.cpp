@@ -201,7 +201,7 @@ GroupElement * DlogGroupAbs::exponentiateWithPreComputedValues(GroupElement * gr
 GroupElement * DlogGroupAbs::computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations)
 {
 	int n = groupElements.size(); //number of bases and exponents
-	vector<GroupElement *> exponentsResult; //holds the exponentiations result
+	vector<GroupElement *> exponentsResult(n); //holds the exponentiations result
 
 	// raises each element to the corresponding power
 	for (int i = 0; i < n; i++) {

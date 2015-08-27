@@ -50,8 +50,8 @@ public:
 	* @return <code>true</code> if this element is the identity of the group; <code>false</code> otherwise.
 	*/
 	bool isIdentity() override { return element == 1; }
-	bool ZpSafePrimeElementCryptoPp::operator==(const ZpSafePrimeElementCryptoPp &other) const;
-	bool ZpSafePrimeElementCryptoPp::operator!=(const ZpSafePrimeElementCryptoPp &other) const;
+	bool ZpSafePrimeElementCryptoPp::operator==(const GroupElement &other) const override;
+	bool ZpSafePrimeElementCryptoPp::operator!=(const GroupElement &other) const override;
 	string toString() {
 		return "ZpSafePrimeElementCryptoPp [element value=" + string(element) + "]";
 	}

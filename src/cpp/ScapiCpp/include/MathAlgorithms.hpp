@@ -39,6 +39,7 @@ using biginteger = boost::multiprecision::cpp_int;
 
 class MathAlgorithms {
 public:
+	static biginteger modInverse(biginteger a, biginteger m);
 	/**
 	* Computes the integer x that is expressed through the given primes and the
 	* congruences with the chinese remainder theorem (CRT).
@@ -49,7 +50,7 @@ public:
 	*            the primes p_i
 	* @return an integer x for that x % p_i == c_i
 	*/
-	static biginteger chineseRemainderTheorem(vector<biginteger> congruences, vector<biginteger> moduli);
+	static biginteger chineseRemainderTheorem(const vector<biginteger> & congruences, const vector<biginteger> & moduli);
 
 	/**
 	* Computes n!  (n factorial)

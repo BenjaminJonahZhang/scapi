@@ -41,6 +41,9 @@ public:
 	* @return the GroupElementSendableData object
 	*/
 	virtual GroupElementSendableData * generateSendableData() = 0;	
+
+	virtual bool GroupElement::operator==(const GroupElement &other) const=0;
+	virtual bool GroupElement::operator!=(const GroupElement &other) const=0;
 };
 
 /*
