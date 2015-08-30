@@ -68,9 +68,9 @@ GroupElementSendableData * ZpSafePrimeElementCryptoPp::generateSendableData() {
 /**** CryptoPpDlogZpSafePrime ***/
 /*************************************************/
 
-CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, boost::mt19937 prg)
+CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg)
 {
-	boost::mt19937 prime_gen(clock()); // prg for prime checking
+	mt19937 prime_gen(clock()); // prg for prime checking
 	this->random_element_gen = prg;
 	biginteger p = groupParams->getP();
 	biginteger q = groupParams->getQ();

@@ -11,6 +11,7 @@
 
 
 int find_log2_floor(biginteger);
+int bitlength(biginteger bi);
 
 /**
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.
@@ -64,7 +65,9 @@ public:
 	* @return the order of the group
 	*/
 	biginteger getQ() { return q; }
-	//virtual ~GroupParams() = 0;
+	
+	// making this class and abstract one
+	virtual ~GroupParams() = 0;
 };
 
 /**
@@ -223,7 +226,7 @@ public:
 	* @param data the GroupElementSendableData from which we wish to "reconstruct" an element of this DlogGroup
 	* @return the reconstructed GroupElement
 	*/
-	//virtual GroupElement * reconstructElement(bool bCheckMembership, const GroupElementSendableData& data) = 0;
+	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) = 0;
 
 	/**
 	* Computes the product of several exponentiations with distinct bases
@@ -312,7 +315,7 @@ class DlogGroupAbs : public primeOrderSubGroup {
 protected:
 	GroupParams * groupParams;  //group parameters
 	GroupElement * generator;	//generator of the group
-	boost::mt19937 random_element_gen; 
+	mt19937 random_element_gen; 
 
 	int k; //k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
 

@@ -1,3 +1,6 @@
+#ifndef SECURITY_LEVEL_H
+#define SECURITY_LEVEL_H
+
 /**
 * Many cryptographic primitives and schemes have different security levels.
 * For example, an encryption scheme can be CPA-secure (secure against chosen-plaintext attacks)
@@ -33,3 +36,5 @@ class CDH:public Dlog {};
 * A group in which the decisional Diffie-Hellman problem is assumed to hold should implement this interface.
 */
 class DDH : public CDH {};
+
+#endif

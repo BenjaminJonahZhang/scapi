@@ -14,6 +14,11 @@ int find_log2_floor(biginteger bi)
 	return r;
 }
 
+int bitlength(biginteger bi)
+{
+	return find_log2_floor(bi) + 1;
+}
+
 DlogGroupAbs::GroupElementsExponentiations::GroupElementsExponentiations(DlogGroupAbs * parent_, GroupElement * base_) {
 	base = base_;
 	parent = parent_;

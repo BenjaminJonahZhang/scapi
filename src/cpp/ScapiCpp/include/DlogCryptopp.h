@@ -1,9 +1,11 @@
 #ifndef SCAPI_DLOG_CryptoPP_H
 #define SCAPI_DLOG_CryptoPP_H
 
+
 #include "Dlog.hpp"
 // CryptoPP includes
 #include <gfpcrypt.h>
+#include <random>
 #include <cryptlib.h>
 #include <osrng.h>
 
