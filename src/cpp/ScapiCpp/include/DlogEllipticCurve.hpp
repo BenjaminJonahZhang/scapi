@@ -3,15 +3,61 @@
 
 #include "SecurityLevel.hpp"
 #include "Dlog.hpp"
+#include <boost/algorithm/string.hpp>
 #include <map>
 #include <random>
 
 typedef map<const string, string> CfgMap;
 
 /**
+* Marker interface. Every class that implements it, is signed as an elliptic curve point
+*/
+class ECElement : public virtual GroupElement {
+public:
+	/**
+	* This function returns the x coordinate of the (x,y) point which is an element of a given elliptic curve.
+	* In case of infinity point, returns null.
+	* @return x coordinate of (x,y) point
+	*/
+	virtual biginteger getX() const = 0;
+	/**
+	* This function returns the y coordinate of the (x,y) point which is an element of a given elliptic curve.
+	* In case of infinity point, returns null.
+	* @return y coordinate of (x,y) point
+	*/
+	virtual biginteger getY() const = 0;
+	/**
+	* Elliptic curve has a unique point called infinity.
+	* In order to know if this object is an infinity point, this function should be called.
+	* @return true if this point is the infinity, false, otherwise.
+	*/
+	virtual bool isInfinity() = 0;
+};
+
+class ECElementSendableData : public GroupElementSendableData {
+private:
+	static const long serialVersionUID = 3494666921421090306L;
+
+protected:
+	biginteger x;
+	biginteger y;
+
+public:
+	ECElementSendableData(biginteger x, biginteger y) {
+		this->x = x;
+		this->y = y;
+	};
+	biginteger getX() { return x; };
+	biginteger getY() { return y; };
+	string toString() { return "ECElementSendableData [x=" + x.str() + ", y=" + y.str() + "]"; };
+	//virtual ~ECElementSendableData() {}; // must implement this to make the class concrete
+};
+
+
+/**
 * Marker interface for elliptic curve point over the field Fp.
 */
-class ECFpPoint : public ECElement {};
+class ECFpPoint : public virtual ECElement {};
 
 /**
 * This class holds the parameters of an elliptic curves Dlog group.
@@ -103,7 +149,99 @@ public:
 	}
 	
 	// implementing a destructor to make it concrete class
-	~ECFpGroupParams() override {};
+	//~ECFpGroupParams() override {};
+};
+
+
+
+
+
+
+
+
+/**
+* Marker interface. Every class that implements it is signed as elliptic curve.
+*/
+class DlogEllipticCurve : public virtual DlogGroup {
+public:
+	/**
+	* @return the infinity point of this dlog group
+	*/
+	virtual ECElement * getInfinity() = 0;
+
+	/**
+	* @return the name of the curve. For example - P-192.
+	*/
+	virtual string getCurveName() = 0;
+	/**
+	* @return the properties file where the curves are defined.
+	*/
+	virtual string getFileName() = 0;
+};
+
+/**
+* Marker interface. Every class that implements it is signed as elliptic curve over F[p]
+*/
+class DlogECFp : public virtual DlogEllipticCurve {};
+/**
+* This class manages the creation of NIST recommended elliptic curves.
+* We have a properties file which contains the parameters for the curves.
+* This class uploads the file once, and constructs a properties object from it.
+*/
+class DlogGroupEC : public virtual DlogGroupAbs, public virtual DlogEllipticCurve {
+private:
+	CfgMap nistProperties; // properties object to hold nist parameters
+protected:
+	static const string NISTEC_PROPERTIES_FILE;
+	string curveName;
+	string fileName;
+	DlogGroupEC() {};
+
+	/**
+	* Constructor that initializes this DlogGroup with a curve that is not necessarily one of NIST recommended elliptic curves.
+	* @param fileName - name of the elliptic curves file. This file has to comply with
+	* @param curveName - name of curve to initialized
+	* @throws IOException
+	*/
+	DlogGroupEC(string fileName, string curveName, mt19937 prg = mt19937(clock()));
+	virtual void doInit(string curveName) = 0;
+
+	CfgMap getProperties(string fileName);
+
+public:
+	string getCurveName() { return curveName; };
+	string getFileName() { return fileName; };
+	/**
+	* Checks parameters of this group to see if they conform to the type this group is supposed to be.<p>
+	* Parameters are uploaded from a configuration file upon construction of concrete instance of an Elliptic Curve Dlog group.
+	* By default, SCAPI uploads a file with NIST recommended curves. In this case we assume the parameters are always correct.
+	* It is also possible to upload a user-defined configuration file (with format specified in the "Elliptic Curves Parameters File Format" section of the FirstLevelSDK_SDD.docx file). In this case,
+	* it is the user's responsibility to check the validity of the parameters.
+	* In both ways, the parameters we set should be correct. Therefore, currently the function validateGroup does not perform any validity check and always returns true.
+	* In the future we may add the validity checks.
+	* @return true.
+	*/
+	virtual bool validateGroup() override { return true; };
+	/**
+	* Checks if the element set as the generator is indeed the generator of this group.
+	* The generator is set upon construction of this group. <p>
+	* For Elliptic curves there are two ways to set the generator. One way is to load it from NIST file, so the generator is correct.
+	* The second way is to get the generator values from the user in the init function. In that way, it is the user's responsibility to check the validity of the parameters.
+	* In both ways, the generator we set must be correct. However, currently the function isGenerator does not operate the validity check and always returns true.
+	* Maybe in the future we will add the validity checks.
+	* @return <code>true</code> is the generator is valid;<p>
+	* 		   <code>false</code> otherwise.
+	*
+	*/
+	virtual bool isGenerator() override { return true; };
+
+	/**
+	* For Elliptic Curves, the identity is equivalent to the infinity.
+	* @return the identity of this Dlog group
+	*/
+	virtual GroupElement * getIdentity() override { return getInfinity(); };
+
+	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
 };
 
 /**
@@ -120,7 +258,7 @@ public:
 	* @param y coefficient of the point
 	* @return true if the given x and y represented a valid point on the given curve
 	*/
-	bool checkCurveMembership(ECFpGroupParams params, biginteger x, biginteger y);
+	bool checkCurveMembership(ECFpGroupParams * params, biginteger x, biginteger y);
 
 	/**
 	* This function finds the y coordinate of a point in the curve for a given x, if it exists.
@@ -163,7 +301,7 @@ public:
 	* @param point
 	* @return true if the given point is in the given dlog group.
 	*/
-	bool checkSubGroupMembership(DlogECFp * curve, ECFpPoint point); 
+	bool checkSubGroupMembership(DlogECFp * curve, ECFpPoint * point);
 
 	/**
 	* This function maps any group element to a byte array. This function does not have an inverse,<p>
@@ -204,137 +342,5 @@ public:
 	*/
 	string getGroupType() { return "ECFp"; };
 };
-
-
-/**
-* Marker interface. Every class that implements it, is signed as an elliptic curve point
-*/
-class ECElement : public GroupElement {
-public:
-	/**
-	* This function returns the x coordinate of the (x,y) point which is an element of a given elliptic curve.
-	* In case of infinity point, returns null.
-	* @return x coordinate of (x,y) point
-	*/
-	virtual biginteger getX()=0;
-	/**
-	* This function returns the y coordinate of the (x,y) point which is an element of a given elliptic curve.
-	* In case of infinity point, returns null.
-	* @return y coordinate of (x,y) point
-	*/
-	virtual biginteger getY()=0;
-	/**
-	* Elliptic curve has a unique point called infinity.
-	* In order to know if this object is an infinity point, this function should be called.
-	* @return true if this point is the infinity, false, otherwise.
-	*/
-	virtual bool isInfinity()=0;
-};
-
-class ECElementSendableData : public GroupElementSendableData {
-private:
-	static const long serialVersionUID = 3494666921421090306L;
-
-protected:
-	biginteger x;
-	biginteger y;
-
-public:
-	ECElementSendableData(biginteger x, biginteger y) {
-		this->x = x;
-		this->y = y;
-	};
-	biginteger getX() { return x; };
-	biginteger getY() { return y; };
-	string toString() { return "ECElementSendableData [x=" + x.str() + ", y=" + y.str() + "]"; };
-};
-
-
-/**
-* Marker interface. Every class that implements it is signed as elliptic curve.
-*/
-class DlogEllipticCurve : public DlogGroup {
-public:
-	/**
-	* @return the infinity point of this dlog group
-	*/
-	virtual ECElement * getInfinity() = 0;
-
-	/**
-	* @return the name of the curve. For example - P-192.
-	*/
-	virtual string getCurveName() = 0;
-	/**
-	* @return the properties file where the curves are defined.
-	*/
-	virtual string getFileName() = 0;
-};
-
-
-/**
-* This class manages the creation of NIST recommended elliptic curves.
-* We have a properties file which contains the parameters for the curves.
-* This class uploads the file once, and constructs a properties object from it.
-*/
-class DlogGroupEC : public DlogGroupAbs, public DlogEllipticCurve {
-private:
-	CfgMap nistProperties; // properties object to hold nist parameters
-protected:
-	static const string NISTEC_PROPERTIES_FILE;
-	string curveName;
-	string fileName;
-	DlogGroupEC() {};
-
-	/**
-	* Constructor that initializes this DlogGroup with a curve that is not necessarily one of NIST recommended elliptic curves.
-	* @param fileName - name of the elliptic curves file. This file has to comply with
-	* @param curveName - name of curve to initialized
-	* @throws IOException
-	*/
-	DlogGroupEC(string fileName, string curveName, mt19937 prg = mt19937(clock()));
-	virtual void doInit(CfgMap ecProperties, string curveName) = 0;
-
-	CfgMap getProperties(string fileName);
-
-public:
-	string getCurveName() { return curveName; };
-	string getFileName() { return fileName; };
-	/**
-	* Checks parameters of this group to see if they conform to the type this group is supposed to be.<p>
-	* Parameters are uploaded from a configuration file upon construction of concrete instance of an Elliptic Curve Dlog group.
-	* By default, SCAPI uploads a file with NIST recommended curves. In this case we assume the parameters are always correct.
-	* It is also possible to upload a user-defined configuration file (with format specified in the "Elliptic Curves Parameters File Format" section of the FirstLevelSDK_SDD.docx file). In this case,
-	* it is the user's responsibility to check the validity of the parameters.
-	* In both ways, the parameters we set should be correct. Therefore, currently the function validateGroup does not perform any validity check and always returns true.
-	* In the future we may add the validity checks.
-	* @return true.
-	*/
-	bool validateGroup() override { return true; };
-	/**
-	* Checks if the element set as the generator is indeed the generator of this group.
-	* The generator is set upon construction of this group. <p>
-	* For Elliptic curves there are two ways to set the generator. One way is to load it from NIST file, so the generator is correct.
-	* The second way is to get the generator values from the user in the init function. In that way, it is the user's responsibility to check the validity of the parameters.
-	* In both ways, the generator we set must be correct. However, currently the function isGenerator does not operate the validity check and always returns true.
-	* Maybe in the future we will add the validity checks.
-	* @return <code>true</code> is the generator is valid;<p>
-	* 		   <code>false</code> otherwise.
-	*
-	*/
-	bool isGenerator() override { return true; };
-
-	/**
-	* For Elliptic Curves, the identity is equivalent to the infinity.
-	* @return the identity of this Dlog group
-	*/
-	GroupElement * getIdentity() override { return getInfinity(); };
-
-	GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
-};
-
-/**
-* Marker interface. Every class that implements it is signed as elliptic curve over F[p]
-*/
-class DlogECFp : public DlogEllipticCurve {};
 
 #endif

@@ -38,7 +38,7 @@ public:
 	* calculate element^2 mod p
 	* @param p - group modulus
 	*/
-	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, boost::mt19937 prg);
+	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg);
 	/*
 	* Constructor that simply create element using the given value
 	*/
@@ -79,7 +79,7 @@ public:
 	* Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
 	* @param groupParams - contains the group parameters
 	*/
-	CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, boost::mt19937 prg = boost::mt19937(clock()));
+	CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg = mt19937(clock()));
 
 	/**
 	* Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
@@ -102,7 +102,7 @@ public:
 	* Initializes the CryptoPP implementation of Dlog over Zp* with random elements
 	* @param numBits - number of the prime p bits to generate
 	*/
-	CryptoPpDlogZpSafePrime(int numBits = 1024, boost::mt19937 prg = boost::mt19937(clock()));
+	CryptoPpDlogZpSafePrime(int numBits = 1024, mt19937 prg = mt19937(clock()));
 
 	//creates an int from the given string and calls the appropriate constructor
 	CryptoPpDlogZpSafePrime(string numBits) : CryptoPpDlogZpSafePrime(stoi(numBits)) {};
@@ -139,7 +139,8 @@ public:
 	GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) override;
 	GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) override;
 	const vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) override;
-	const vector<unsigned char>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
+	virtual const vector<unsigned char>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
+	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
 };
 
 #endif

@@ -1,14 +1,18 @@
-#include "../include/DlogEllipticCurve.hpp";
+#include "../include/DlogEllipticCurve.hpp"
 
+string convert_hex_to_string(string hex)
+{
+	return hex;
+}
 /*******************************************/
 /******** ECFpUtility Implementation ******/
 /******************************************/
 
-bool ECFpUtility::checkCurveMembership(ECFpGroupParams params, biginteger x, biginteger y) {
+bool ECFpUtility::checkCurveMembership(ECFpGroupParams * params, biginteger x, biginteger y) {
  	 /* get a, b, p from group params */
-	 biginteger a = params.getA();
-	 biginteger b = params.getB();
-	 biginteger p = params.getP();
+	 biginteger a = params->getA();
+	 biginteger b = params->getB();
+	 biginteger p = params->getP();
 
 	 //Calculates the curve equation with the given x,y.
 
@@ -50,6 +54,35 @@ biginteger ECFpUtility::findYInCurveEquationForX(ECFpGroupParams params, biginte
 		return NULL;
 }
 
+GroupParams * ECFpUtility::checkAndCreateInitParams(CfgMap ecProperties, string curveName) {
+	// check that the given curve is in the field that matches the group
+	if (!boost::algorithm::starts_with(curveName, "P-")) //	if (!curveName.startsWith("P-")) {
+		throw invalid_argument("curveName is not a curve over Fp field and doesn't match the DlogGroup type");
+
+	// get the curve parameters
+	biginteger p(ecProperties[curveName]);
+	biginteger a(ecProperties[curveName + "a"]);
+	biginteger b(convert_hex_to_string(ecProperties[curveName + "b"]));   // make sure it is possitve?
+	biginteger x(convert_hex_to_string(ecProperties[curveName + "x"]));  // make sure it is possitve?
+	biginteger y(convert_hex_to_string(ecProperties[curveName + "y"]));   // make sure it is possitve?
+	biginteger q(ecProperties[curveName + "r"]);
+	biginteger h(ecProperties[curveName + "h"]);
+
+	// create the GroupParams
+	GroupParams * groupParams = new ECFpGroupParams(q, x, y, p, a, b, h);
+	return groupParams;
+}
+
+int ECFpUtility::calcK(biginteger p) {
+	int bitsInp = bitlength(p);
+	int k = (int)floor((0.4 * bitsInp) / 8) - 1;
+	//For technical reasons of how we chose to do the padding for encoding and decoding (the least significant byte of the encoded string contains the size of the 
+	//the original binary string sent for encoding, which is used to remove the padding when decoding) k has to be <= 255 bytes so that the size can be encoded in the padding.
+	if (k > 255) {
+		k = 255;
+	}
+	return k;
+}
 
 /*******************************************/
 /******** DlogGroupEC Implementation ******/
@@ -57,18 +90,10 @@ biginteger ECFpUtility::findYInCurveEquationForX(ECFpGroupParams params, biginte
 
 const string DlogGroupEC::NISTEC_PROPERTIES_FILE = "/propertiesFiles/NISTEC.properties";
 
-DlogGroupEC::DlogGroupEC(string fileName, string curveName, mt19937 prg = mt19937(clock())){
-	CfgMap ecProperties;
-	ecProperties = getProperties(fileName); //get properties object containing the curve data
-	
-	//checks that the curveName is in the file 
-	if(ecProperties.find(curveName)==ecProperties.end()) // not found
-		throw invalid_argument("no such elliptic curve in the given file");
-
+DlogGroupEC::DlogGroupEC(string fileName, string curveName, mt19937 prg){
 	this->curveName = curveName;
 	this->fileName = fileName;
 	this->random_element_gen = prg;
-	doInit(ecProperties, curveName); // set the data and initialize the curve
 }
 
 CfgMap DlogGroupEC::getProperties(string fileName){
@@ -98,33 +123,4 @@ GroupElement * DlogGroupEC::reconstructElement(bool bCheckMembership, GroupEleme
 		throw invalid_argument("data type doesn't match the group type");
 	vector<biginteger> values = { ec_element->getX(), ec_element->getY() };
 	return generateElement(bCheckMembership, values);
-}
-
-
-GroupElement * MiraclAdapterDlogEC::exponentiateWithPreComputedValues(GroupElement * base, biginteger exponent) {
-	
-	//This function performs basic checks on the group element, such as if it is of the right type for the relevant Dlog and checks if the 
-	//base group element is the infinity. If so, then the result of exponentiating is the base group element itself, return it.
-	bool infinity = basicAndInfinityChecksForExpForPrecomputedValues(base);
-	if (infinity)
-		return base;
-
-	//Look for the base in the map. If this is the first time we calculate the exponentiations for this base then:
-	//1) we will not find the base in the map
-	//2) we need to perform the pre-computation for this base
-	//3) and then save the pre-computation for this base in the map
-	auto pos = exponentiationsMap.find(base);
-	long ebrickPointer;
-	//If didn't find the pointer for the base element, create one:
-	if (pos==exponentiationsMap.end()) {
-		//the actual pre-computation is performed by Miracl. The call to this function returns a pointer to an "ebrick"
-		//structure created and held by the Miracl code. We save this pointer in the map for the current base and pass it on
-		//to the actual computation of the exponentiation in the step below.
-		ebrickPointer = initExponentiateWithPrecomputedValues(base, exponent, getWindow(), getOrder().bitLength());
-		exponentiationsMap[base] =  ebrickPointer;
-	}
-	//At this stage we have a pointer to the ebrick pointer in native code, and we pass it on to compute base^exponent and obtain the resulting Group Element
-	Long ebrickPointer = exponentiationsMap.get(base);
-	return computeExponentiateWithPrecomputedValues(ebrickPointer, exponent);
-
 }

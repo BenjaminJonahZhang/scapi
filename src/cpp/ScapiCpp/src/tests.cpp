@@ -2,6 +2,7 @@
 #include "../include/catch.hpp"
 #include "../include/Dlog.hpp"
 #include "../include/DlogCryptopp.h"
+#include "../include/DlogMiracl.hpp"
 
 
 void gen_random(vector<unsigned char> &v, const int len) {
@@ -102,13 +103,13 @@ TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 
 	SECTION("sqrt and sqrt with reminder")
 	{
-		REQUIRE(mp::sqrt(25) == 5);
-		REQUIRE(mp::sqrt(27) == 5);
+		REQUIRE(mp::sqrt(biginteger(25)) == 5);
+		REQUIRE(mp::sqrt(biginteger(27)) == 5);
 		biginteger r;
 		auto res = mp::sqrt(biginteger(25), r);
 		REQUIRE(r == 0);
 		REQUIRE(res == 5);
-		auto res = mp::sqrt(biginteger(29), r);
+		res = mp::sqrt(biginteger(29), r);
 		REQUIRE(r == 4);
 		REQUIRE(res == 5);
 	}
@@ -151,12 +152,19 @@ TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
 	}
 	SECTION("factorial")
 	{
-		REQUIRE(MathAlgorithms::factorial(6), 720);
+		REQUIRE(MathAlgorithms::factorial(6)==720);
 		string fact35 = "10333147966386144929666651337523200000000";
 		REQUIRE(MathAlgorithms::factorialBI(35).str() == fact35);
 	}
 }
 
+TEST_CASE("Miracl big", "[big, miracl, biginteger")
+{
+	auto b = biginteger_to_big(biginteger(3));
+	REQUIRE(b == 3);
+	auto c = big_to_biginteger(Big(18));
+	REQUIRE(c == 18);
+}
 /***************************************************/
 /***********TESTING DLOG IMPLEMENTATIONS******************/
 /*****************************************************/
@@ -243,7 +251,7 @@ TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 	{
 		DlogGroup * dg = new CryptoPpDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
 		test_all(dg);
-		delete dg;
+		//delete dg;
 	}
 }
 

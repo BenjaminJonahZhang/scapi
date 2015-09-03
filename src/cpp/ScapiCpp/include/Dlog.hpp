@@ -5,6 +5,7 @@
 #include <string>
 //#include <boost/multiprecision/gmp.hpp> 
 #include <boost/multiprecision/random.hpp>
+#include <random>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include "SecurityLevel.hpp"
 #include "MathAlgorithms.hpp"
@@ -17,7 +18,12 @@ int bitlength(biginteger bi);
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.
 *
 */
-class GroupElementSendableData {};
+class GroupElementSendableData {
+public:
+	virtual ~GroupElementSendableData() = 0; // making this an abstract class
+};
+
+inline GroupElementSendableData::~GroupElementSendableData() {}; // must provide implemeantion to allow destruction of base classes
 
 /**
 * This is the main interface of the Group element hierarchy.<p>
@@ -45,6 +51,7 @@ public:
 
 	virtual bool GroupElement::operator==(const GroupElement &other) const=0;
 	virtual bool GroupElement::operator!=(const GroupElement &other) const=0;
+	virtual ~GroupElement() {};
 };
 
 /*
@@ -69,6 +76,8 @@ public:
 	// making this class and abstract one
 	virtual ~GroupParams() = 0;
 };
+
+inline GroupParams::~GroupParams() { };
 
 /**
 * This is the general interface for the discrete logarithm group. Every class in the DlogGroup family implements this interface.
@@ -173,7 +182,7 @@ public:
 	* @return the inverse element of the given GroupElement
 	* @throws IllegalArgumentException
 	**/
-	virtual GroupElement * getInverse(GroupElement * groupElement) = 0;
+	virtual GroupElement * getInverse(GroupElement  * groupElement) = 0;
 
 	/**
 	* Raises the base GroupElement to the exponent. The result is another GroupElement.
@@ -305,12 +314,12 @@ public:
 /**
 * Marker interface for Dlog groups that has a prime order sub-group.
 */
-class primeOrderSubGroup : public DlogGroup {};
+class primeOrderSubGroup : public virtual DlogGroup {};
 
 /**
 * DlogGroupAbs is an abstract class that implements common functionality of the Dlog group.
 */
-class DlogGroupAbs : public primeOrderSubGroup {
+class DlogGroupAbs : public virtual primeOrderSubGroup {
 
 protected:
 	GroupParams * groupParams;  //group parameters

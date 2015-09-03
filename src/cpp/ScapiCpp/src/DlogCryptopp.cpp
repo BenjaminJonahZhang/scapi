@@ -34,7 +34,7 @@ ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger x, biginteger 
 		element = x;
 }
 
-ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, boost::mt19937 prg)
+ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg)
 {
 	// find a number in the range [1, ..., p-1]
 	boost::random::uniform_int_distribution<biginteger> ui(1, p - 1);
@@ -109,7 +109,7 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt
 	k = calcK(p);
 }
 
-CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(int numBits, boost::mt19937 prg) {
+CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(int numBits, mt19937 prg) {
 
 	this->random_element_gen = prg;
 
@@ -324,4 +324,11 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 		 throw invalid_argument("element type doesn't match the group type");
 	 string res = string(zp_element->getElementValue());
 	 return vector<unsigned char>(res.begin(), res.end());
+ }
+
+ GroupElement * CryptoPpDlogZpSafePrime::reconstructElement(bool bCheckMembership, GroupElementSendableData * data) {
+	 ZpElementSendableData * zp_data = dynamic_cast<ZpElementSendableData *>(data);
+	 if (!(zp_data))
+		 throw invalid_argument("data type doesn't match the group type");
+	 return generateElement(bCheckMembership, vector<biginteger>({ zp_data->getX() }));
  }
