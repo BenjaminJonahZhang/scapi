@@ -19,3 +19,6 @@
 [submodule "lib/MaliciousOTExtension"]
 	path = lib/MaliciousOTExtension
 	url = https://github.com/cryptobiu/MaliciousOTExtension.git
+[submodule "lib/ScGarbledCircuit"]
+	path = lib/ScGarbledCircuit
+	url = https://github.com/cryptobiu/ScGarbledCircuit.git
