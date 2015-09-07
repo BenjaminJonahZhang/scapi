@@ -49,7 +49,7 @@ In order to install scapi: ::
   $ cd scapi
   $ git submodule init
   $ git submodule update
-  $ make
+  $ make prefix=/usr
   $ sudo make install prefix=/usr
 
 .. _Windows:
