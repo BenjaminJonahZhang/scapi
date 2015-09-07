@@ -259,7 +259,7 @@ public class PlainTCPSocketChannel implements Channel{
 	}
 
 	protected void sendIdentity() throws IOException {
-		byte[] port = Integer.toString(me.getPort()).getBytes();
+		byte[] port = ByteBuffer.allocate(4).putInt(me.getPort()).array();
 		sendSocket.getOutputStream().write(port, 0, port.length);
 	}
 	

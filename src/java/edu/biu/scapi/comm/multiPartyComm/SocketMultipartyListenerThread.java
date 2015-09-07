@@ -198,7 +198,7 @@ class SocketMultipartyListenerThread extends Thread{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		int port = Integer.valueOf(new String(output));
+		int port = ByteBuffer.wrap(output).getInt();
 		
 		//Create and returns a SocketPartyData object with the received ip and port.
 		SocketPartyData acceptedParty = new SocketPartyData(inetAddr, port);
