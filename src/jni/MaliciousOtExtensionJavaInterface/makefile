@@ -7,7 +7,7 @@ CXX=g++-4.9
 CXXFLAGS=-std=c++0x -g -fPIC
 
 # dependencies
-LIBMIRACL = ../../../install/lib/libmiracl.a
+LIBMIRACL = $(prefix)/lib/libmiracl.a
 
 INCLUDES=-I$(prefix)/include -I$(includedir) -I$(prefix)/ssl/include -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/darwin/
 LIBRARIES_DIR=-L$(prefix)/ssl/lib -L$(libdir) -L$(prefix)/lib
