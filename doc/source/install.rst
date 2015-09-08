@@ -74,9 +74,10 @@ Needed Files
 
 1. ScapiWin-{version}.jar (Scapi)
 2. bcprov-{version}.jar (Bouncy Castle)
-3. commons-exec-1.2.jar (Apache Commons utilities)
-4. Precompiled DLLs under win32Dlls (for 32-bit windows) or under x64Dlls (for 64-bit windows)
-5. msvcp100.dll and msvcr100.dll (Microsoft DLLs used by the native code)
+3. commons-exec-{version}.jar (Apache Commons utilities)
+4. activemq-all-{version}.jar (Apache ActiveMQ ™ is an open source messaging and Integration Patterns server)
+5. Precompiled DLLs under win32Dlls (for 32-bit windows) or under x64Dlls (for 64-bit windows)
+6. msvcp100.dll, msvcr100.dll, msvcp120.dll and msvcr120.dll(Microsoft DLLs used by the native code)
 
 In order to install SCAPI
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,10 +88,12 @@ On Eclipse:
 
    a. Add ScapiWin-{version}.jar.
    b. Add bcprov-{version}.jar.
-   c. Add commons-exec-1.2.jar.
+   c. Add commons-exec-{version}.jar.
+   d. Add activemq-all-{version}.jar
+   
 2. Configure build path: go to Source tab and locate the Native Library Location section.
 
-   a. Add the lib folder where you have the Miracl, Crypto++, NTL and OpenSSL precompiled DLLs.
+   a. Add the lib folder where you have the precompiled DLLs (assets/win32Dlls or assets/x64Dlls).
 3. Place the msvcp100.dll and msvcr100.dll in [C:]\Windows\System32 folder if they are missing there.
 
 .. _git: http://git-scm.org/
