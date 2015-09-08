@@ -40,10 +40,6 @@ Since Scapi's buildsystem is based on gcc, you must install gcc manually using h
   Homebrew compiles gcc from source, and it can take a lot of time (usually around 20-50 minutes).
   **DO NOT** stop the shell process even though it seems to be stuck, it's not stuck.
   
-  Note on using JNI with JDK 1.8 on Linux
-  ---------------------------------------
-  Seems that JDK 1.8 introduced a change of behavior regarding JNI include file locations.
-  Details on the problem and workaround can be found [here](http://stackoverflow.com/questions/24996017/jdk-1-8-on-linux-missing-include-file)
 
 Installing Scapi from Source (On UNIX-based Operating Systems)
 --------------------------------------------------------------
@@ -56,6 +52,11 @@ In order to install scapi: ::
   $ git submodule update
   $ make prefix=/usr
   $ sudo make install prefix=/usr
+  
+.. note::
+
+  Seems that JDK 1.8 introduced a change of behavior regarding JNI include file locations.
+  Details on the problem and workaround can be found in the following link: `jdk-1-8-on-linux`_
 
 .. _Windows:
 
@@ -98,3 +99,4 @@ On Eclipse:
 .. _gcc: http://gcc.gnu.org/
 .. _clang: http://clang.llvm.org/
 .. _homebrew: http://brew.sh/
+.. _jdk-1-8-on-linux: http://stackoverflow.com/questions/24996017/jdk-1-8-on-linux-missing-include-file
