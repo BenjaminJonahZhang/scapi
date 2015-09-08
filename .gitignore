@@ -17,3 +17,5 @@ install/*
 *.log
 target/*
 .settings
+.metadata/*
+bin/*
