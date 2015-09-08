@@ -92,7 +92,7 @@ JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni
 BASENAME_BOUNCYCASTLE:=bcprov-jdk16-146.jar
 BASENAME_APACHE_COMMONS:=commons-exec-1.2.jar
 BASENAME_JUNIT:=junit-3.7.jar
-BASENAME_SCAPI:=ScapiWin-V2-3-0.jar
+BASENAME_SCAPI:=Scapi-2.4.jar
 
 # target names of created jars (apache commons, bouncy castle, scapi)
 #JAR_BOUNCYCASTLE:=$(builddir)/BouncyCastle/jars/$(BASENAME_BOUNCYCASTLE)
