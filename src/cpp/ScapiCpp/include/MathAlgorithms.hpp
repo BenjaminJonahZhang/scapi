@@ -23,14 +23,8 @@
 *
 */
 
-//#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
 
-using namespace std;
-// Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
-namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
-using biginteger = boost::multiprecision::cpp_int;
-
+#include "Common.hpp"
 
 /**
 * This class holds general math algorithms needed by cryptographic algorithms.<p>

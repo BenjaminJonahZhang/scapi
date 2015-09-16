@@ -1,23 +1,8 @@
-#include <iostream>
 #include "../include/Dlog.hpp"
-#include <math.h> /* pow */
 
-using namespace std;
-
-int find_log2_floor(biginteger bi)
-{
-	int r = 0;
-	while (bi >>= 1) // unroll for more speed...
-	{
-		r++;
-	}
-	return r;
-}
-
-int bitlength(biginteger bi)
-{
-	return find_log2_floor(bi) + 1;
-}
+/**************************************/ 
+/**** DlogGroupAbs Implementation *****/
+/**************************************/
 
 DlogGroupAbs::GroupElementsExponentiations::GroupElementsExponentiations(DlogGroupAbs * parent_, GroupElement * base_) {
 	base = base_;

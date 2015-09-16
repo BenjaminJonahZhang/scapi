@@ -102,6 +102,7 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Common.cpp" />
     <ClCompile Include="src\Dlog.cpp" />
     <ClCompile Include="src\DlogCryptopp.cpp" />
     <ClCompile Include="src\DlogElipticCurve.cpp" />
@@ -111,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp" />
+    <ClInclude Include="include\Common.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
     <ClInclude Include="include\DlogCryptopp.h" />
     <ClInclude Include="include\DlogEllipticCurve.hpp" />
