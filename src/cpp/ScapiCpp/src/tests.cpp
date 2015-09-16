@@ -1,27 +1,80 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "../include/common.hpp"
 #include "../include/catch.hpp"
 #include "../include/Dlog.hpp"
 #include "../include/DlogCryptopp.h"
 #include "../include/DlogMiracl.hpp"
+#include <ctype.h>
 
-
-void gen_random(vector<unsigned char> &v, const int len) {
-	static const char alphanum[] =
-		"0123456789"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz";
-
-	for (int i = 0; i < len; ++i) {
-		v.push_back(alphanum[rand() % (sizeof(alphanum) - 1)]);
-	}
+biginteger endcode_decode(biginteger bi) {
+	size_t len = bytesCount(bi);
+	byte * output = new byte[len];
+	encodeBigInteger(bi, output, len);
+	auto res = decodeBigInteger(output, len);
+	delete output;
+	return res;
 }
 
-TEST_CASE("find_log2_floor", "[helper, log, bitcount]") {
-	REQUIRE(find_log2_floor(16) == 4);
-	REQUIRE(find_log2_floor(19) == 4);
-	REQUIRE(find_log2_floor(31) == 4);
-	REQUIRE(find_log2_floor(32) == 5);
-	REQUIRE(find_log2_floor(39) == 5);
+string rsa100 = "1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139";
+
+TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
+
+	SECTION("find_log2_floor") {
+		REQUIRE(find_log2_floor(16) == 4);
+		REQUIRE(find_log2_floor(19) == 4);
+		REQUIRE(find_log2_floor(31) == 4);
+		REQUIRE(find_log2_floor(32) == 5);
+		REQUIRE(find_log2_floor(39) == 5);
+	}
+
+	SECTION("bitlength and byteLength")
+	{
+		REQUIRE(NumberOfBits(64) == 7);
+		REQUIRE(bytesCount(64) == 1);
+		REQUIRE(NumberOfBits(9999) == 14);
+		REQUIRE(bytesCount(9999) == 2);
+		REQUIRE(NumberOfBits(biginteger(rsa100))== 330);
+		REQUIRE(bytesCount(biginteger(rsa100)) == 42);
+	}
+
+	SECTION("gen_random_bytes_vector")
+	{
+		vector<byte> v, v2;
+		gen_random_bytes_vector(v, 10);
+		gen_random_bytes_vector(v2, 10);
+		REQUIRE(v.size() == 10);
+		for (byte b : v)
+			REQUIRE(isalnum(b));
+		string string1(v.begin(), v.end());
+		string string2(v2.begin(), v2.end());
+		REQUIRE(string1 != string2);
+	}
+
+	SECTION("copy byte vector to byte array")
+	{
+		vector<byte> v;
+		gen_random_bytes_vector(v, 20);
+		byte * vb = new byte[40];
+		int index;
+		copy_byte_vector_to_byte_array(v, vb, 0);
+		copy_byte_vector_to_byte_array(v, vb, 20);
+		for (auto it = v.begin(); it != v.end(); it++)
+		{
+			index = it - v.begin();
+			REQUIRE(*it == vb[index]);
+			REQUIRE(*it == vb[index+20]);
+		}
+		delete vb;
+	}
+
+	SECTION("encode and decode bigintegers")
+	{
+		biginteger bi_res = endcode_decode(3322);
+		REQUIRE(bi_res == 3322);
+		biginteger birsa100 = biginteger(rsa100);
+		bi_res = endcode_decode(birsa100);
+		REQUIRE(bi_res == birsa100);
+	}
 }
 
 TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
@@ -227,7 +280,7 @@ void test_encode_decode(DlogGroup * dg)
 
 	vector<byte> v;
 	v.reserve(k);
-	gen_random(v, k);
+	gen_random_bytes_vector(v, k);
 
 	GroupElement * ge = dg->encodeByteArrayToGroupElement(v);
 	vector<byte> res = dg->decodeGroupElementToByteArray(ge);

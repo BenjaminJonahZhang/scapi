@@ -48,7 +48,7 @@ GroupElement * MiraclAdapterDlogEC::exponentiateWithPreComputedValues(GroupEleme
 		//the actual pre-computation is performed by Miracl. The call to this function returns a pointer to an "ebrick"
 		//structure created and held by the Miracl code. We save this pointer in the map for the current base and pass it on
 		//to the actual computation of the exponentiation in the step below.
-		ebrickPointer = initExponentiateWithPrecomputedValues(base, exponent, getWindow(), bitlength(getOrder()));
+		ebrickPointer = initExponentiateWithPrecomputedValues(base, exponent, getWindow(), NumberOfBits(getOrder()));
 		exponentiationsMap[base] = ebrickPointer;
 	}
 	else
@@ -61,7 +61,7 @@ int MiraclAdapterDlogEC::getWindow() {
 	if (window != 0) {
 		return window;
 	}
-	int bits = bitlength(getOrder());
+	int bits = NumberOfBits(getOrder());
 	if (bits <= 256) {
 		window = 8;
 	}

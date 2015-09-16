@@ -1,18 +1,10 @@
 #ifndef SCAPI_DLOG_H
 #define SCAPI_DLOG_H
 
-#include <unordered_map>
-#include <string>
-//#include <boost/multiprecision/gmp.hpp> 
-#include <boost/multiprecision/random.hpp>
-#include <random>
-#include <boost/multiprecision/miller_rabin.hpp>
+#include "Common.hpp"
 #include "SecurityLevel.hpp"
 #include "MathAlgorithms.hpp"
 
-
-int find_log2_floor(biginteger);
-int bitlength(biginteger bi);
 
 /**
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.

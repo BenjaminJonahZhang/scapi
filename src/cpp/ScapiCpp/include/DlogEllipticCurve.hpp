@@ -1,11 +1,9 @@
 #ifndef DLOG_EC_H
 #define DLOG_EC_H
 
-#include "SecurityLevel.hpp"
 #include "Dlog.hpp"
 #include <boost/algorithm/string.hpp>
 #include <map>
-#include <random>
 
 typedef map<const string, string> CfgMap;
 
@@ -291,7 +289,7 @@ public:
 	* @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
 	* @return an FpPoint with the coordinates of the corresponding GroupElement point or null if could not find the encoding in reasonable time
 	*/
-	FpPoint * findPointRepresentedByByteArray(ECFpGroupParams params, vector<unsigned char> binaryString, int k);
+	FpPoint * findPointRepresentedByByteArray(ECFpGroupParams params, const vector<byte> & binaryString, int k);
 
 	/**
 	* checks if the given point is in the given dlog group with the q prime order.

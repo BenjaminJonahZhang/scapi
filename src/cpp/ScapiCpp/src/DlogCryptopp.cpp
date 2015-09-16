@@ -284,6 +284,7 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 
 	//There is no need to check membership since the "element" was generated so that it is always an element.
 	ZpSafePrimeElementCryptoPp * element = new ZpSafePrimeElementCryptoPp(y, ((ZpGroupParams * )groupParams)->getP(), false);
+	delete(bstr);
 	return element;
 }
 
