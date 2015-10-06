@@ -80,7 +80,7 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\code\scapi\lib\Miracl\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
+    <IncludePath>C:\code\Builds\Miracl Build\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
     <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -89,8 +89,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\code\scapi\lib\CryptoPP\x64\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\code\scapi\lib\CryptoPP\x64\Output\Debug\cryptlib.lib;C:\code\scapi\lib\Miracl\test_folder\miracl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\lib\CryptoPP\x64\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\code\Builds\Miracl Build\test_folder\miracl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

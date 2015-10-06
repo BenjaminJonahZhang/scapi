@@ -35,6 +35,8 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 		REQUIRE(bytesCount(9999) == 2);
 		REQUIRE(NumberOfBits(biginteger(rsa100))== 330);
 		REQUIRE(bytesCount(biginteger(rsa100)) == 42);
+		REQUIRE(NumberOfBits(-biginteger(rsa100)) == 330);
+		REQUIRE(bytesCount(-biginteger(rsa100)) == 42);
 	}
 
 	SECTION("gen_random_bytes_vector")
@@ -74,6 +76,13 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 		biginteger birsa100 = biginteger(rsa100);
 		bi_res = endcode_decode(birsa100);
 		REQUIRE(bi_res == birsa100);
+		bi_res = endcode_decode(-birsa100);
+		REQUIRE(bi_res == -birsa100);
+	}
+
+	SECTION("convert hex to string") {
+		string hex = "64";
+		REQUIRE(convert_hex_to_biginteger(hex)==biginteger(100));
 	}
 }
 
@@ -98,9 +107,9 @@ TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 	SECTION("generating random from range")
 	{
 		boost::random::uniform_int_distribution<biginteger> ui(0, 100);
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 100; ++i) {
 			biginteger randNum = ui(gen);
-			REQUIRE((randNum >= 1 && randNum <= 100));
+			REQUIRE((randNum >= 0 && randNum <= 100));
 		}
 	}
 	
@@ -211,18 +220,47 @@ TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
 	}
 }
 
+TEST_CASE("reading file and properties map", "[file, map, properties]")
+{
+	//SECTION("reading file") {
+	//	string fileName = "C:/code/scapi/src/cpp/ScapiCpp/x64/Debug/testFile.txt";
+	//	ifstream myfile(fileName);
+	//	REQUIRE(myfile.good());
+	//	string s;
+	//	int i = 0;
+	//	while (getline(myfile, s))
+	//		++i;
+	//	CAPTURE(s);
+	//	CAPTURE(i);
+	//	REQUIRE(s == "test line");
+	//	REQUIRE(i == 1);
+	//}
+	SECTION("property map") {
+		CfgMap config;
+		config["AB"] = "Z";
+		auto it = config.find("AB");
+		REQUIRE(it != config.end());
+		REQUIRE(it->second == "Z");
+	}
+
+}
+
 TEST_CASE("Miracl big", "[big, miracl, biginteger")
 {
-	auto b = biginteger_to_big(biginteger(3));
-	REQUIRE(b == 3);
-	auto c = big_to_biginteger(Big(18));
-	REQUIRE(c == 18);
+	auto bi_rsa100 = biginteger(rsa100);
+	auto d = biginteger_to_big(bi_rsa100);
+	size_t len = bytesCount(bi_rsa100);
+	byte * output = new byte[len];
+	encodeBigInteger(bi_rsa100, output, len);
+	big result = mirvar(0);
+	bytes_to_big(len, (char *) output, result);
 }
+
 /***************************************************/
 /***********TESTING DLOG IMPLEMENTATIONS******************/
 /*****************************************************/
 
-void test_multiply_group_elements(DlogGroup * dg)
+void test_multiply_group_elements(DlogGroup * dg, bool check_membership=false)
 {
 	GroupElement * ge = dg->createRandomElement();
 	GroupElement * ige = dg->getInverse(ge);
@@ -230,8 +268,9 @@ void test_multiply_group_elements(DlogGroup * dg)
 	GroupElement * identity = dg->getIdentity();
 
 	vector <GroupElement *> vs{ ge, ige, mul, identity };
-	for (GroupElement * tge : vs)
-		REQUIRE(dg->isMember(tge));
+	if (check_membership)
+		for (GroupElement * tge : vs)
+			REQUIRE(dg->isMember(tge));
 
 	REQUIRE(mul->isIdentity());
 	delete ge, ige, mul, identity;
@@ -305,6 +344,16 @@ TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 		DlogGroup * dg = new CryptoPpDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
 		test_all(dg);
 		//delete dg;
+	}
+	SECTION("testing DlogMiracl")
+	{
+		MiraclDlogECFp * md = new MiraclDlogECFp();
+		//test_all(dg);
+		test_multiply_group_elements(md, false);
+		test_simultaneous_multiple_exponentiations(md);
+		test_exponentiate(md);
+		//test_exponentiate_with_pre_computed_values(dg); - NOT WORKING!
+//		test_encode_decode(md); - NOT WORKING YET!
 	}
 }
 

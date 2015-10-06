@@ -44,7 +44,7 @@ GroupElement * MiraclAdapterDlogEC::exponentiateWithPreComputedValues(GroupEleme
 	ebrick * ebrickPointer;
 	auto p = exponentiationsMap.find(base);
 	//If didn't find the pointer for the base element, create one:
-	if (p != exponentiationsMap.end()) {
+	if (p == exponentiationsMap.end()) {
 		//the actual pre-computation is performed by Miracl. The call to this function returns a pointer to an "ebrick"
 		//structure created and held by the Miracl code. We save this pointer in the map for the current base and pass it on
 		//to the actual computation of the exponentiation in the step below.
@@ -78,7 +78,8 @@ int MiraclAdapterDlogEC::getWindow() {
 void MiraclDlogECFp::doInit(string curveName) {
 	CfgMap ecProperties;
 	ecProperties = getProperties(fileName); //get properties object containing the curve data
-											//checks that the curveName is in the file 
+	
+	// checks that the curveName is in the file 
 	if (ecProperties.find(curveName) == ecProperties.end()) // not found
 		throw invalid_argument("no such elliptic curve in the given file");
 
@@ -93,10 +94,9 @@ void MiraclDlogECFp::doInit(string curveName) {
 void MiraclDlogECFp::createUnderlyingCurveAndGenerator(GroupParams * params) {
 	//There is no need to check that the params passed are an instance of ECFpGroupParams since this function is only used by SCAPI.
 	ECFpGroupParams * fpParams = (ECFpGroupParams *)params;
-	// create the ECCurve
+	
+	// create the ECCurve - convert the accepted parameters to MIRACL parameters 
 	biginteger p = fpParams->getP();
-	/* convert the accepted parameters to MIRACL parameters*/
-	miracl* mip = getMip();
 	Big bigp = biginteger_to_big(p);
 	Big biga = biginteger_to_big(fpParams->getA() % p);
 	Big bigb = biginteger_to_big(fpParams->getB());
@@ -104,9 +104,10 @@ void MiraclDlogECFp::createUnderlyingCurveAndGenerator(GroupParams * params) {
 	/* initialize the curve */
 	ecurve_init(biga.getbig(), bigb.getbig(), bigp.getbig(), 2);
 
-	mirkill(biga.getbig());
-	mirkill(bigp.getbig());
-	mirkill(bigb.getbig());
+	//mirkill(biga.getbig()); // TODO - this throws exception from some reason
+	//mirkill(bigp.getbig());
+	//mirkill(bigb.getbig());
+
 	// create the generator
 	generator = new ECFpPointMiracl(fpParams->getXg(), fpParams->getYg(), this);
 }
@@ -126,10 +127,10 @@ ebrick * MiraclDlogECFp::initExponentiateWithPrecomputedValues(GroupElement * ba
 
 	//translate parameters  to miracl notation
 	biginteger p = params->getP();
-	big exponentB = biginteger_to_big(exponent).getbig();
-	big pB = biginteger_to_big(p).getbig(); 
-	big aB = biginteger_to_big(params->getA() % p).getbig();
-	big bB = biginteger_to_big(params->getB()).getbig();
+	Big exponentB = biginteger_to_big(exponent);
+	Big pB = biginteger_to_big(p); 
+	Big aB = biginteger_to_big(params->getA() % p);
+	Big bB = biginteger_to_big(params->getB());
 
 	//Create a new structure to hold the precomputed values for given base and exponent
 	ebrick* exponentiations = new ebrick();
@@ -142,13 +143,13 @@ ebrick * MiraclDlogECFp::initExponentiateWithPrecomputedValues(GroupElement * ba
 	epoint_get(base->getPoint(), x, y);
 
 	//Perform precomputation
-	ebrick_init(exponentiations, x, y, aB, bB, pB, window, maxBits);
+	ebrick_init(exponentiations, x, y, aB.getbig(), bB.getbig(), pB.getbig(), window, maxBits);
 
 	//clean up
-	mirkill(exponentB);
-	mirkill(pB);
-	mirkill(aB);
-	mirkill(bB);
+	mirkill(exponentB.getbig());
+	mirkill(pB.getbig());
+	mirkill(aB.getbig());
+	mirkill(bB.getbig());
 
 	//Return the pointer to the structure where the precomputed values are held
 	return exponentiations;
@@ -156,14 +157,14 @@ ebrick * MiraclDlogECFp::initExponentiateWithPrecomputedValues(GroupElement * ba
 
 GroupElement * MiraclDlogECFp::computeExponentiateWithPrecomputedValues(ebrick* ebrickPointer, biginteger exponent) {
 	//translate parameters  to miracl notation
-	big exponentB = biginteger_to_big(exponent).getbig();
+	Big exponentB = biginteger_to_big(exponent);
 
 	//(x,y) are the coordinates of the point which is the result of the exponentiation
 	big x, y;
 	x = mirvar(0);
 	y = mirvar(0);
 	//calculates the required exponent
-	mul_brick(ebrickPointer, exponentB, x, y);
+	mul_brick(ebrickPointer, exponentB.getbig(), x, y);
 
 	//printf("The result of mul_brick(mip, exponentiations, exponent, x, y) is x=%d, y=%d\n", (*x).w,(*y).w);
 
@@ -194,13 +195,13 @@ GroupElement * MiraclDlogECFp::getInverse(GroupElement * groupElement) {
 
 	//init the result point and copy point values to it
 	epoint* p2 = epoint_init();
-	epoint2_get((epoint*)point, x, y);
-	epoint2_set(x, y, 0, p2);
+	epoint_get(point, x, y);
+	epoint_set(x, y, 0, p2);
 
 	mirkill(x);
 	mirkill(y);
 	//inverse the point
-	epoint2_negate(p2);
+	epoint_negate(p2);
 
 	// build a ECFpPointMiracl element from the result value
 	return new ECFpPointMiracl(p2, this);
@@ -220,7 +221,7 @@ GroupElement * MiraclDlogECFp::multiplyGroupElements(GroupElement * groupElement
 		return groupElement1;
 
 	epoint * point1 = ecm_point1->getPoint();
-	epoint * point2 = ecm_point1->getPoint();
+	epoint * point2 = ecm_point2->getPoint();
 
 	/* convert the accepted parameters to MIRACL parameters*/
 	big x = mirvar(0);
@@ -255,14 +256,15 @@ GroupElement * MiraclDlogECFp::exponentiate(GroupElement * base, biginteger expo
 		exponent = exponent % getOrder();
 
 	epoint * point = ecm_point->getPoint();
-	big exp = biginteger_to_big(exponent).getbig();
+	Big exp = biginteger_to_big(exponent);
 
 	//init the result point
 	epoint * p2 = epoint_init();
 
 	/* The exponentiate operation is converted to multiplication because miracl treat EC as additive group */
-	ecurve_mult(exp, point, p2);
-	mirkill(exp);
+	ecurve_mult(exp.getbig(), point, p2);
+
+	//mirkill(exp.getbig());
 
 	// build a ECFpPointMiracl element from the result value
 	return new ECFpPointMiracl(p2, this);
@@ -542,24 +544,127 @@ void MiraclDlogECFp::endExponentiateWithPreComputedValues(GroupElement * base) {
 	}
 }
 
+GroupElement * MiraclDlogECFp::encodeByteArrayToGroupElement(const vector<byte> & binaryString) {
+	int len = binaryString.size();
+	if (len > k)
+		return 0;
+
+	byte * byteString = new byte[len];
+	copy_byte_vector_to_byte_array(binaryString, byteString, 0);
+	big x, p;
+	x = mirvar(0);
+	p = getMip()->modulus;
+	biginteger pi = ((ECFpGroupParams *)groupParams)->getP();
+	cout << "got: " << pi << " from " << p << endl;
+	int xx = logb2(p);
+	//int l = logb2(p) / 8;
+	getMip()->modulus = biginteger_to_big(pi).getbig();
+	size_t l = bytesCount(pi);
+
+	char* randomArray = new char[l - k - 2];
+	char* newString = new char[l - k - 1 + len];
+
+	memcpy(newString + l - k - 2, byteString, len);
+	newString[l - k - 2 + len] = (char)len;
+
+	int counter = 0;
+	bool success = 0;
+
+	csprng rng;
+	srand(time(0));
+	long seed;
+	char raw = rand();
+	time((time_t*)&seed);
+	strong_init(&rng, 1, &raw, seed);
+	do {
+
+		for (int i = 0; i<l - k - 2; i++) {
+			randomArray[i] = strong_rng(&rng);
+		}
+
+		memcpy(newString, randomArray, l - k - 2);
+
+		bytes_to_big(l - k - 1 + len, newString, x);
+
+		//If the number is negative, make it positive.
+		if (exsign(x) == -1) {
+			absol(x, x);
+		}
+		//epoint_x returns true if the given x value leads to a valid point on the curve.
+		//if failed, go back to choose a random r etc.
+		success = epoint_x(x);
+		counter++;
+	} while ((!success) && (counter <= 80)); //we limit the amount of times we try to 80 which is an arbitrary number.
+
+	epoint* point = 0;
+	if (success) {
+		point = epoint_init();
+		epoint_set(x, x, 0, point);
+	}
+
+	char* temp = new char[l - k - 1 + len];
+	big_to_bytes(l - k - 1 + len, x, temp, 1);
+
+	//Delete the allocated memory.
+	mirkill(x);
+	delete(randomArray);
+	delete(newString);
+	delete(byteString);
+
+	//Return the created point.
+	if (!point)
+		return NULL;
+
+	// Build a ECFpPointOpenSSL element from the result.
+	return new ECFpPointMiracl(point, this);
+}
+
+const vector<byte> MiraclDlogECFp::decodeGroupElementToByteArray(GroupElement * groupElement) {
+	ECFpPointMiracl * point = dynamic_cast<ECFpPointMiracl *>(groupElement);
+	if (!point)
+		throw invalid_argument("element type doesn't match the group type");
+	
+	size_t lenX = bytesCount(point->getX());
+	byte * xByteArray = new byte[lenX];
+	encodeBigInteger(point->getX(), xByteArray, lenX);
+	byte bOriginalSize = xByteArray[lenX - 1];
+	byte * b2 = new byte[bOriginalSize];
+	vector<byte> result(bOriginalSize);
+	result.insert(result.end(), &xByteArray[lenX - 1 - bOriginalSize], &xByteArray[lenX - 1]);
+	//result->insert(result->end(), &xByteArray[0], &xByteArray[sizeX]);
+	//result->insert(result->end(), &yByteArray[0], &xByteArray[sizeY]);
+	//System.arraycopy(xByteArray, xByteArray.length - 1 - bOriginalSize, b2, 0, bOriginalSize);
+	return result;
+}
+const vector<byte> MiraclDlogECFp::mapAnyGroupElementToByteArray(GroupElement * groupElement) {
+	//This function simply returns an array which is the result of concatenating 
+	//the byte array representation of x with the byte array representation of y.
+	ECFpPointMiracl * point = dynamic_cast<ECFpPointMiracl *>(groupElement);
+	if (!point)
+		throw invalid_argument("element type doesn't match the group type");
+
+	//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
+	//If we ever decide to change the implementation there will only be one place to change it.
+	return *util.mapAnyGroupElementToByteArray(point->getX(), point->getY());
+}
+
 /****************************************************/
 /******** ECFpPointMiracl Implementation ******/
 /***************************************************/ 
 
 ECFpPointMiracl::ECFpPointMiracl(biginteger x, biginteger y, MiraclDlogECFp * curve){
-	mip = curve->getMip();
-
 	//Create a point in the field with the given parameters, done by Miracl's native code.
 	//Miracl always checks validity of (x,y).
+	
 	/* create the point with x,y values */
 	epoint* p = epoint_init();
-	big b_x = biginteger_to_big(x).getbig();
-	big b_y = biginteger_to_big(y).getbig();
+	Big b_x = biginteger_to_big(x);
+	Big b_y = biginteger_to_big(y);
 
-	bool valid = epoint_set(b_x, b_y, 0, p);
+	bool valid = epoint_set(b_x.getbig(), b_y.getbig(), 0, p);
 
-	mirkill(b_x);
-	mirkill(b_y);
+	//mirkill(b_x.getbig());
+	//mirkill(b_y.getbig());
 
 	//If the validity check done by Miracl did not succeed then this not a valid point
 	if (!valid) {

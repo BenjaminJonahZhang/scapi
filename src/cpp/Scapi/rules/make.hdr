@@ -1,0 +1,179 @@
+MAKEFLAGS= -r  --no-print-directory
+
+#
+#  parallel builds are NOT supported
+#
+
+#
+#  set up to suppress logging of compilation commands
+#
+HIDE=@
+
+#
+#  define the proper build order
+#
+
+all::    prebuild
+clean::  prebuild
+tests::  prebuild
+nothing::
+
+
+ifeq ("$(MAKE_RULES_DIR)","")
+MAKE_RULES_DIR:=    $(dir $(lastword $(MAKEFILE_LIST)))
+endif
+
+ifeq ("$(PROJECT_TOP_DIR)","")
+include $(MAKE_RULES_DIR)/find_project_top.hdr
+endif
+
+######################################################################################################
+# DEFINE THE PRIMARY SOURCE AND OUTPUT DIRECTORIES
+#
+#  The default values are all empty.  If you superseed them in make.config, make sure they end
+#  in /.
+#
+#  Note that on windows, these should have forward slash not backslash in them
+#  which means that on windows every command rule that uses one of them, or a filename found by
+#  searching one, must use the $(subst /,\\,<string>) technique, in the command itself, to correct
+#  the pathname for windows use.
+#
+#  Note that OBJDIR, BINDIR, and LIBDIR below refer to directories where we put generated files.
+#  Do not intermingled non-generated files with generated files in those directories -- the make clean
+#  rule will destroy the non-generated files as well.
+#
+OBJDIR=
+SRCDIR=
+BINDIR=
+LIBDIR=
+
+#
+#  the following are space separated lists of compiler options to be superseeded or added to by
+#  your project's make.config
+#
+OPT_LEVEL=  Optimized
+CPP_OPTIONS=
+C_OPTIONS=
+CPP_LINK_OPTIONS=
+C_LINK_OPTIONS=
+CLEAN_FILES=
+#
+#  INCLUDES is a list of directory names, not -I<dirname>'s.  The list is space separated
+#           so, on windows, you in your make.config file, you should use the 8.3 format names for
+#           directories with spaces in the names.  See "dir /x <parentdir>" to get the 8.3 format
+#           name for "<dir>".
+#
+INCLUDES= .
+
+######################################################################################################
+#  NOW DETERMINE THE OPERATING SYSTEM
+
+include $(MAKE_RULES_DIR)determine_MAKE_OS.hdr
+
+#######################################################################################################
+# SET UP TO ALLOW A PROJECT'S make.config TO TRIGGER THE BUILD OF A DLL OR SHARED OBJECT
+# To make a dll, superseed the make.config in your project directory (ie create it if it does not
+# already exist) then add BUILD_DLL:=true, and append any special DLL / shared object building options
+# that you to add to DLL_OPTIONS.  Note that the default logic for building a shared object / dll 
+# will be brought in automatically, so you don't have to do that -- you only have append extra,
+# non-standard dll options to DLL_OPTIONS
+
+BUILD_DLL:=false
+DLL_OPTIONS=
+
+
+
+######################################################################################################
+#  LET THE PROJECT SUPERSEED THE DEFAULT VARIABLE ASSIGNMENTS
+#     first:  bring in the defaults
+include $(MAKE_RULES_DIR)make.config
+#     next:   allow the project to superseed the defaults
+-include $(PROJECT_TOP_DIR)make.config
+
+BUILD_DLL:=$(strip $(BUILD_DLL))
+OPT_LEVEL:=$(strip $(OPT_LEVEL))
+
+ifeq ("$(OPT_LEVEL)","Debug")
+# good
+else
+ifeq ("$(OPT_LEVEL)","Optimized")
+# good
+else
+$(error Invalid setting:  "OPT_LEVEL:=$(OPT_LEVEL)" -- it must be either Debug or Optimized)
+endif
+endif
+
+#
+#  Now remove leading and trailing whitespace from variables defined in the project configuration file.
+#  This is necessary because comments accidentally cause make to leave trailing spaces on symbol
+#  definitions.  Normally, this is not a problem, but in this particular makefile logic, the trailing
+#  whitespaces cause all kinds of trouble.  
+#
+OBJDIR:= $(strip $(OBJDIR))
+LIBDIR:= $(strip $(LIBDIR))
+BINDIR:= $(strip $(BINDIR))
+SRCDIR:= $(strip $(SRCDIR))
+
+######################################################################################################
+# BRING IN THE OPERATING SYSTEM SPECIFIC RULES
+#
+#  Note:  if you want to let the user superseed the compiler to be used on your platform,
+#  you might consider putting an if statement here that would bring in a different subdirectory
+#  of rules/.  By default, the symbol, MAKE_OS, tells you which default rule set, which defines the
+#  compiler for your build on the current OS. The MAKE_OS values are going to be either:
+#
+#     windows
+#     unix
+#     cygwin
+#
+#  with unix and linux being treated the same.
+#
+#  Note that your project's make.config file is read before including the rest of the compiler
+#  rules, so you can safely detect any overrides to the compile rules here.
+#
+include $(MAKE_RULES_DIR)$(MAKE_OS)/rules.hdr
+
+makefiles::
+        @$(ECHO) MAKE_OS= $(MAKE_OS)
+	@$(ECHO) OBJDIR= $(OBJDIR)
+	@$(ECHO) LIBDIR= $(LIBDIR)
+	@$(ECHO) SRCDIR= $(SRCDIR)
+	@$(ECHO) BINDIR= $(BINDIR)
+	@$(ECHO) INCLUDED_MAKEFILES= $(MAKEFILE_LIST)
+	@$(ECHO) MAKE_RULES_DIR= $(MAKE_RULES_DIR)
+	@$(ECHO) PROJECT_TOP_DIR= $(PROJECT_TOP_DIR)
+
+
+######################################################################################################
+# HANDLE MAKEFILE RECURSION -- IE PROJECT TREES
+# NOTE THAT VARIABLE, SUBDIRS, MUST BE POPULATED BEFORE INCLUDING THIS HEADER FILE!
+# SUBDIRS ARE HANDLED BEFORE PARENTS!
+######################################################################################################
+
+ifneq ("$(SUBDIRS)","")
+
+all::        dirTargets
+clean::      dirTargets
+tests::      dirTargets
+nothing::    dirTargets
+
+dirTargets: $(foreach dir,$(SUBDIRS),$(dir)/.dirTarget)
+
+ifneq ("$(MAKECMDGOALS)","makefiles")
+ifneq ("$(MAKECMDGOALS)","backup")
+
+#
+#  except for backup, recursively apply all commands to subdirs
+#
+
+$(foreach dir,$(SUBDIRS),$(dir)/.dirTarget) :
+	$(MAKE) -C $(basename $@) $(MAKECMDGOALS)
+
+.PHONY:  dirTargets  $(foreach dir,$(SUBDIRS),$(dir)/.dirTarget)
+
+endif
+endif
+
+endif
+
+.PHONY:  all clean tests nothing backup

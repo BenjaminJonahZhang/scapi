@@ -9,7 +9,7 @@
 
 
 
-Big biginteger_to_big(biginteger bi);
+Big biginteger_to_big(biginteger bi); 
 biginteger big_to_biginteger(Big b);
 
 /**
@@ -80,7 +80,11 @@ public:
 		return new ECElementSendableData(getX(), getY());
 	}
 
-	int hashCode();
+	/**
+	* Overloading operator < to allow using ECFpPoint as key in map
+	*/
+	bool operator<(const ECFpPoint& other) const { return getX() < other.getX(); };
+
 	bool ECFpPointMiracl::operator==(const GroupElement &other) const override;
 	bool ECFpPointMiracl::operator!=(const GroupElement &other) const override;
 	string toString() {
@@ -133,7 +137,6 @@ public:
 
 /**
 * This class implements an Elliptic curve Dlog group over Zp utilizing Miracl's implementation.<p>
-* It uses JNI technology to call Miracl's native code.
 */
 class MiraclDlogECFp : public MiraclAdapterDlogEC, public DlogECFp, public DDH {
 
@@ -180,7 +183,7 @@ protected:
 	GroupElement * computeExponentiateWithPrecomputedValues(ebrick * ebrickPointer, biginteger exponent) override;
 
 public:
-	MiraclDlogECFp(string fileName = NISTEC_PROPERTIES_FILE, string curveName = "P - 192") : MiraclAdapterDlogEC(fileName, curveName) {
+	MiraclDlogECFp(string fileName = NISTEC_PROPERTIES_FILE, string curveName = "P-192") : MiraclAdapterDlogEC(fileName, curveName) {
 		doInit(curveName); // set the data and initialize the curve 
 	};
 	MiraclDlogECFp(string fileName, string curveName, mt19937 prg) : MiraclAdapterDlogEC(fileName, curveName, prg) {};

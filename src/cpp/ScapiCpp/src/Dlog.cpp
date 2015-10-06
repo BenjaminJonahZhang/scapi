@@ -68,10 +68,10 @@ bool DlogGroupAbs::isOrderGreaterThan(int numBits) {
 }
 
 GroupElement * DlogGroupAbs::createRandomElement() {
-	//This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
-	//However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
-	//Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
-	boost::random::uniform_int_distribution<biginteger> ui(0, groupParams->getQ() - 1);
+	// This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
+	// However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
+	// Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
+	boost::random::uniform_int_distribution<biginteger> ui(1, groupParams->getQ() - 1);
 	biginteger randNum = ui(random_element_gen);
 	// compute g^x to get a new element
 	return exponentiate(generator, randNum);

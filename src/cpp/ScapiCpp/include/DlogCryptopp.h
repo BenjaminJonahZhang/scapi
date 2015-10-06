@@ -138,8 +138,8 @@ public:
 	GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) override; 
 	GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) override;
 	GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) override;
-	const vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) override;
-	virtual const vector<unsigned char>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
+	const vector<byte> decodeGroupElementToByteArray(GroupElement * groupElement) override;
+	virtual const vector<byte>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
 	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
 };
 
