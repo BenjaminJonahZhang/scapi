@@ -1,9 +1,5 @@
 #include "../include/DlogEllipticCurve.hpp"
 
-string convert_hex_to_string(string hex)
-{
-	return hex;
-}
 /*******************************************/
 /******** ECFpUtility Implementation ******/
 /******************************************/
@@ -16,6 +12,7 @@ bool ECFpUtility::checkCurveMembership(ECFpGroupParams * params, biginteger x, b
 
 	 //Calculates the curve equation with the given x,y.
 
+	 cout << "a= " << a << " b= " << b << " p=" << p << endl;
 	 // compute x^3 % p
 	 biginteger x3 = mp::powm(x, 3, p);
 	 // compute x^3+ax+b
@@ -100,7 +97,7 @@ bool ECFpUtility::checkSubGroupMembership(DlogECFp * curve, ECFpPoint * point)
 	return point->isIdentity();
 }
 
-GroupParams * ECFpUtility::checkAndCreateInitParams(CfgMap ecProperties, string curveName) {
+GroupParams * ECFpUtility::checkAndCreateInitParams(CfgMap & ecProperties, string curveName) {
 	// check that the given curve is in the field that matches the group
 	if (!boost::algorithm::starts_with(curveName, "P-")) //	if (!curveName.startsWith("P-")) {
 		throw invalid_argument("curveName is not a curve over Fp field and doesn't match the DlogGroup type");
@@ -108,9 +105,9 @@ GroupParams * ECFpUtility::checkAndCreateInitParams(CfgMap ecProperties, string 
 	// get the curve parameters
 	biginteger p(ecProperties[curveName]);
 	biginteger a(ecProperties[curveName + "a"]);
-	biginteger b(convert_hex_to_string(ecProperties[curveName + "b"]));   // make sure it is possitve?
-	biginteger x(convert_hex_to_string(ecProperties[curveName + "x"]));  // make sure it is possitve?
-	biginteger y(convert_hex_to_string(ecProperties[curveName + "y"]));   // make sure it is possitve?
+	biginteger b = convert_hex_to_biginteger(ecProperties[curveName + "b"]);   // make sure it is possitve?
+	biginteger x = convert_hex_to_biginteger(ecProperties[curveName + "x"]);  // make sure it is possitve?
+	biginteger y = convert_hex_to_biginteger(ecProperties[curveName + "y"]);   // make sure it is possitve?
 	biginteger q(ecProperties[curveName + "r"]);
 	biginteger h(ecProperties[curveName + "h"]);
 
@@ -199,11 +196,35 @@ ECFpUtility::FpPoint * ECFpUtility::findPointRepresentedByByteArray(ECFpGroupPar
 	return NULL;
 }
 
+vector<byte> * ECFpUtility::mapAnyGroupElementToByteArray(biginteger x, biginteger y) {
+	// This function simply returns an array which is the result of concatenating 
+	// the byte array representation of x with the byte array representation of y.
+	byte * xByteArray;
+	byte * yByteArray;
+	size_t sizeX = allocateAndEncodeBigInteger(x, xByteArray);
+	size_t sizeY = allocateAndEncodeBigInteger(y, yByteArray);
+	
+	vector<byte> * result = new vector<byte>(sizeX + sizeY);
+	result->insert(result->end(), &xByteArray[0], &xByteArray[sizeX]);
+	result->insert(result->end(), &yByteArray[0], &xByteArray[sizeY]);
+	return result;
+}
+
+vector<byte> * ECFpUtility::getKLeastSignBytes(biginteger x, int k) {
+	// To retrieve the k least significant bits of a number x we do:
+	// lsb = x mod (2^8k)
+	biginteger modulo = mp::pow(biginteger(2), 8 * k);
+	byte * moduloByteArray;
+	auto len = allocateAndEncodeBigInteger(modulo, moduloByteArray);
+	vector<byte> * result = new vector<byte>(len);
+	result->insert(result->end(), &moduloByteArray[0], &moduloByteArray[len]);
+	return result;
+}
 /*******************************************/
 /******** DlogGroupEC Implementation ******/
 /******************************************/
 
-const string DlogGroupEC::NISTEC_PROPERTIES_FILE = "/propertiesFiles/NISTEC.properties";
+const string DlogGroupEC::NISTEC_PROPERTIES_FILE = "C:/code/scapi/src/java/propertiesFiles/NISTEC.properties";
 
 DlogGroupEC::DlogGroupEC(string fileName, string curveName, mt19937 prg){
 	this->curveName = curveName;
@@ -217,12 +238,16 @@ CfgMap DlogGroupEC::getProperties(string fileName){
 		return nistProperties;
 
 	CfgMap ecProperties;
-
-	//Load the elliptic curves file
-	//Instead of loading the plain file, which only works from outside a jar file, we load it as a resource 
-	//that can also work from within a jar file. The path from which we load the properties file from is from now under bin\propertiesFiles.
-	//InputStream in = (InputStream)getClass().getResourceAsStream(fileName);
-	//ecProperties.load(in);
+	string s, key, value;
+	ifstream myfile(fileName);
+	while (getline(myfile, s))
+	{
+		key = s.substr(0, s.find('='));
+		value = s.substr(s.find('=') + 1);
+		boost::algorithm::erase_all(key, " ");
+		boost::algorithm::erase_all(value, " ");
+		ecProperties[key] = value;
+	}
 
 	//Set the member variable nistProperties to the recently loaded ecProperties file, so that next time
 	//the NIST file has to be read, the already loaded file will be returned. (See above). 

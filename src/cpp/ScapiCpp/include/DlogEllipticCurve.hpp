@@ -308,7 +308,7 @@ public:
 	* @param y coordinate of a point in the curve (this function does not check for membership)
 	* @return byte[] representation
 	*/
-	vector<unsigned char> mapAnyGroupElementToByteArray(biginteger x, biginteger y);
+	vector<byte> * mapAnyGroupElementToByteArray(biginteger x, biginteger y);
 
 	/**
 	* This function calculates k, the maximum length in bytes of a string to be converted to a Group Element of this group.
@@ -323,7 +323,7 @@ public:
 	* @param k
 	* @return k least significant bits of x
 	*/
-	vector<unsigned char> getKLeastSignBytes(biginteger x, int k);
+	vector<byte> * getKLeastSignBytes(biginteger x, int k);
 
 	/**
 	* This function receives the name of a curve and some possible properties and it checks that curve is actually a curve over the Fp field. If so, it creates the necessary
@@ -333,7 +333,7 @@ public:
 	* @return the GroupParams if this curve is a curve over the Fp field.
 	* @throws IllegalArgumentException if curveName is not a curve over Fp field and doesn't match the DlogGroup type.
 	*/
-	GroupParams * checkAndCreateInitParams(CfgMap ecProperties, string curveName);
+	GroupParams * checkAndCreateInitParams(CfgMap & ecProperties, string curveName);
 
 	/**
 	* @return the type of the group - ECFp

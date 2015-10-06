@@ -57,9 +57,6 @@ size_t bytesCount(biginteger value)
 	return length;
 }
 
-/*
-* Converting big integer to a byte array. Array must be allocated already
-*/
 void encodeBigInteger(biginteger value, byte* output, size_t length)
 {
 	if (value.is_zero())
@@ -89,4 +86,16 @@ biginteger decodeBigInteger(byte* input, size_t length)
 	if (a >= 0x80)
 		result |= (biginteger) - 1 << (bits + 8);
 	return result;
+}
+
+size_t allocateAndEncodeBigInteger(biginteger value, byte * output) {
+	size_t len = bytesCount(value);
+	output = new byte[len];
+	encodeBigInteger(value, output, len);
+	return len;
+}
+
+biginteger convert_hex_to_biginteger(const string & input) {
+	string s = "0x" + input;
+	return boost::lexical_cast<biginteger>(s);
 }

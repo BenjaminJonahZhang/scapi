@@ -300,7 +300,7 @@ public:
 	* This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array.
 	* @return a byte array representation of the given group element
 	*/
-	virtual const vector<unsigned char> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
+	virtual const vector<byte> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
 };
 
 /**
