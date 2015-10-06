@@ -19,3 +19,14 @@ target/*
 .settings
 .metadata/*
 bin/*
+*.suo
+*.idb
+*pdb
+*.tlog
+*.lastbuildstate
+*.obj
+*.opensdf
+*.sdf
+*.ilk
+*.exe
+*.ipch
