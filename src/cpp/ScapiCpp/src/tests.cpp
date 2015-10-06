@@ -222,19 +222,19 @@ TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
 
 TEST_CASE("reading file and properties map", "[file, map, properties]")
 {
-	SECTION("reading file") {
-		string fileName = "C:/code/scapi/src/cpp/ScapiCpp/x64/Debug/testFile.txt";
-		ifstream myfile(fileName);
-		REQUIRE(myfile.good());
-		string s;
-		int i = 0;
-		while (getline(myfile, s))
-			++i;
-		CAPTURE(s);
-		CAPTURE(i);
-		REQUIRE(s == "test line");
-		REQUIRE(i == 1);
-	}
+	//SECTION("reading file") {
+	//	string fileName = "C:/code/scapi/src/cpp/ScapiCpp/x64/Debug/testFile.txt";
+	//	ifstream myfile(fileName);
+	//	REQUIRE(myfile.good());
+	//	string s;
+	//	int i = 0;
+	//	while (getline(myfile, s))
+	//		++i;
+	//	CAPTURE(s);
+	//	CAPTURE(i);
+	//	REQUIRE(s == "test line");
+	//	REQUIRE(i == 1);
+	//}
 	SECTION("property map") {
 		CfgMap config;
 		config["AB"] = "Z";
@@ -247,10 +247,6 @@ TEST_CASE("reading file and properties map", "[file, map, properties]")
 
 TEST_CASE("Miracl big", "[big, miracl, biginteger")
 {
-	//auto b = biginteger_to_big(biginteger(3));
-	//REQUIRE(b == 3);
-	//auto c = big_to_biginteger(Big(18));
-	//REQUIRE(c == 18);
 	auto bi_rsa100 = biginteger(rsa100);
 	auto d = biginteger_to_big(bi_rsa100);
 	size_t len = bytesCount(bi_rsa100);
@@ -259,6 +255,7 @@ TEST_CASE("Miracl big", "[big, miracl, biginteger")
 	big result = mirvar(0);
 	bytes_to_big(len, (char *) output, result);
 }
+
 /***************************************************/
 /***********TESTING DLOG IMPLEMENTATIONS******************/
 /*****************************************************/
