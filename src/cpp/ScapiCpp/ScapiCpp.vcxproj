@@ -85,12 +85,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\code\scapi\assets\gmp\include;C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\code\scapi\lib\CryptoPP\x64\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\code\Builds\Miracl Build\test_folder\miracl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\OpenSSL-Win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\code\Builds\Miracl Build\test_folder\miracl.lib;C:\OpenSSL-Win64\lib\libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -107,6 +107,7 @@
     <ClCompile Include="src\DlogCryptopp.cpp" />
     <ClCompile Include="src\DlogElipticCurve.cpp" />
     <ClCompile Include="src\DlogMiracl.cpp" />
+    <ClCompile Include="src\DlogOpenSSL.cpp" />
     <ClCompile Include="src\MathAlgorithms.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
@@ -114,10 +115,11 @@
     <ClInclude Include="include\catch.hpp" />
     <ClInclude Include="include\Common.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
-    <ClInclude Include="include\DlogCryptopp.h" />
+    <ClInclude Include="include\DlogCryptopp.hpp" />
     <ClInclude Include="include\DlogEllipticCurve.hpp" />
     <ClInclude Include="include\DlogMiracl.hpp" />
     <ClInclude Include="include\MathAlgorithms.hpp" />
+    <ClInclude Include="include\DlogOpenSSL.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>
   <ItemGroup>

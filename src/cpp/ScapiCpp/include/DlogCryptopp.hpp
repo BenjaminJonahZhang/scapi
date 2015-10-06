@@ -14,50 +14,19 @@
 /**********************/
 biginteger cryptoppint_to_biginteger(CryptoPP::Integer cint);
 CryptoPP::Integer biginteger_to_cryptoppint(biginteger bi);
+
 /**
 * This class is an adapter class of Crypto++ to a ZpElement in SCAPI.<p>
 * It holds a pointer to a Zp element in Crypto++. It implements all the functionality of a Zp element.
 */
 class ZpSafePrimeElementCryptoPp : public ZpSafePrimeElement {
-private:
-	biginteger element;
 public:
-	/**
-	* This constructor accepts x value and DlogGroup (represented by p).
-	* If x is valid, sets it; else, throws exception
-	* @param x
-	*  @param p - group modulus
-	* @throws IllegalArgumentException
-	*/
-	ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, bool bCheckMembership);
-	/**
-	* Constructor that gets DlogGroup and chooses random element with order q.
-	* The algorithm is:
-	* input: modulus p
-	* choose a random element between 1 to p-1
-	* calculate element^2 mod p
-	* @param p - group modulus
-	*/
-	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg);
-	/*
-	* Constructor that simply create element using the given value
-	*/
-	ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger elementValue);
-
-	biginteger getElementValue() override{
-		return element;
-	}
-	/**
-	* This function checks if this element is the identity of the Dlog group.
-	* @return <code>true</code> if this element is the identity of the group; <code>false</code> otherwise.
-	*/
-	bool isIdentity() override { return element == 1; }
-	bool ZpSafePrimeElementCryptoPp::operator==(const GroupElement &other) const override;
-	bool ZpSafePrimeElementCryptoPp::operator!=(const GroupElement &other) const override;
-	string toString() {
+	ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, bool bCheckMembership) : ZpSafePrimeElement(x, p, bCheckMembership) {};
+	ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg) : ZpSafePrimeElement(p, prg) {};
+	ZpSafePrimeElementCryptoPp(biginteger elementValue) : ZpSafePrimeElement(elementValue) {};
+	virtual string toString() {
 		return "ZpSafePrimeElementCryptoPp [element value=" + string(element) + "]";
-	}
-	GroupElementSendableData * generateSendableData() override;
+	};
 };
 
 /**
@@ -111,18 +80,10 @@ public:
 		// TODO: NOT IMPLEMENTED 
 	}
 
-	/**
-	* @return the type of the group - Zp*
-	*/
 	string getGroupType() { return "Zp*"; }
-
-	/**
-	* @return the identity of this Zp group - 1
-	*/
 	GroupElement * getIdentity() {
 		return new ZpSafePrimeElementCryptoPp(1, ((ZpGroupParams *)groupParams)->getP(), false);
 	}
-
 	GroupElement * createRandomElement() override {
 		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
 		//It calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.

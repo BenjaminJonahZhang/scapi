@@ -2,8 +2,9 @@
 #include "../include/common.hpp"
 #include "../include/catch.hpp"
 #include "../include/Dlog.hpp"
-#include "../include/DlogCryptopp.h"
+#include "../include/DlogCryptopp.hpp"
 #include "../include/DlogMiracl.hpp"
+#include "../include/DlogOpenSSL.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -354,6 +355,11 @@ TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 		test_exponentiate(md);
 		//test_exponentiate_with_pre_computed_values(dg); - NOT WORKING!
 //		test_encode_decode(md); - NOT WORKING YET!
+	}
+	SECTION("test OpenSSLZpSafePrime implementation")
+	{
+		DlogGroup * dg = new OpenSSLDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
+		test_all(dg);
 	}
 }
 

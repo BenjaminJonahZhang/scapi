@@ -1,4 +1,4 @@
-#include "../include/DlogCryptopp.h"
+#include "../include/DlogCryptopp.hpp"
 
 
 biginteger cryptoppint_to_biginteger(CryptoPP::Integer cint)
@@ -12,56 +12,6 @@ CryptoPP::Integer biginteger_to_cryptoppint(biginteger bi)
 {
 	return CryptoPP::Integer(bi.str().c_str());
 }
-
-/*************************************************/
-/*ZpSafePrimeElementCryptoPp*/
-/*************************************************/
-ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, bool bCheckMembership){
-	if (bCheckMembership) {
-		biginteger q = (p - 1) / 2; 
-		//if the element is in the expected range, set it. else, throw exception
-		if (x > 0 && x <= (p - 1))
-		{
-			if (boost::multiprecision::powm(x, q, p) == 1) // x^q mod p == 1
-				element = x;
-			else
-				throw invalid_argument("Cannot create Zp element. Requested value " + (string)x + " is not in the range of this group.");
-		}
-		else
-			throw invalid_argument("Cannot create Zp element. Requested value " + (string)x + " is not in the range of this group.");
-	}
-	else
-		element = x;
-}
-
-ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg)
-{
-	// find a number in the range [1, ..., p-1]
-	boost::random::uniform_int_distribution<biginteger> ui(1, p - 1);
-	biginteger rand_in_range = ui(prg);
-	//calculate its power to get a number in the subgroup and set the power as the element. 
-	element = boost::multiprecision::powm(rand_in_range, 2, p);
-}
-
-ZpSafePrimeElementCryptoPp::ZpSafePrimeElementCryptoPp(biginteger elementValue)
-{
-		element = elementValue;
-}
-
-bool ZpSafePrimeElementCryptoPp::operator==(const GroupElement &other) const{
-	if (typeid(*this) != typeid(other))
-		return false;
-	return this->element == ((ZpSafePrimeElementCryptoPp *) &other)->element;
-}
-
-bool ZpSafePrimeElementCryptoPp::operator!=(const GroupElement &other) const {
-	return !(*this == other);
-}
-
-GroupElementSendableData * ZpSafePrimeElementCryptoPp::generateSendableData() {
-	return new ZpElementSendableData(getElementValue());
-}
-/*************************************************/
 
 
 /*************************************************/

@@ -98,7 +98,7 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 		this.groupParams = groupParams;
 		this.random = random;
 		
-		//Create CryptoPP Dlog group with p, ,q , g.
+		//Create OpenSSL Dlog group with p, ,q , g.
 		//The validity of g will be checked after the creation of the group because the check need the pointer to the group.
 		dlog = createDlogZp(p.toByteArray(), q.toByteArray(), g.toByteArray());
 		

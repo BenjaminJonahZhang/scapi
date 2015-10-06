@@ -533,7 +533,34 @@ public:
 /**
 * This is a marker interface. Every class that implements it is marked as an element of a sub-group of prime order of Zp* where p is a safe prime.
 */
-class ZpSafePrimeElement : public ZpElement {};
+class ZpSafePrimeElement : public ZpElement {
+protected:
+	biginteger element;
+public:
+	/**
+	* This constructor accepts x value and DlogGroup (represented by p).
+	* If x is valid, sets it; else, throws exception
+	*/
+	ZpSafePrimeElement(biginteger x, biginteger p, bool bCheckMembership);
+	/**
+	* Constructor that gets DlogGroup and chooses random element with order q.
+	* The algorithm is:
+	* input: modulus p
+	* choose a random element between 1 to p-1
+	* calculate element^2 mod p
+	*/
+	ZpSafePrimeElement(biginteger p, mt19937 prg);
+	/*
+	* Constructor that simply create element using the given value
+	*/
+	ZpSafePrimeElement(biginteger elementValue) { element = elementValue; };
+	biginteger getElementValue() override { return element; };
+	bool isIdentity() override { return element == 1; }
+	bool ZpSafePrimeElement::operator==(const GroupElement &other) const override;
+	bool ZpSafePrimeElement::operator!=(const GroupElement &other) const override;
+	virtual string toString() = 0; 
+	GroupElementSendableData * generateSendableData() override;
+};
 
 class ZpElementSendableData : public GroupElementSendableData {
 
