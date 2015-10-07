@@ -14,7 +14,8 @@ LIBRARIES_DIR=-L$(prefix)/ssl/lib -L$(libdir) -L$(prefix)/lib
 LIBRARIES=$(INCLUDE_ARCHIVES_START) $(LIBMIRACL)  -lssl -lcrypto -lMaliciousOTExtension $(INCLUDE_ARCHIVES_END)
 
 # objects
-OT_JNI_OBJECTS = ConnectionManager.o OTExtensionMaliciousCommonInterface.o OTExtensionMaliciousReceiverInterface.o OTExtensionMaliciousSenderInterface.o OTExtensionMaliciousReceiver.o OTExtensionMaliciousSender.o
+OT_JNI_OBJECTS = ConnectionManager.o OTExtensionMaliciousCommonInterface.o OTExtensionMaliciousReceiverInterface.o OTExtensionMaliciousSenderInterface.o \
+OTExtensionMaliciousReceiver.o OTExtensionMaliciousSender.o CommunicationSetup.o 
 
 ## targets ##
 # all: libMaliciousOtExtensionJavaInterface$(JNI_LIB_EXT) # mainSender.exe mainReceiver.exe
@@ -30,6 +31,9 @@ mainReceiver.exe: $(OT_JNI_OBJECTS) mainReceiver.cpp
 	$(CXX) -o $@ $(OT_JNI_OBJECTS) mainReceiver.cpp $(INCLUDES) $(LIBRARIES_DIR) $(LIBRARIES)
 
 ConnectionManager.o: ConnectionManager.cpp
+	$(CXX) $(CXXFLAGS) -c $< $(INCLUDES)
+	
+CommunicationSetup.o: CommunicationSetup.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCLUDES)
 
 OTExtensionMaliciousCommonInterface.o: OTExtensionMaliciousCommonInterface.cpp ConnectionManager.o
