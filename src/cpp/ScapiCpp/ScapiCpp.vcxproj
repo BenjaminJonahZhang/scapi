@@ -118,6 +118,8 @@
     <ClInclude Include="include\DlogCryptopp.hpp" />
     <ClInclude Include="include\DlogEllipticCurve.hpp" />
     <ClInclude Include="include\DlogMiracl.hpp" />
+    <ClInclude Include="include\Hash.hpp" />
+    <ClInclude Include="include\HashOpenSSL.hpp" />
     <ClInclude Include="include\MathAlgorithms.hpp" />
     <ClInclude Include="include\DlogOpenSSL.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />

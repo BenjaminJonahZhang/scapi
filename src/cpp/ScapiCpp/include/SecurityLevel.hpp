@@ -37,4 +37,9 @@ class CDH:public Dlog {};
 */
 class DDH : public CDH {};
 
+/**
+* This hierarchy specifies the security level of a cryptographic hash function. The levels in this hierarchy are TargetCollisionResistant and CollisionResistant.
+*/
+class HashSecLevel : public SecurityLevel {};
+
 #endif
