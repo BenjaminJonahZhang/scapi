@@ -237,7 +237,7 @@ $(JNI_MALOTEXT): compile-malotext
 	@$(MAKE) -C src/jni/MaliciousOtExtensionJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 	
-$(JNI_MALYAOUTIL): compile-malyaoutil
+$(JNI_MALYAOUTIL): compile-openssl
 	@echo "Compiling the Malicious Yao Util jni interface..."
 	@$(MAKE) -C src/jni/MaliciousYaoUtilJavaInterface CXX=$(CXX)
 	@cp $@ assets/
