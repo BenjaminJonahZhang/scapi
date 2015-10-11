@@ -81,11 +81,12 @@ JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(JNI_LIB_EX
 JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(JNI_LIB_EXT)
 JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_MALOTEXT:=src/jni/MaliciousOtExtensionJavaInterface/libMaliciousOtExtensionJavaInterface$(JNI_LIB_EXT)
+JNI_MALYAOUTIL:=src/jni/MaliciousYaoUtilJavaInterface/libMaliciousYaoUtilJavaInterface$(JNI_LIB_EXT)
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUIT:=src/jni/ScGarbledCircuitJavaInterface/libScGarbledCircuitJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUITNOFIXEDKEY:=src/jni/ScGarbledCircuitNoFixedKeyJavaInterface/libScGarbledCircuitNoFixedKeyJavaInterface$(JNI_LIB_EXT)
-JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-ntl jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey
+JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-malyaoutil jni-ntl jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey 
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
@@ -209,6 +210,7 @@ jni-cryptopp: $(JNI_CRYPTOPP)
 jni-miracl: $(JNI_MIRACL)
 jni-otextension: $(JNI_OTEXTENSION)
 jni-malotext: $(JNI_MALOTEXT)
+jni-malyaoutil: $(JNI_MALYAOUTIL)
 jni-ntl: $(JNI_NTL)
 jni-openssl: $(JNI_OPENSSL)
 jni-scgarbledcircuit: $(JNI_SCGARBLEDCIRCUIT)
@@ -234,6 +236,12 @@ $(JNI_MALOTEXT): compile-malotext
 	@echo "Compiling the Malicious OtExtension jni interface..."
 	@$(MAKE) -C src/jni/MaliciousOtExtensionJavaInterface CXX=$(CXX)
 	@cp $@ assets/
+	
+$(JNI_MALYAOUTIL): compile-malyaoutil
+	@echo "Compiling the Malicious Yao Util jni interface..."
+	@$(MAKE) -C src/jni/MaliciousYaoUtilJavaInterface CXX=$(CXX)
+	@cp $@ assets/
+	
 
 $(JNI_NTL): compile-ntl
 	@echo "Compiling the NTL jni interface..."
@@ -316,6 +324,7 @@ clean-malotext:
 	@echo "Cleaning the malicious ot extension build dir..."
 	@rm -rf $(builddir)/MaliciousOTExtension
 	@rm -f compile-malotext
+	
 
 clean-ntl:
 	@echo "Cleaning the ntl build dir..."
@@ -358,6 +367,11 @@ clean-jni-otextension:
 clean-jni-malotext:
 	@echo "Cleaning the Malicious Ot Extension jni build dir..."
 	@$(MAKE) -C src/jni/MaliciousOtExtensionJavaInterface clean
+	
+clean-jni-malyaoutil:
+	@echo "Cleaning the Malicious Yao Util jni build dir..."
+	@$(MAKE) -C src/jni/MaliciousYaoUtilJavaInterface clean
+
 
 clean-jni-ntl:
 	@echo "Cleaning the NTL jni build dir..."
