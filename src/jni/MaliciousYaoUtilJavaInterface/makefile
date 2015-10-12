@@ -4,7 +4,7 @@
 
 # compilation options
 CXX=g++
-CXXFLAGS=-fPIC 
+CXXFLAGS=-fPIC -maes
 
 # openssl dependency
 OPENSSL_INCLUDES = -I$(prefix)/ssl/include
