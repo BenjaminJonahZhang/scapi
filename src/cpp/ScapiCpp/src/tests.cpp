@@ -5,6 +5,7 @@
 #include "../include/DlogCryptopp.hpp"
 #include "../include/DlogMiracl.hpp"
 #include "../include/DlogOpenSSL.hpp"
+#include "../include/HashOpenSSL.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -68,6 +69,24 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 			REQUIRE(*it == vb[index+20]);
 		}
 		delete vb;
+	}
+
+
+	SECTION("copy byte array to byte vector")
+	{
+		byte src[10] = { 0xb1, 0xb2, 0xb3, 0xb4,  0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xc1 };
+		vector<byte> target;
+		copy_byte_array_to_byte_vector(src, 10, target, 0);
+		int i = 0;
+		REQUIRE(target.size() == 10);
+		for (byte & b : target) 
+			REQUIRE(src[i++] == b);
+		target.clear();
+		copy_byte_array_to_byte_vector(src, 10, target, 5);
+		i = 5;
+		REQUIRE(target.size() == 5);
+		for (byte & b : target)
+			REQUIRE(src[i++] == b);
 	}
 
 	SECTION("encode and decode bigintegers")
@@ -223,19 +242,6 @@ TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
 
 TEST_CASE("reading file and properties map", "[file, map, properties]")
 {
-	//SECTION("reading file") {
-	//	string fileName = "C:/code/scapi/src/cpp/ScapiCpp/x64/Debug/testFile.txt";
-	//	ifstream myfile(fileName);
-	//	REQUIRE(myfile.good());
-	//	string s;
-	//	int i = 0;
-	//	while (getline(myfile, s))
-	//		++i;
-	//	CAPTURE(s);
-	//	CAPTURE(i);
-	//	REQUIRE(s == "test line");
-	//	REQUIRE(i == 1);
-	//}
 	SECTION("property map") {
 		CfgMap config;
 		config["AB"] = "Z";
@@ -363,6 +369,36 @@ TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 	}
 }
 
+template<typename T>
+void test_hash(string in, string expect)
+{
+	CryptographicHash * hash = new T();
+	const char *cstr = in.c_str();
+	int len = in.size();
+	vector<byte> vec(cstr, cstr + len);
+	hash->update(vec, 0, len);
+	vector<byte> out;
+	hash->hashFinal(out, 0);
+	string actual = hexStr(out);
+	CAPTURE(actual);
+	CAPTURE(expect);
+	CAPTURE(actual.size());
+	CAPTURE(expect.size());
+	CAPTURE(hash->getHashedMsgSize());
+	REQUIRE(actual == expect);
+	delete hash;
+}
 
+TEST_CASE("Hash", "[HASH, SHA1]")
+{
+	SECTION("Testing OpenSSL SHA1") {
+		string input_msg = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+		test_hash<OpenSSLSHA1>(input_msg, "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
+		test_hash<OpenSSLSHA224>(input_msg, "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525");
+		test_hash<OpenSSLSHA256>(input_msg, "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
+		test_hash<OpenSSLSHA384>(input_msg, "3391fdddfc8dc7393707a65b1b4709397cf8b1d162af05abfe8f450de5f36bc6b0455a8520bc4e6f5fe95b1fe3c8452b");
+		test_hash<OpenSSLSHA512>(input_msg, "204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445");
+	}
+}
 
 /// TEST EC Utilities!

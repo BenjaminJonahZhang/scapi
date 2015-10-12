@@ -10,6 +10,8 @@
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <math.h> /* pow */
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 // Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
@@ -24,6 +26,7 @@ int NumberOfBits(biginteger bi);
 size_t bytesCount(biginteger value);
 void gen_random_bytes_vector(vector<byte> &v, const int len);
 void copy_byte_vector_to_byte_array(const vector<byte> &source_vector, byte * dest, int beginIndex);
+void copy_byte_array_to_byte_vector(const byte* src, int src_len, vector<byte>& target_vector, int beginIndex);
 /*
 * Converting big integer to a byte array. Array must be allocated already
 */
@@ -36,5 +39,7 @@ biginteger decodeBigInteger(byte* input, size_t length);
 size_t allocateAndEncodeBigInteger(biginteger value, byte * output);
 
 biginteger convert_hex_to_biginteger(const string & hex);
+
+string hexStr(vector<byte> const & data);
 
 #endif

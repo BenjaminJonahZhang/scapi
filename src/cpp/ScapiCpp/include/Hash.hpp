@@ -25,6 +25,7 @@ class CollisionResistant : TargetCollisionResistant {};
 */
 class CryptographicHash {
 public:
+	virtual ~CryptographicHash() {};
 	/**
 	* @return The algorithm name. For example - SHA1
 	*/
@@ -41,23 +42,23 @@ public:
 	* @param inOffset the offset within the byte array
 	* @param inLen the length. The number of bytes to take after the offset
 	* */
-	virtual void update(byte * in, int inOffset, int inLen)=0;
+	virtual void update(const vector<byte> &in, int inOffset, int inLen)=0;
 
 	/**
 	* Completes the hash computation and puts the result in the out array.
 	* @param out the output in byte array
 	* @param outOffset the offset which to put the result bytes from
 	*/
-	virtual void hashFinal(byte * out, int outOffset)=0;
+	virtual void hashFinal(vector<byte> &out, int outOffset)=0;
 };
 
 /*****************************************************************
 * SHA Marker interfaces. Every class that implements them is signed as SHA:
 ******************************************************************/
-class SHA1   : public CryptographicHash, public CollisionResistant {};
-class SHA224 : public CryptographicHash, public CollisionResistant {};
-class SHA256 : public CryptographicHash, public CollisionResistant {};
-class SHA384 : public CryptographicHash, public CollisionResistant {};
-class SHA512 : public CryptographicHash, public CollisionResistant {};
+class SHA1   : public virtual CryptographicHash, public virtual CollisionResistant {};
+class SHA224 : public virtual CryptographicHash, public virtual CollisionResistant {};
+class SHA256 : public virtual CryptographicHash, public virtual CollisionResistant {};
+class SHA384 : public virtual CryptographicHash, public virtual CollisionResistant {};
+class SHA512 : public virtual CryptographicHash, public virtual CollisionResistant {};
 
 #endif

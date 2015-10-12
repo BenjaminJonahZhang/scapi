@@ -1,4 +1,8 @@
+#ifndef SCAPI_HASH_OPENSSL_H
+#define SCAPI_HASH_OPENSSL_H
+
 #include "Hash.hpp"
+#include <openssl/evp.h>
 /**
 * A general adapter class of hash for OpenSSL. <p>
 * This class implements all the functionality by passing requests to the adaptee c++ functions,
@@ -8,11 +12,12 @@
 * to this base class.
 * Since the underlying library is written in a native language we use the JNI architecture.
 */
-class OpenSSLHash : public CryptographicHash {
+class OpenSSLHash : public virtual CryptographicHash {
 private:
 	int hashSize;
+	void finalHash();
 protected:
-	long hash; //Pointer to the native hash object.
+	EVP_MD_CTX* hash; //Pointer to the native hash object.
 	virtual ~OpenSSLHash();
 public:
 	/**
@@ -22,8 +27,8 @@ public:
 	OpenSSLHash(string hashName);
 	int getHashedMsgSize() override { return hashSize;};
 	string getAlgorithmName() override;
-	void update(byte* in, int inOffset, int inLen) override;
-	void hashFinal(byte* out, int outOffset) override;
+	void update(const vector<byte> &in, int inOffset, int inLen) override;
+	void hashFinal(vector<byte> &out, int outOffset) override;
 };
 
 /************************************************************
@@ -55,3 +60,4 @@ public:
 	OpenSSLSHA512() : OpenSSLHash("SHA512") {};
 };
 
+#endif
