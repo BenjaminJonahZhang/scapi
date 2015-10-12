@@ -2,6 +2,12 @@
 #include "TedKrovetzAesNiWrapperC.h"
 #include <iostream>
 
+#ifdef _WIN32
+#include "StdAfx.h"
+#else
+#include "Compat.h"
+#endif
+
 using namespace std;
 
 JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatrix_restoreKeys
