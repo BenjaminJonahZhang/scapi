@@ -36,6 +36,11 @@ void copy_byte_vector_to_byte_array(const vector<byte> &source_vector, byte * de
 	}
 }
 
+void copy_byte_array_to_byte_vector(const byte* src, int src_len, vector<byte>& target_vector, int beginIndex)
+{
+	target_vector.insert(target_vector.end(), &src[beginIndex], &src[src_len]);
+}
+
 /*
 * Length of biginteger in bytes
 */
@@ -98,4 +103,12 @@ size_t allocateAndEncodeBigInteger(biginteger value, byte * output) {
 biginteger convert_hex_to_biginteger(const string & input) {
 	string s = "0x" + input;
 	return boost::lexical_cast<biginteger>(s);
+}
+
+string hexStr(vector<byte> const & data)
+{
+	string res;
+	boost::algorithm::hex(data.begin(), data.end(), back_inserter(res));
+	boost::algorithm::to_lower(res);
+	return res;
 }

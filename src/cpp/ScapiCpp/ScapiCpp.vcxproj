@@ -108,6 +108,7 @@
     <ClCompile Include="src\DlogElipticCurve.cpp" />
     <ClCompile Include="src\DlogMiracl.cpp" />
     <ClCompile Include="src\DlogOpenSSL.cpp" />
+    <ClCompile Include="src\HashOpenSSL.cpp" />
     <ClCompile Include="src\MathAlgorithms.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
