@@ -13,7 +13,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_comm_twoPartyComm_NativeChannel_initS
 	 CSocket* s = new CSocket();
 	 s->Socket();
 	 
-	 boolean connect = s->Connect(ipS, port);
+	 bool connect = s->Connect(ipS, port);
 	 
 	 env->ReleaseStringUTFChars(ip, ipS);
 
