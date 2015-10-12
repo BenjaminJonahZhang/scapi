@@ -71,7 +71,7 @@ CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension \
 				clean-malotext clean-ntl clean-openssl clean-scgarbledcircuit \
 				clean-scgarbledcircuitnofixedkey clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension \
-					clean-jni-malotext clean-jni-ntl clean-jni-openssl \
+					clean-jni-malotext clean-jni-malyaoutil clean-jni-ntl clean-jni-openssl \
 					clean-jni-scgarbledcircuit clean-jni-scgarbledcircuitnofixedkey \
 					clean-jni-assets
 					
