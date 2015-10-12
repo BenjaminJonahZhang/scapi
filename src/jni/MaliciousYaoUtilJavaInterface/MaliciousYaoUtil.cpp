@@ -8,8 +8,8 @@ using namespace std;
 JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatrix_restoreKeys
   (JNIEnv *env, jobject, jbyteArray receivedKeysArray, jobjectArray matrixArray, int n, int m, jbyteArray restoredKeysArray){
 
-	  block* receivedKeys = (block *)  _aligned_malloc(sizeof(block) * m, 16);
-	  block* restoredKeys = (block *)  _aligned_malloc(sizeof(block) * n, 16);
+	  block* receivedKeys = (block *)  _mm_malloc(sizeof(block) * m, 16);
+	  block* restoredKeys = (block *)  _mm_malloc(sizeof(block) * n, 16);
 	  
 	  jbyte *carr = env->GetByteArrayElements(receivedKeysArray, 0);
 	  memcpy(receivedKeys, carr, sizeof(block) * m);
@@ -182,7 +182,7 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProt
 
 	  env->SetByteArrayRegion(output, 0, size*SIZE_OF_BLOCK,  (jbyte*)outputBlocks);
 
-	   _mm_freemmaligned_free(keys2Blocks);
+	   _mm_free(keys2Blocks);
 	   _mm_free(outputBlocks);
 }
 
