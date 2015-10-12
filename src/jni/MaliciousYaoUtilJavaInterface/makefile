@@ -4,7 +4,7 @@
 
 # compilation options
 CXX=g++
-CXXFLAGS=-fPIC -maes
+CXXFLAGS=-fPIC -mavx -maes -mpclmul -DRDTSC -DTEST=AES128 -O3
 
 # openssl dependency
 OPENSSL_INCLUDES = -I$(prefix)/ssl/include
@@ -12,7 +12,7 @@ OPENSSL_LIB_DIR = -L$(prefix)/ssl/lib
 OPENSSL_LIB = -lssl -lcrypto
 
 
-SOURCES = MaliciousYaoUtil.cpp Util.cpp
+SOURCES = MaliciousYaoUtil.cpp Util.cpp TedKrovetzAesNiWrapperC.cpp
 OBJ_FILES = $(SOURCES:.cpp=.o)
 
 ## targets ##
