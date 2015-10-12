@@ -2,11 +2,6 @@
 #include "TedKrovetzAesNiWrapperC.h"
 #include <iostream>
 
-#ifdef _WIN32
-#include "StdAfx.h"
-#else
-#include "Compat.h"
-#endif
 
 using namespace std;
 
@@ -36,8 +31,8 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
 	  env->SetByteArrayRegion(restoredKeysArray, 0, n*SIZE_OF_BLOCK,  (jbyte*)restoredKeys);
 
 	  env->ReleaseByteArrayElements(receivedKeysArray,carr,JNI_ABORT);
-	  _aligned_free(receivedKeys);
-	  _aligned_free(restoredKeys);
+	  _mm_free(receivedKeys);
+	  _mm_free(restoredKeys);
 
 	  delete matrix;
 
@@ -50,17 +45,17 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
 	  jbyte *probeResistantKeys = env->GetByteArrayElements(probeResistantKeysBytes, 0);
 	  jbyte *seed = env->GetByteArrayElements(seedBytes, 0);
 
-	  block* originalKeysb = (block *)  _aligned_malloc(sizeof(block) * n * 2, 16);
-	  block* probeResistantKeysb = (block *)  _aligned_malloc(sizeof(block) * m * 2, 16);
-	  block* newKeysb = (block *)  _aligned_malloc(sizeof(block) * n, 16);
-	  block * indexArray = (block *)_aligned_malloc(sizeof(block) * n, 16);
+	  block* originalKeysb = (block *)  _mm_malloc(sizeof(block) * n * 2, 16);
+	  block* probeResistantKeysb = (block *)  _mm_malloc(sizeof(block) * m * 2, 16);
+	  block* newKeysb = (block *)  _mm_malloc(sizeof(block) * n, 16);
+	  block * indexArray = (block *)_mm_malloc(sizeof(block) * n, 16);
 	
 	  for (int i = 0; i < n; i++){
 
 		indexArray[i] = _mm_set_epi32(0, 0, 0, i);
 	  }
 
-	  AES_KEY * aesSeedKey = (AES_KEY *)_aligned_malloc(sizeof(AES_KEY), 16);
+	  AES_KEY * aesSeedKey = (AES_KEY *)_mm_malloc(sizeof(AES_KEY), 16);
 	  AES_set_encrypt_key((const unsigned char *)seed, 128, aesSeedKey);
 	  AES_ecb_encrypt_chunk_in_out(indexArray, newKeysb, n, aesSeedKey);
 
@@ -87,11 +82,11 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
 	 env->ReleaseByteArrayElements(originalKeysBytes,originalKeys,0);
 	 env->ReleaseByteArrayElements(seedBytes,seed,0);
 
-	 _aligned_free(originalKeysb);
-	 _aligned_free(probeResistantKeysb);
-	 _aligned_free(newKeysb);
-	 _aligned_free(indexArray);
-	 _aligned_free(aesSeedKey);
+	 _mm_free(originalKeysb);
+	 _mm_free(probeResistantKeysb);
+	 _mm_free(newKeysb);
+	 _mm_free(indexArray);
+	 _mm_free(aesSeedKey);
 
 	 delete matrix;
 }
@@ -100,7 +95,7 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
   (JNIEnv *env, jobject, jbyteArray probeResistantKeysBytes, jbyteArray originalKey0Bytes, jbyteArray originalKey1Bytes, 
   int i, jbyteArray newKeyBytes, int n, int m, jobjectArray matrixArray){
 	  
-	  block* probeResistantKeys = (block *)  _aligned_malloc(sizeof(block) * m * 2, 16);
+	  block* probeResistantKeys = (block *)  _mm_malloc(sizeof(block) * m * 2, 16);
 	  
 	  jbyte *carr = env->GetByteArrayElements(probeResistantKeysBytes, 0);
 	  jbyte *key0 = env->GetByteArrayElements(originalKey0Bytes, 0);
@@ -133,7 +128,7 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
 	  env->ReleaseByteArrayElements(originalKey1Bytes, (jbyte*)key1, JNI_ABORT);
 	  env->ReleaseByteArrayElements(newKeyBytes, (jbyte*) newKey, JNI_ABORT);
 
-	  _aligned_free(probeResistantKeys);
+	  _mm_free(probeResistantKeys);
 
 	  delete matrix;
 }
@@ -141,7 +136,7 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_primitives_KProbeResistantMatr
 JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProtocolP2_xorKeysWithMask
   (JNIEnv *env, jobject, jbyteArray keysArray, jbyteArray maskBytes, int size){
 
-	  block* keysBlocks = (block *)  _aligned_malloc(sizeof(block) * size, 16);
+	  block* keysBlocks = (block *)  _mm_malloc(sizeof(block) * size, 16);
 	 
 	  jbyte *keys = env->GetByteArrayElements(keysArray, 0);
 	  jbyte *maskArray = env->GetByteArrayElements(maskBytes, 0);
@@ -160,7 +155,7 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProt
 
 	  env->SetByteArrayRegion(keysArray, 0, size*SIZE_OF_BLOCK,  (jbyte*)keysBlocks);
 
-	   _aligned_free(keysBlocks);
+	   _mm_free(keysBlocks);
 
 }
 
@@ -168,9 +163,9 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProt
 JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProtocolP2_xorKeys
   (JNIEnv * env, jobject, jbyteArray keys1Array, jbyteArray keys2Array, jbyteArray output, int size){
 	  
-	  block* keys1Blocks = (block *)  _aligned_malloc(sizeof(block) * size, 16);
-	  block* keys2Blocks = (block *)  _aligned_malloc(sizeof(block) * size, 16);
-	  block* outputBlocks = (block *)  _aligned_malloc(sizeof(block) * size, 16);
+	  block* keys1Blocks = (block *)  _mm_malloc(sizeof(block) * size, 16);
+	  block* keys2Blocks = (block *)  _mm_malloc(sizeof(block) * size, 16);
+	  block* outputBlocks = (block *)  _mm_malloc(sizeof(block) * size, 16);
 	 
 	  jbyte *keys1 = env->GetByteArrayElements(keys1Array, 0);
 	  jbyte *keys2 = env->GetByteArrayElements(keys2Array, 0);
@@ -187,9 +182,8 @@ JNIEXPORT void JNICALL Java_edu_biu_protocols_yao_offlineOnline_specs_OnlineProt
 
 	  env->SetByteArrayRegion(output, 0, size*SIZE_OF_BLOCK,  (jbyte*)outputBlocks);
 
-	   _aligned_free(keys1Blocks);
-	   _aligned_free(keys2Blocks);
-	   _aligned_free(outputBlocks);
+	   _mm_freemmaligned_free(keys2Blocks);
+	   _mm_free(outputBlocks);
 }
 
 
