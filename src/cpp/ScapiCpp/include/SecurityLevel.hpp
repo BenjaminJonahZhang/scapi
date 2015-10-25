@@ -42,4 +42,21 @@ class DDH : public CDH {};
 */
 class HashSecLevel : public SecurityLevel {};
 
+/**
+* This hierarchy specifies the security level of a message authentication code (MAC) or digital signature scheme.<p>
+* The hierarchy here only refers to the number of times that the MAC or signature scheme can be used; namely, OneTime or UnlimitedTimes.
+* We do not currently have another interface for a bounded but not unlimited number of times; if necessary this can be added later.
+* We also consider by default adaptive chosen-message attacks and so have not defined a separate hierarchy for adaptive/non-adaptive attacks and chosen versus random message attacs.
+*/
+class MacSignSecLevel : public SecurityLevel {};
+
+/**
+* Any MAC or signature scheme that is secure for one-time use only should implement this interface.
+*/
+class OneTime : public MacSignSecLevel {};
+/**
+* Any MAC or signature scheme that is secure for an unlimited number of uses should implement this interface. This is the security level of standard MAC and signature schemes.
+*/
+class UnlimitedTimes : public OneTime {};
+
 #endif
