@@ -78,7 +78,7 @@ public class SSLSocketChannel extends PlainTCPSocketChannel{
 	}
 	
 	@Override
-	void connect()  {
+	protected boolean connect()  {
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
 		
@@ -115,7 +115,9 @@ public class SSLSocketChannel extends PlainTCPSocketChannel{
 			//This exception can be thrown every time the socket didn't manage to connect. 
 			//This is fine because the channel tries to connect until it succeed.
 			Logging.getLogger().log(Level.FINEST, e.toString());
+			return false;
 		}
+		return true;
 	
 	}
 

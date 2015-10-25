@@ -36,9 +36,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Level;
-
 import edu.biu.scapi.generals.Logging;
 
 /** 
@@ -187,7 +185,7 @@ public class PlainTCPChannel extends PlainChannel{
 	 * @return
 	 * @throws IOException 
 	 */
-	boolean connect() throws IOException {
+	protected boolean connect() throws IOException {
 		
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
@@ -214,7 +212,7 @@ public class PlainTCPChannel extends PlainChannel{
 	/**
 	 * Returns if the socket is connected
 	 */
-	boolean isConnected(){
+	protected boolean isConnected(){
 		
 		if(socket!=null)
 			return socket.isConnected();

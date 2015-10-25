@@ -38,8 +38,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 
-import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.comm.PlainTCPChannel;
+import edu.biu.scapi.comm.PlainChannel;
 import edu.biu.scapi.generals.Logging;
 
 /**
@@ -57,20 +56,7 @@ import edu.biu.scapi.generals.Logging;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class PlainTCPSocketChannel implements Channel{
-	
-	/**
-	 * A channel has a state. It can be either NOT_INIT,CONNECTING or READY.
-	 * 
-	 * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
-	 */
-	public static enum State {
-		
-		NOT_INIT,
-		CONNECTING,
-		READY
-	}
-	
+public class PlainTCPSocketChannel extends PlainChannel{
 	/**
 	 * 
 	 * A nested class to use in the send and receive functions. 
@@ -92,7 +78,7 @@ public class PlainTCPSocketChannel implements Channel{
 			
 	}
 	
-	private State state;						// The state of the channel.
+//	private State state;						// The state of the channel.
 	protected Socket sendSocket;				//A socket used to send messages.
 	private Socket receiveSocket;				//A socket used to receive messages.
 	protected ObjectOutputStream outStream;		//Used to send a message
@@ -107,9 +93,8 @@ public class PlainTCPSocketChannel implements Channel{
 	/**
 	 * A constructor that set the state of this channel to not ready.
 	 */
-	PlainTCPSocketChannel(){
-		
-		state = State.NOT_INIT;
+	public PlainTCPSocketChannel(){
+		setState(State.NOT_INIT);
 	}
 	
 	/**
@@ -118,7 +103,6 @@ public class PlainTCPSocketChannel implements Channel{
 	 * @param port other party's port.
 	 */
 	PlainTCPSocketChannel(InetAddress ipAddress, int port, boolean checkIdentity, SocketPartyData me) {
-		
 		this(new InetSocketAddress(ipAddress, port), checkIdentity, me);
 	}
 	
@@ -127,27 +111,10 @@ public class PlainTCPSocketChannel implements Channel{
 	 * @param socketAddress other end's InetSocketAddress
 	 */
 	PlainTCPSocketChannel(InetSocketAddress socketAddress, boolean checkIdentity, SocketPartyData me) {
-		
-		this();
+		super();
 		this.socketAddress = socketAddress;
 		this.checkIdentity = checkIdentity;
 		this.me = me;
-	}
-
-	/**
-	 * Returns the state of the channel. 
-	 */
-	State getState() {
-		
-		return state;
-	}
-
-	/**
-	 * Sets the state of the channel. 
-	 */
-	public void setState(State state) {
-		this.state = state; 
-		
 	}
 
 	/** 
@@ -232,7 +199,7 @@ public class PlainTCPSocketChannel implements Channel{
 	 * After the connection has succeeded the output stream is set for the send function.
 	 * @throws IOException 
 	 */
-	void connect()  {
+	protected boolean connect(){
 		
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
@@ -254,9 +221,9 @@ public class PlainTCPSocketChannel implements Channel{
 				setReady();
 			}	
 		} catch (IOException e) {
-			
 			Logging.getLogger().log(Level.FINEST, e.toString());
 		}
+		return true;
 	}
 
 	protected void sendIdentity() throws IOException {
@@ -267,15 +234,18 @@ public class PlainTCPSocketChannel implements Channel{
 	/**
 	 * Returns if the send socket is connected.
 	 */
-	boolean isSendConnected(){
+	protected boolean isSendConnected(){
 		
 		if(sendSocket!=null){
-			
 			return sendSocket.isConnected();
 		
 		} else{
 			return false;
 		}
+	}
+	
+	protected boolean isConnected(){
+		return isSendConnected();
 	}
 
 	/**
@@ -306,7 +276,7 @@ public class PlainTCPSocketChannel implements Channel{
 			
 			if (sendSocket.isConnected() && receiveSocket.isConnected()){
 				//set the channel state to READY
-				state = State.READY;
+				this.setState(State.READY);
 				Logging.getLogger().log(Level.INFO, "state: ready " + toString());				
 			}
 		}

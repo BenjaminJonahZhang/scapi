@@ -100,7 +100,7 @@ public class EncryptedChannel extends ChannelDecorator {
 	 * @param encScheme a symmetric encryption scheme that is CPA-secure.
 	 * @throws SecurityLevelException if the encryption scheme is not CPA-secure 
 	 */
-	public EncryptedChannel(Channel channel, SymmetricEnc encScheme) throws SecurityLevelException {
+	public EncryptedChannel(PlainChannel channel, SymmetricEnc encScheme) throws SecurityLevelException {
 		super(channel);
 		doConstruct( encScheme);
 	}

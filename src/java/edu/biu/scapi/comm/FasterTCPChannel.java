@@ -142,7 +142,7 @@ public class FasterTCPChannel extends PlainChannel {
 	 * @throws IOException 
 	 */
 	@Override
-	boolean connect() throws IOException {
+	protected boolean connect() throws IOException {
 		
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
@@ -167,7 +167,7 @@ public class FasterTCPChannel extends PlainChannel {
 	 * Returns if the socket is connected
 	 */
 	@Override
-	boolean isConnected() {
+	protected boolean isConnected() {
 		if(socket!=null) {
 			return socket.isConnected();
 		} else {

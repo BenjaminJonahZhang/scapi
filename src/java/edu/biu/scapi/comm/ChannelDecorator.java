@@ -35,15 +35,15 @@ import edu.biu.scapi.exceptions.InvalidChannelException;
   * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public abstract class ChannelDecorator implements Channel {
-	protected Channel channel;
+	protected PlainChannel channel;
 	
 
 	/**
 	 * This constructor wraps the given Channel with a new ChannelDecorator.
 	 * @param channel 
 	 */
-	public ChannelDecorator(Channel channel){
-		if(((PlainChannel)channel).getState()!= PlainChannel.State.READY)
+	public ChannelDecorator(PlainChannel channel){
+		if (channel.getState() != PlainChannel.State.READY)
 			throw new InvalidChannelException("The basic channel has to be in READY state.");
 		this.channel = channel;
 	}

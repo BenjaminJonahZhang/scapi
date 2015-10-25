@@ -90,7 +90,7 @@ public class AuthenticatedChannel extends ChannelDecorator {
 	 * @param mac the MAC algorithm required to authenticate the messages sent by this channel
 	 * @throws SecurityLevelException if the MAC algorithm passed is not UnlimitedTimes-secure
 	 */
-	public AuthenticatedChannel(Channel channel, Mac mac) throws SecurityLevelException {
+	public AuthenticatedChannel(PlainChannel channel, Mac mac) throws SecurityLevelException {
 		super(channel);	
 		doConstruct(mac);
 	}
