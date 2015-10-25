@@ -181,38 +181,23 @@ void OpenSSLAES::setKey(SecretKey secretKey) {
 /*************************************************/
 /**** OpenSSLHMAC ***/
 /*************************************************/
-char *ossl_err_as_string(void)
-{
-	BIO *bio = BIO_new(BIO_s_mem());
-	ERR_print_errors(bio);
-	char *buf = NULL;
-	size_t len = BIO_get_mem_data(bio, &buf);
-	char *ret = (char *)calloc(1, 1 + len);
-	if (ret)
-		memcpy(ret, buf, len);
-	BIO_free(bio);
-	return ret;
-}
-
 void OpenSSLHMAC::construct(string hashName, mt19937 random) {
 	/*
 	* The way we call the hash is not the same as OpenSSL. For example: we call "SHA-1" while OpenSSL calls it "SHA1".
 	* So the hyphen should be deleted.
 	*/
-	hashName.erase(remove(hashName.begin(), hashName.end(), '-'), hashName.end());
 
 	hmac = new  HMAC_CTX;
 	OpenSSL_add_all_digests();
+	HMAC_CTX_init(hmac);
+
+	hashName.erase(remove(hashName.begin(), hashName.end(), '-'), hashName.end());
 	// get the underlying hash function.
 	const EVP_MD *md = EVP_get_digestbyname(hashName.c_str());
 
-	// create an Hmac object and initialize it with the created hash.
-	HMAC_CTX_init(hmac);
-	int res = HMAC_Init_ex(hmac, NULL, 0, md, NULL);
-	ERR_print_errors_fp(stdout);
-	string st(ossl_err_as_string());
-	cout << "**********" << st	<<endl;
-	cout << "++++++++++++" <<endl;
+	// create an Hmac object and initialize it with the created hash and default key.
+	int res = HMAC_Init_ex(hmac, "012345678", 0, md, NULL);
+	//res = HMAC_Init_ex(hmac, NULL, 0, md, NULL);
 	if (0 == res)
 		throw runtime_error("failed to create hmac");
 
@@ -258,14 +243,14 @@ void OpenSSLHMAC::computeBlock(const vector<byte> & inBytes, int inOffset, int i
 	// check that the offset and length are correct.
 	if ((inOffset > inBytes.size()) || (inOffset + inLen > inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
-	if ((outOffset > outBytes.size()) || (outOffset + getBlockSize() > outBytes.size()))
-		throw out_of_range("wrong offset for the given output buffer");
+	//if ((outOffset > outBytes.size()) || (outOffset + getBlockSize() > outBytes.size()))
+	//	throw out_of_range("wrong offset for the given output buffer");
 
 	// update the Hmac object.
 	HMAC_Update(hmac, &inBytes[inOffset], inLen);
 
-	int size = EVP_MD_size(hmac->md); //Get the size of the hash output.
-	byte* output = new byte[size]; //create a byte array to hold the result.
+	int size = EVP_MD_size(hmac->md); // Get the size of the hash output.
+	byte* output = new byte[size]; // create a byte array to hold the result.
 
 	//Compute the final function and copy the output the the given output array
 	if (0 == (HMAC_Final(hmac, output, NULL)))

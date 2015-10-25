@@ -435,11 +435,28 @@ TEST_CASE("PRF", "[AES, PRF]")
 	}
 	SECTION("HMAC")
 	{
-		auto mac = OpenSSLHMAC();
-		const char * c = "Jefe";
-		cout << mac.getAlgorithmName() << endl;
-		SecretKey sk = SecretKey((byte *)c, strlen(c), mac.getAlgorithmName());
-		mac.setKey(sk);
+		string key = "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b";
+		char const * plain = "Hi There";
+		string expected_out_hex = "b617318655057264e28bc0b6fb378c8ef146be00";
+
+		// create mac and set key
+		auto mac = new OpenSSLHMAC();
+		string s = boost::algorithm::unhex(key);
+		char const *c = s.c_str();
+		SecretKey sk = SecretKey((byte *)c, strlen(c), mac->getAlgorithmName());
+		mac->setKey(sk);
+
+		// compute_block for plain 
+		int in_len = strlen(plain);
+		vector<byte> in_vec, out_vec;
+		copy_byte_array_to_byte_vector((byte*)plain, in_len, in_vec, 0);
+		mac->computeBlock(in_vec, 0, in_len, out_vec, 0);
+
+		// clean 
+		delete mac;
+		
+		// verify 
+		REQUIRE(hexStr(out_vec) == expected_out_hex);
 	}
 }
 
