@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-class CmtPedersenCommitmentMessage implements CmtCCommitmentMsg, Serializable {
+public class CmtPedersenCommitmentMessage implements CmtCCommitmentMsg, Serializable {
 	private static final long serialVersionUID = -4867238837511177003L;
 	
 	// In Pedersen schemes the commitment object is a groupElement. 
