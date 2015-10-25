@@ -6,6 +6,7 @@
 #include "../include/DlogMiracl.hpp"
 #include "../include/DlogOpenSSL.hpp"
 #include "../include/HashOpenSSL.hpp"
+#include "../include/OpenSSLPrf.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -398,6 +399,64 @@ TEST_CASE("Hash", "[HASH, SHA1]")
 		test_hash<OpenSSLSHA256>(input_msg, "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
 		test_hash<OpenSSLSHA384>(input_msg, "3391fdddfc8dc7393707a65b1b4709397cf8b1d162af05abfe8f450de5f36bc6b0455a8520bc4e6f5fe95b1fe3c8452b");
 		test_hash<OpenSSLSHA512>(input_msg, "204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445");
+	}
+}
+
+template<typename T>
+void test_prp(string key, string in, string expected_out)
+{
+	OpenSSLPRP * prp = new T();
+	string s = boost::algorithm::unhex(key);
+	char const *c = s.c_str();
+	SecretKey sk = SecretKey((byte *)c, strlen(c), prp->getAlgorithmName());
+	prp->setKey(sk);
+
+	string sin = boost::algorithm::unhex(in);
+	char const * cin = sin.c_str();
+	vector<byte> in_vec, out_vec;
+	copy_byte_array_to_byte_vector((byte*)cin, strlen(cin), in_vec, 0);
+	prp->computeBlock(in_vec, 0, out_vec, 0);
+	
+	REQUIRE(hexStr(out_vec) == expected_out);
+	delete prp;
+}
+
+TEST_CASE("PRF", "[AES, PRF]")
+{
+	SECTION("OpenSSL PRP")
+	{
+		test_prp<OpenSSLAES>("2b7e151628aed2a6abf7158809cf4f3c", "6bc1bee22e409f96e93d7e117393172a", "3ad77bb40d7a3660a89ecaf32466ef97");
+	}
+	SECTION("TRIPLE DES")
+	{
+		string key = "1234567890123456ABCDEFGH";
+		string plain = "The quic";
+		test_prp<OpenSSLTripleDES>(boost::algorithm::hex(key), boost::algorithm::hex(plain), "13d4d3549493d287");
+	}
+	SECTION("HMAC")
+	{
+		string key = "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b";
+		char const * plain = "Hi There";
+		string expected_out_hex = "b617318655057264e28bc0b6fb378c8ef146be00";
+
+		// create mac and set key
+		auto mac = new OpenSSLHMAC();
+		string s = boost::algorithm::unhex(key);
+		char const *c = s.c_str();
+		SecretKey sk = SecretKey((byte *)c, strlen(c), mac->getAlgorithmName());
+		mac->setKey(sk);
+
+		// compute_block for plain 
+		int in_len = strlen(plain);
+		vector<byte> in_vec, out_vec;
+		copy_byte_array_to_byte_vector((byte*)plain, in_len, in_vec, 0);
+		mac->computeBlock(in_vec, 0, in_len, out_vec, 0);
+
+		// clean 
+		delete mac;
+		
+		// verify 
+		REQUIRE(hexStr(out_vec) == expected_out_hex);
 	}
 }
 
