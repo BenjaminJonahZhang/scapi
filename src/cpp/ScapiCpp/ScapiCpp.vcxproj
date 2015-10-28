@@ -112,6 +112,7 @@
     <ClCompile Include="src\MathAlgorithms.cpp" />
     <ClCompile Include="src\OpenSSLPrf.cpp" />
     <ClCompile Include="src\prf.cpp" />
+    <ClCompile Include="src\Prg.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
