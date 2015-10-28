@@ -46,7 +46,8 @@ typedef unsigned char byte;		// put in global namespace to avoid ambiguity with 
 int find_log2_floor(biginteger);
 int NumberOfBits(biginteger bi);
 size_t bytesCount(biginteger value);
-void gen_random_bytes_vector(vector<byte> &v, const int len);
+mt19937 get_seeded_random();
+void gen_random_bytes_vector(vector<byte> &v, const int len, mt19937 random = get_seeded_random());
 void copy_byte_vector_to_byte_array(const vector<byte> &source_vector, byte * dest, int beginIndex);
 void copy_byte_array_to_byte_vector(const byte* src, int src_len, vector<byte>& target_vector, int beginIndex);
 /*

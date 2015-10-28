@@ -1,7 +1,7 @@
 #ifndef SCAPI_OPENSSL_PRF_H
 #define SCAPI_OPENSSL_PRF_H
 
-#include "prf.hpp"
+#include "Prf.hpp"
 #include "HashOpenSSL.hpp"
 #include "Key.hpp"
 #include <openssl/rand.h>
@@ -114,6 +114,7 @@ public:
 	* @param secretKey the secret key
 	*/
 	void setKey(SecretKey secretKey) override;
+	void setMacKey(SecretKey secretKey) override { setKey(secretKey); };
 	bool isKeySet() override { return _isKeySet; };
 	string getAlgorithmName() override;
 	int getBlockSize() override { return EVP_MD_size(hmac->md); };

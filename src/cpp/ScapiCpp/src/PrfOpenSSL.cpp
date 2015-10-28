@@ -1,4 +1,4 @@
-#include "../include/OpenSSLPrf.hpp"
+#include "../include/PrfOpenSSL.hpp"
 #include <algorithm>
 
 /*************************************************/
@@ -62,7 +62,7 @@ void OpenSSLPRP::optimizedCompute(const vector<byte> & inBytes, vector<byte> &ou
 void OpenSSLPRP::computeBlock(const vector<byte> & inBytes, int inOff, int inLen, vector<byte> &outBytes, int outOff, int outLen) {
 	if (!isKeySet())
 		throw IllegalStateException("secret key isn't set");
-	// àhe checks on the offset and length are done in the computeBlock(inBytes, inOff, outBytes, outOff).
+	// the checks on the offset and length are done in the computeBlock(inBytes, inOff, outBytes, outOff).
 	if (inLen == outLen && inLen == getBlockSize()) //Checks that the lengths are the same as the block size.
 		computeBlock(inBytes, inOff, outBytes, outOff);
 	else

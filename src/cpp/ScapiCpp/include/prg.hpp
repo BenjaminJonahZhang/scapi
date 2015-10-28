@@ -5,6 +5,7 @@
 #include "Key.hpp"
 #include "prf.hpp"
 #include "Factories.hpp"
+#include <openssl/rc4.h>
 
 /**
 * Parameters for PrgFromPrf key generation.
@@ -83,7 +84,7 @@ class ScPrgFromPrf : public PseudorandomGenerator {
 private:
 	PseudorandomFunction * prf;	// Underlying PRF.
 	vector<byte> ctr;			// Counter used for key generation.
-	bool isKeySet;
+	bool _isKeySet=false;
 	/**
 	* Increases the ctr byte array by 1 bit.
 	*/
@@ -94,20 +95,47 @@ public:
 	* Constructor that lets the user choose the underlying PRF algorithm.
 	* @param prf underlying PseudorandomFunction.
 	*/
-	ScPrgFromPrf(PseudorandomFunction * prf) {prf = prf; };
+	ScPrgFromPrf(PseudorandomFunction * prf) {this->prf = prf; };
 	/**
 	* Constructor that lets the user choose the underlying PRF algorithm.
 	* @param prfName PseudorandomFunction algorithm name.
 	*/
-	ScPrgFromPrf(string prfName) : ScPrgFromPrf(PrfFactory.getInstance().getObject(prfName)) {};
+	ScPrgFromPrf(string prfName) : ScPrgFromPrf(PrfFactory::getInstance().getObject(prfName)) {};
 
 	void setKey(SecretKey secretKey) override;
-	bool isKeySet() override { return isKeySet; };
+	bool isKeySet() override { return _isKeySet; };
 	string getAlgorithmName() override { return "PRG_from_" + prf->getAlgorithmName(); };
 	SecretKey generateKey(AlgorithmParameterSpec keyParams) override { return prf->generateKey(keyParams); };
 	SecretKey generateKey(int keySize) override { return prf->generateKey(keySize); };
 	void getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
-}
+};
+
+/**
+* This class wraps the OpenSSL implementation of RC4.
+* RC4 is a well known stream cipher, that is essentially a pseudorandom generator.<p>
+* In our implementation, we throw out the first 1024 bits since the first few bytes have been shown to have some bias.
+**/
+class OpenSSLRC4 : public RC4 {
+private:
+	RC4_KEY *rc4; //pointer to the openssl RC4 object.
+	mt19937 random;
+	bool _isKeySet=false;
+
+public:
+	OpenSSLRC4(mt19937 random = get_seeded_random()) {
+		this->random = random;
+		rc4 = new RC4_KEY();
+	}
+	void setKey(SecretKey secretKey) override;	
+	bool isKeySet() override { return _isKeySet; };
+	string getAlgorithmName() override { return "RC4"; };
+	SecretKey generateKey(AlgorithmParameterSpec keyParams) override{
+		throw NotImplementedException("To generate a key for this prg object use the generateKey(int keySize) function");
+	}
+	SecretKey generateKey(int keySize) override;
+	void getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
+	~OpenSSLRC4();
+};
 
 
 #endif

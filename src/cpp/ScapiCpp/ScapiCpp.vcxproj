@@ -109,9 +109,11 @@
     <ClCompile Include="src\DlogMiracl.cpp" />
     <ClCompile Include="src\DlogOpenSSL.cpp" />
     <ClCompile Include="src\HashOpenSSL.cpp" />
+    <ClCompile Include="src\Kdf.cpp" />
     <ClCompile Include="src\MathAlgorithms.cpp" />
-    <ClCompile Include="src\OpenSSLPrf.cpp" />
-    <ClCompile Include="src\prf.cpp" />
+    <ClCompile Include="src\PrfOpenSSL.cpp" />
+    <ClCompile Include="src\Prf.cpp" />
+    <ClCompile Include="src\Prg.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -124,13 +126,14 @@
     <ClInclude Include="include\Factories.hpp" />
     <ClInclude Include="include\Hash.hpp" />
     <ClInclude Include="include\HashOpenSSL.hpp" />
+    <ClInclude Include="include\Kdf.h" />
     <ClInclude Include="include\Key.hpp" />
-    <ClInclude Include="include\mac.hpp" />
+    <ClInclude Include="include\Mac.hpp" />
     <ClInclude Include="include\MathAlgorithms.hpp" />
     <ClInclude Include="include\DlogOpenSSL.hpp" />
-    <ClInclude Include="include\OpenSSLPrf.hpp" />
-    <ClInclude Include="include\prf.hpp" />
-    <ClInclude Include="include\prg.hpp" />
+    <ClInclude Include="include\PrfOpenSSL.hpp" />
+    <ClInclude Include="include\Prf.hpp" />
+    <ClInclude Include="include\Prg.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>
   <ItemGroup>

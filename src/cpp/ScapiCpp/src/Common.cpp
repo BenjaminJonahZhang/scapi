@@ -1,4 +1,5 @@
 #include "../include/Common.hpp"
+#include <chrono>
 
 /******************************/
 /* Helper Methods *************/
@@ -15,14 +16,14 @@ int NumberOfBits(biginteger bi) {
 	return find_log2_floor(bi) + 1;
 }
 
-void gen_random_bytes_vector(vector<byte> &v, const int len) {
+void gen_random_bytes_vector(vector<byte> &v, const int len, mt19937 random) {
 	static const char alphanum[] =
 		"0123456789"
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz";
 
 	for (int i = 0; i < len; ++i) 
-		v.push_back(alphanum[rand() % (sizeof(alphanum) - 1)]);
+		v.push_back(alphanum[random() % (sizeof(alphanum) - 1)]);
 }
 
 /**
@@ -113,4 +114,9 @@ string hexStr(vector<byte> const & data)
 	return res;
 }
 
-
+mt19937 get_seeded_random() {
+	mt19937 mt;
+	auto seed = chrono::high_resolution_clock::now().time_since_epoch().count();
+	mt.seed(seed);
+	return mt;
+}

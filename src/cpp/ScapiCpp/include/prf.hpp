@@ -237,7 +237,7 @@ class PrpVaryingIOLength : public virtual PseudorandomPermutation, public virtua
 * Marker interface. Every class that implements it is signed as Hmac.
 * Hmac has varying input length and thus implements the interface PrfVaryingInputLength.
 */
-class Hmac : public PrfVaryingInputLength, public UniqueTagMac, public UnlimitedTimes {}; // also inherits from UniqueTagMac but from omitting this since it is midlayer construct
+class Hmac : public virtual PrfVaryingInputLength, public virtual UniqueTagMac, public virtual UnlimitedTimes {}; 
 
 /**
 * This class implements some common functionality of varying input and output length prf classes.

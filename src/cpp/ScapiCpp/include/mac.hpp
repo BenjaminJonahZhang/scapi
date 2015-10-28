@@ -17,7 +17,7 @@ public:
 	* The key can be changed at any time.
 	* @param secretKey secret key
 	*/
-	virtual void setKey(SecretKey secretKey)=0;
+	virtual void setMacKey(SecretKey secretKey)=0;
 
 	/**
 	* An object trying to use an instance of mac needs to check if it has already been initialized.

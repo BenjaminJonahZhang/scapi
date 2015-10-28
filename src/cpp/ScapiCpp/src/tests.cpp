@@ -1,4 +1,5 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+
 #include "../include/common.hpp"
 #include "../include/catch.hpp"
 #include "../include/Dlog.hpp"
@@ -6,7 +7,8 @@
 #include "../include/DlogMiracl.hpp"
 #include "../include/DlogOpenSSL.hpp"
 #include "../include/HashOpenSSL.hpp"
-#include "../include/OpenSSLPrf.hpp"
+#include "../include/PrfOpenSSL.hpp"
+#include "../include/Prg.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -457,6 +459,39 @@ TEST_CASE("PRF", "[AES, PRF]")
 		
 		// verify 
 		REQUIRE(hexStr(out_vec) == expected_out_hex);
+	}
+}
+
+void test_prg(PseudorandomGenerator * prg, string expected_name)
+{
+	REQUIRE(!prg->isKeySet()); // verify key is not set yet
+	auto sk = prg->generateKey(32);
+	prg->setKey(sk);
+	REQUIRE(prg->isKeySet());
+
+	REQUIRE(prg->getAlgorithmName() == expected_name); // verify alg name is as expected
+	vector<byte> out;
+	prg->getPRGBytes(out, 0, 16);
+	REQUIRE(out.size() == 16);
+	vector<byte> out2;
+	prg->getPRGBytes(out2, 0, 16);
+	string s1(out.begin(), out.end());
+	string s2(out2.begin(), out2.end());
+	REQUIRE(s1 != s2);
+}
+
+TEST_CASE("PRG", "[PRG]")
+{
+	SECTION("ScPrgFromPrf")
+	{
+		PseudorandomFunction * prf = new OpenSSLAES();
+		ScPrgFromPrf * scprg = new ScPrgFromPrf(prf);
+		test_prg(scprg, "PRG_from_AES");
+	}
+
+	SECTION("OpenSSLRC4")
+	{
+		test_prg(new OpenSSLRC4(), "RC4");
 	}
 }
 

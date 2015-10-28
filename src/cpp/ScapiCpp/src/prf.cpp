@@ -1,4 +1,4 @@
-#include "../include/prf.hpp"
+#include "../include/Prf.hpp"
 
 void PrpFromPrfFixed::computeBlock(const vector<byte> & inBytes, int inOff, int inLen, vector<byte>& outBytes, int outOff, int outLen) {
 	if (!isKeySet())
