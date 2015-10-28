@@ -114,6 +114,7 @@ public:
 	* @param secretKey the secret key
 	*/
 	void setKey(SecretKey secretKey) override;
+	void setMacKey(SecretKey secretKey) override { setKey(secretKey); };
 	bool isKeySet() override { return _isKeySet; };
 	string getAlgorithmName() override;
 	int getBlockSize() override { return EVP_MD_size(hmac->md); };
