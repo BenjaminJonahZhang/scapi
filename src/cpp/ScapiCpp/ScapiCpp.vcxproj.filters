@@ -101,6 +101,12 @@
     <ClInclude Include="include\Key.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\prg.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Factories.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
