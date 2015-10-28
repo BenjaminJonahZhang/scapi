@@ -1,7 +1,7 @@
 #ifndef SCAPI_OPENSSL_PRF_H
 #define SCAPI_OPENSSL_PRF_H
 
-#include "prf.hpp"
+#include "Prf.hpp"
 #include "HashOpenSSL.hpp"
 #include "Key.hpp"
 #include <openssl/rand.h>
