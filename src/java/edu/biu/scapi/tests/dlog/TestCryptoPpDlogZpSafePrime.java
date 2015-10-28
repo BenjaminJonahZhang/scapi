@@ -6,7 +6,7 @@ import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
 public class TestCryptoPpDlogZpSafePrime extends TestDlogGroupInterface{
 
 	public DlogGroup createInstance(){
-		return new CryptoPpDlogZpSafePrime();
+		return new CryptoPpDlogZpSafePrime(64);
 	}
 	
 	public String getGroupType(){

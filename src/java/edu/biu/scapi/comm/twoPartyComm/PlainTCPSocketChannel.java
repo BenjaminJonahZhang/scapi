@@ -102,7 +102,7 @@ public class PlainTCPSocketChannel extends PlainChannel{
 	 * @param ipAddress other party's IP address.
 	 * @param port other party's port.
 	 */
-	PlainTCPSocketChannel(InetAddress ipAddress, int port, boolean checkIdentity, SocketPartyData me) {
+	public PlainTCPSocketChannel(InetAddress ipAddress, int port, boolean checkIdentity, SocketPartyData me) {
 		this(new InetSocketAddress(ipAddress, port), checkIdentity, me);
 	}
 	
@@ -110,7 +110,7 @@ public class PlainTCPSocketChannel extends PlainChannel{
 	 * A constructor that set the given socket address and set the state of this channel to not ready.
 	 * @param socketAddress other end's InetSocketAddress
 	 */
-	PlainTCPSocketChannel(InetSocketAddress socketAddress, boolean checkIdentity, SocketPartyData me) {
+	public PlainTCPSocketChannel(InetSocketAddress socketAddress, boolean checkIdentity, SocketPartyData me) {
 		super();
 		this.socketAddress = socketAddress;
 		this.checkIdentity = checkIdentity;
@@ -199,7 +199,7 @@ public class PlainTCPSocketChannel extends PlainChannel{
 	 * After the connection has succeeded the output stream is set for the send function.
 	 * @throws IOException 
 	 */
-	protected boolean connect(){
+	public boolean connect(){
 		
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
@@ -222,6 +222,8 @@ public class PlainTCPSocketChannel extends PlainChannel{
 			}	
 		} catch (IOException e) {
 			Logging.getLogger().log(Level.FINEST, e.toString());
+			System.out.println(e.toString());
+			return false;
 		}
 		return true;
 	}

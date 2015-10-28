@@ -78,7 +78,7 @@ public class SSLSocketChannel extends PlainTCPSocketChannel{
 	}
 	
 	@Override
-	protected boolean connect()  {
+	public boolean connect()  {
 		//try to connect
 		Logging.getLogger().log(Level.INFO, "Trying to connect to " + socketAddress.getAddress() + " on port " + socketAddress.getPort());
 		

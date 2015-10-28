@@ -1,8 +1,9 @@
 package edu.biu.scapi.tests.comm;
 
 import org.junit.Test;	
-import static org.junit.Assert.*;
+
 import java.security.InvalidKeyException;
+
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
