@@ -50,6 +50,11 @@ public:
 	* @param outOffset the offset which to put the result bytes from
 	*/
 	virtual void hashFinal(vector<byte> &out, int outOffset)=0;
+
+	/**
+	* Factory method. Create concrete instance of the give algorithm name in the default implementation. 
+	*/
+	static CryptographicHash* get_new_cryptographic_hash(string hash_name="SHA1");
 };
 
 /*****************************************************************

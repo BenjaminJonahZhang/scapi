@@ -9,6 +9,8 @@
 #include "../include/HashOpenSSL.hpp"
 #include "../include/PrfOpenSSL.hpp"
 #include "../include/Prg.hpp"
+#include "../include/Kdf.hpp"
+#include "../include/RandomOracle.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -495,4 +497,39 @@ TEST_CASE("PRG", "[PRG]")
 	}
 }
 
+TEST_CASE("KDF","")
+{
+	SECTION("HKDF")
+	{
+		HKDF hkdf(new OpenSSLHMAC());
+		string s = "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c";
+		string source = boost::algorithm::unhex(s);
+		vector<byte> v_source(source.begin(), source.end());
+		auto sk = hkdf.deriveKey(v_source, 0, v_source.size(), 40);
+		auto v = sk.getEncoded();
+		string s2(v.begin(), v.end());
+	}
+}
+
+void random_oracle_test(RandomOracle * ro, string algName)
+{
+	REQUIRE(ro->getAlgorithmName() == algName);
+	string input = "123456";
+	vector<byte> in_vec(input.begin(), input.end());
+	vector<byte> output;
+	ro->compute(in_vec, 0, 6, output, 6);
+	//REQUIRE(output.size() == 6);
+	string s(output.begin(), output.end());
+	delete ro;
+}
+TEST_CASE("Random Oracle", "")
+{
+	SECTION("HashBasedRO") {
+		random_oracle_test(new HashBasedRO(), "HashBasedRO");
+	}
+	SECTION("HKDFBasedRO") {
+		HKDF hkdf(new OpenSSLHMAC());
+		random_oracle_test(new HKDFBasedRO(&hkdf), "HKDFBasedRO");
+	}
+}
 /// TEST EC Utilities!

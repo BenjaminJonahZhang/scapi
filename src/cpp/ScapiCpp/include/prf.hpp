@@ -82,6 +82,11 @@ public:
 	* @param outOffset output offset in the outBytes array to put the result from
 	*/
 	virtual void computeBlock(const vector<byte> & inBytes, int inOffset, int inLen, vector<byte> &outBytes, int outOffset)=0;
+
+	/**
+	* Factory method. Create concrete instance of the give algorithm name in the default implementation.
+	*/
+	static PseudorandomFunction* get_new_prf(string algName = "AES");
 };
 
 /**

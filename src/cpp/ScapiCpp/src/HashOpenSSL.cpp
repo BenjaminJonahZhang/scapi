@@ -66,3 +66,11 @@ void OpenSSLHash::hashFinal(vector<byte> &out, int outOffset) {
 	copy_byte_array_to_byte_vector(tempOut, length, out, outOffset);
 	delete tempOut;
 }
+
+CryptographicHash* CryptographicHash::get_new_cryptographic_hash(string hashName)
+{
+	set<string> algSet = { "SHA1", "SHA224", "SHA256", "SHA384", "SHA512" };
+	if (algSet.find(hashName) == algSet.end())
+		throw invalid_argument("unexpected hash_name");
+	return new OpenSSLHash(hashName);
+}
