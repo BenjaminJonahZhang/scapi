@@ -3,6 +3,7 @@
 
 #include "Hash.hpp"
 #include <openssl/evp.h>
+#include <set>
 /**
 * A general adapter class of hash for OpenSSL. <p>
 * This class implements all the functionality by passing requests to the adaptee c++ functions,

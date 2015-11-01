@@ -379,3 +379,14 @@ void OpenSSLTripleDES::setKey(SecretKey secretKey) {
 	EVP_CIPHER_CTX_set_padding(invertP, 0);
 	_isKeySet= true;
 }
+
+PseudorandomFunction* PseudorandomFunction::get_new_prf(string algName) {
+	if (algName == "AES")
+		return new OpenSSLAES();
+	if (algName == "TripleDES")
+		return new OpenSSLTripleDES();
+	if (algName == "HMAC")
+		return new OpenSSLHMAC();
+	// wrong algorithm name
+	throw invalid_argument("unexpected prf name");
+}

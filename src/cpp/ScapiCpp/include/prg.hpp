@@ -4,7 +4,6 @@
 #include "Common.hpp"
 #include "Key.hpp"
 #include "prf.hpp"
-#include "Factories.hpp"
 #include <openssl/rc4.h>
 
 /**
@@ -100,7 +99,7 @@ public:
 	* Constructor that lets the user choose the underlying PRF algorithm.
 	* @param prfName PseudorandomFunction algorithm name.
 	*/
-	ScPrgFromPrf(string prfName) : ScPrgFromPrf(PrfFactory::getInstance().getObject(prfName)) {};
+	ScPrgFromPrf(string prfName) : ScPrgFromPrf(PseudorandomFunction::get_new_prf(prfName)) {};
 
 	void setKey(SecretKey secretKey) override;
 	bool isKeySet() override { return _isKeySet; };

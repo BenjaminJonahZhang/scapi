@@ -1,4 +1,5 @@
-#include "../include/Kdf.h"
+#include "../include/Kdf.hpp"
+
 void HKDF::nextRounds(int outLen, const vector<byte> * iv, int hmacLength, vector<byte> & outBytes, vector<byte> & intermediateOutBytes) {
 	int rounds = (int)ceil((float)outLen / (float)hmacLength); // the smallest number so that  hmacLength * rounds >= outLen
 	int currentInBytesSize;	// the size of the CTXInfo and also the round;
@@ -61,7 +62,8 @@ void HKDF::firstRound(vector<byte>& outBytes, const vector<byte> * iv, vector<by
 	hmac->computeBlock(v_in, 0, firstRoundSize, intermediateOutBytes, 0);
 
 	// copies the results to the output array
-	outBytes.insert(outBytes.begin(), &intermediateOutBytes[0], &intermediateOutBytes[outLength]);
+	outBytes = intermediateOutBytes;
+	//outBytes.insert(outBytes.begin(), &intermediateOutBytes[0], &intermediateOutBytes[outLength-1]);
 }
 
 SecretKey HKDF::deriveKey(const vector<byte> & entropySource, int inOff, int inLen, int outLen, const vector<byte>* iv) {
@@ -89,9 +91,9 @@ SecretKey HKDF::deriveKey(const vector<byte> & entropySource, int inOff, int inL
 	char const *c_key = str_key.c_str();
 	hmac->setKey(SecretKey((byte*) c_key, strlen(c_key), ""));
 	int hmacLength = hmac->getBlockSize(); //the size of the output of the hmac.
-	vector<byte> outBytes(outLen); //the output key
+	vector<byte> outBytes;// (outLen); //the output key
 	vector<byte> roundKey; //PRK from the pseudocode
-	vector<byte> intermediateOutBytes(hmacLength); //round result K(i) in the pseudocode
+	vector<byte> intermediateOutBytes;// (hmacLength); //round result K(i) in the pseudocode
 
 	// first computes the new key. The new key is the result of computing the hmac function.
 	//roundKey is now K(0)

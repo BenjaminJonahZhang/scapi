@@ -114,6 +114,7 @@
     <ClCompile Include="src\PrfOpenSSL.cpp" />
     <ClCompile Include="src\Prf.cpp" />
     <ClCompile Include="src\Prg.cpp" />
+    <ClCompile Include="src\RandomOracle.cpp" />
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -123,10 +124,9 @@
     <ClInclude Include="include\DlogCryptopp.hpp" />
     <ClInclude Include="include\DlogEllipticCurve.hpp" />
     <ClInclude Include="include\DlogMiracl.hpp" />
-    <ClInclude Include="include\Factories.hpp" />
     <ClInclude Include="include\Hash.hpp" />
     <ClInclude Include="include\HashOpenSSL.hpp" />
-    <ClInclude Include="include\Kdf.h" />
+    <ClInclude Include="include\Kdf.hpp" />
     <ClInclude Include="include\Key.hpp" />
     <ClInclude Include="include\Mac.hpp" />
     <ClInclude Include="include\MathAlgorithms.hpp" />
@@ -134,6 +134,7 @@
     <ClInclude Include="include\PrfOpenSSL.hpp" />
     <ClInclude Include="include\Prf.hpp" />
     <ClInclude Include="include\Prg.hpp" />
+    <ClInclude Include="include\RandomOracle.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -60,6 +60,9 @@
     <ClCompile Include="src\Kdf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RandomOracle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp">
@@ -98,9 +101,6 @@
     <ClInclude Include="include\Key.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Factories.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Prf.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,7 +113,10 @@
     <ClInclude Include="include\Mac.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Kdf.h">
+    <ClInclude Include="include\Kdf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RandomOracle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
