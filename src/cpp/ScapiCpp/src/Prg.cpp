@@ -1,4 +1,4 @@
-#include "../include/prg.hpp"
+#include "../include/Prg.hpp"
 
 void ScPrgFromPrf::setKey(SecretKey secretKey) {
 	prf->setKey(secretKey); //Sets the key to the underlying prf.

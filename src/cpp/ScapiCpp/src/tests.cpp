@@ -186,19 +186,6 @@ TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 		REQUIRE(p3.str() == s2);
 		REQUIRE(biginteger_to_cryptoppint(p3) == cp3);
 	}
-
-	SECTION("sqrt and sqrt with reminder")
-	{
-		REQUIRE(mp::sqrt(biginteger(25)) == 5);
-		REQUIRE(mp::sqrt(biginteger(27)) == 5);
-		biginteger r;
-		auto res = mp::sqrt(biginteger(25), r);
-		REQUIRE(r == 0);
-		REQUIRE(res == 5);
-		res = mp::sqrt(biginteger(29), r);
-		REQUIRE(r == 4);
-		REQUIRE(res == 5);
-	}
 }
 
 TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
