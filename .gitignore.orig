@@ -17,7 +17,6 @@ install/*
 *.log
 target/*
 .settings
-<<<<<<< HEAD
 .metadata/*
 bin/*
 *.suo
@@ -34,11 +33,6 @@ bin/*
 *.sdf
 *.ilk
 *.exe
-=======
-*.suo
-*.sdf
-*.opensdf
->>>>>>> Adding bin and metadata directories.
 *.ipch
 *.obj
 make.dependencies
@@ -49,3 +43,9 @@ make.dependencies
 .lastbuildstate
 *.ilk
 *.idb
+<<<<<<< HEAD
+
+=======
+src/cpp/code examples/readme.txt
+ScapiCpp.lib
+>>>>>>> adding code examples

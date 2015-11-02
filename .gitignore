@@ -44,3 +44,5 @@ make.dependencies
 *.ilk
 *.idb
 
+src/cpp/code examples/readme.txt
+ScapiCpp.lib

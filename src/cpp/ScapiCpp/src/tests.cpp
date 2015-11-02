@@ -112,7 +112,7 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 
 TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 
-	boost::mt19937 gen(clock());
+	mt19937 gen(get_seeded_random());
 
 	SECTION("testing pow")
 	{
