@@ -19,9 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9C703BA5-F97D-4C6A-9655-CD1305889089}</ProjectGuid>
+    <ProjectGuid>{FEA1B7F4-8A51-42A4-B85F-F178B4E64595}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -63,26 +62,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
-    <NMakeOutput>ScapiTests.exe</NMakeOutput>
-    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
+    <NMakeOutput>code examples.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>C:\code\gmp-static;C:\Program Files %28x86%29\Boost\boost_1_58_0;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)obj\</OutDir>
-    <IntDir>obj\</IntDir>
-    <LibraryPath>C:\code\gmp-static;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
-    <NMakeOutput>ScapiTests.exe</NMakeOutput>
-    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
+    <NMakeOutput>code examples.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\code\Builds\Miracl Build\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -90,52 +75,18 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\OpenSSL-Win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\code\Builds\Miracl Build\test_folder\miracl.lib;C:\OpenSSL-Win64\lib\libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;C:\OpenSSL-Win64\lib\libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Common.cpp" />
-    <ClCompile Include="src\Dlog.cpp" />
-    <ClCompile Include="src\DlogCryptopp.cpp" />
-    <ClCompile Include="src\DlogOpenSSL.cpp" />
-    <ClCompile Include="src\HashOpenSSL.cpp" />
-    <ClCompile Include="src\Kdf.cpp" />
-    <ClCompile Include="src\MathAlgorithms.cpp" />
-    <ClCompile Include="src\PrfOpenSSL.cpp" />
-    <ClCompile Include="src\Prf.cpp" />
-    <ClCompile Include="src\Prg.cpp" />
-    <ClCompile Include="src\RandomOracle.cpp" />
-    <ClCompile Include="src\tests.cpp" />
+    <ClCompile Include="simple_dlog.cpp" />
+    <ClCompile Include="simple_sha1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\catch.hpp" />
-    <ClInclude Include="include\Common.hpp" />
-    <ClInclude Include="include\Dlog.hpp" />
-    <ClInclude Include="include\DlogCryptopp.hpp" />
-    <ClInclude Include="include\Hash.hpp" />
-    <ClInclude Include="include\HashOpenSSL.hpp" />
-    <ClInclude Include="include\Kdf.hpp" />
-    <ClInclude Include="include\Key.hpp" />
-    <ClInclude Include="include\Mac.hpp" />
-    <ClInclude Include="include\MathAlgorithms.hpp" />
-    <ClInclude Include="include\DlogOpenSSL.hpp" />
-    <ClInclude Include="include\PrfOpenSSL.hpp" />
-    <ClInclude Include="include\Prf.hpp" />
-    <ClInclude Include="include\Prg.hpp" />
-    <ClInclude Include="include\RandomOracle.hpp" />
-    <ClInclude Include="include\SecurityLevel.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Makefile" />
+    <None Include="..\ScapiCpp\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -30,3 +30,5 @@ make.dependencies
 .lastbuildstate
 *.ilk
 *.idb
+src/cpp/code examples/readme.txt
+ScapiCpp.lib
