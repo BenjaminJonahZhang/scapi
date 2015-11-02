@@ -309,7 +309,7 @@ public:
 	IteratedPrfVarying(string prfVaryingInputName) { /* TODO: implement */ };
 	IteratedPrfVarying(PrfVaryingInputLength * prfVaryingInput) { prfVaryingInputLength = prfVaryingInput; };
 	string getAlgorithmName() override { return "ITERATED_PRF_VARY_INOUT"; };
-	int getBlockSize() override { throw exception("prp varying has no fixed block size"); };
+	int getBlockSize() override { throw runtime_error("prp varying has no fixed block size"); };
 	/**
 	* Computes the iterated permutation. <p>
 	*
@@ -392,7 +392,7 @@ class LubyRackoffPrpFromPrfVarying : public PrpFromPrfVarying {
 	*/
 	void invertBlock(const vector<byte> & inBytes, int inOff, vector<byte>& outBytes, int outOff, int len) override;
 	string getAlgorithmName() override { return "LUBY_RACKOFF_PRP_FROM_PRF_VARYING"; };
-	int getBlockSize() override { throw exception("prp varying has no fixed block size"); };
+	int getBlockSize() override { throw runtime_error("prp varying has no fixed block size"); };
 };
 
 

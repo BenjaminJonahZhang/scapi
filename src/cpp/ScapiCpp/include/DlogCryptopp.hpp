@@ -3,11 +3,17 @@
 
 
 #include "Dlog.hpp"
-// CryptoPP includes
-#include <gfpcrypt.h>
 #include <random>
+// CryptoPP includes
+#ifdef __linux__ 
+#include <crypto++/gfpcrypt.h>
+#include <crypto++/cryptlib.h>
+#include <crypto++/osrng.h>
+#elif _WIN32
+#include <gfpcrypt.h>
 #include <cryptlib.h>
 #include <osrng.h>
+#endif
 
 /**********************/
 /**** Helpers *********/

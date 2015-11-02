@@ -3,7 +3,7 @@
 
 #include "Common.hpp"
 #include "Key.hpp"
-#include "prf.hpp"
+#include "Prf.hpp"
 #include <openssl/rc4.h>
 
 /**

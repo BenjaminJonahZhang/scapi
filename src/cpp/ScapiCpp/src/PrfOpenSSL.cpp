@@ -304,7 +304,7 @@ bool OpenSSLHMAC::verify(const vector<byte> &msg, int offset, int msgLength, vec
 	// compares the real tag to the given tag.
 	// for code-security reasons, the comparison is fully performed. that is, even if we know already after the first few bits 
 	// that the tag is not equal to the mac, we continue the checking until the end of the tag bits.
-	boolean equal = true;
+	bool equal = true;
 	int length = macTag.size();
 	for (int i = 0; i<length; i++) {
 		if (macTag[i] != tag[i]) {
