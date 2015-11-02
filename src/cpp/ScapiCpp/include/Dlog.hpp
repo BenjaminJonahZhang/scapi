@@ -41,8 +41,8 @@ public:
 	*/
 	virtual GroupElementSendableData * generateSendableData() = 0;	
 
-	virtual bool GroupElement::operator==(const GroupElement &other) const=0;
-	virtual bool GroupElement::operator!=(const GroupElement &other) const=0;
+	virtual bool operator==(const GroupElement &other) const=0;
+	virtual bool operator!=(const GroupElement &other) const=0;
 	virtual ~GroupElement() {};
 };
 
@@ -556,8 +556,8 @@ public:
 	ZpSafePrimeElement(biginteger elementValue) { element = elementValue; };
 	biginteger getElementValue() override { return element; };
 	bool isIdentity() override { return element == 1; }
-	bool ZpSafePrimeElement::operator==(const GroupElement &other) const override;
-	bool ZpSafePrimeElement::operator!=(const GroupElement &other) const override;
+	bool operator==(const GroupElement &other) const override;
+	bool operator!=(const GroupElement &other) const override;
 	virtual string toString() = 0; 
 	GroupElementSendableData * generateSendableData() override;
 };

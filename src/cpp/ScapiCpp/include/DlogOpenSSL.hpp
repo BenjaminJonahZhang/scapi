@@ -46,7 +46,7 @@ class OpenSSLDlogZpSafePrime : public DlogGroupAbs, public DDH {
 private:
 	OpenSSLDlogZpAdapter* dlog; // Pointer to the native group object.
 	OpenSSLDlogZpAdapter* createOpenSSLDlogZpAdapter(biginteger p, biginteger q, biginteger g);
-	OpenSSLDlogZpAdapter * OpenSSLDlogZpSafePrime::createRandomOpenSSLDlogZpAdapter(int numBits);
+	OpenSSLDlogZpAdapter * createRandomOpenSSLDlogZpAdapter(int numBits);
 	int calcK(biginteger p);
 
 protected:

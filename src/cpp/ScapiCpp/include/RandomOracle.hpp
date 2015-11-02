@@ -1,6 +1,6 @@
 #pragma once
 #include "HashOpenSSL.hpp"
-#include "kdf.hpp"
+#include "Kdf.hpp"
 
 /**
 * This interface is the general interface of Random Oracle. Every class in this family should implement this interface.
