@@ -105,8 +105,6 @@
     <ClCompile Include="src\Common.cpp" />
     <ClCompile Include="src\Dlog.cpp" />
     <ClCompile Include="src\DlogCryptopp.cpp" />
-    <ClCompile Include="src\DlogElipticCurve.cpp" />
-    <ClCompile Include="src\DlogMiracl.cpp" />
     <ClCompile Include="src\DlogOpenSSL.cpp" />
     <ClCompile Include="src\HashOpenSSL.cpp" />
     <ClCompile Include="src\Kdf.cpp" />
@@ -122,8 +120,6 @@
     <ClInclude Include="include\Common.hpp" />
     <ClInclude Include="include\Dlog.hpp" />
     <ClInclude Include="include\DlogCryptopp.hpp" />
-    <ClInclude Include="include\DlogEllipticCurve.hpp" />
-    <ClInclude Include="include\DlogMiracl.hpp" />
     <ClInclude Include="include\Hash.hpp" />
     <ClInclude Include="include\HashOpenSSL.hpp" />
     <ClInclude Include="include\Kdf.hpp" />

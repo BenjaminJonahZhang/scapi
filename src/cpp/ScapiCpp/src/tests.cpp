@@ -4,7 +4,6 @@
 #include "../include/catch.hpp"
 #include "../include/Dlog.hpp"
 #include "../include/DlogCryptopp.hpp"
-#include "../include/DlogMiracl.hpp"
 #include "../include/DlogOpenSSL.hpp"
 #include "../include/HashOpenSSL.hpp"
 #include "../include/PrfOpenSSL.hpp"
@@ -245,29 +244,6 @@ TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
 	}
 }
 
-TEST_CASE("reading file and properties map", "[file, map, properties]")
-{
-	SECTION("property map") {
-		CfgMap config;
-		config["AB"] = "Z";
-		auto it = config.find("AB");
-		REQUIRE(it != config.end());
-		REQUIRE(it->second == "Z");
-	}
-
-}
-
-TEST_CASE("Miracl big", "[big, miracl, biginteger")
-{
-	auto bi_rsa100 = biginteger(rsa100);
-	auto d = biginteger_to_big(bi_rsa100);
-	size_t len = bytesCount(bi_rsa100);
-	byte * output = new byte[len];
-	encodeBigInteger(bi_rsa100, output, len);
-	big result = mirvar(0);
-	bytes_to_big(len, (char *) output, result);
-}
-
 /***************************************************/
 /***********TESTING DLOG IMPLEMENTATIONS******************/
 /*****************************************************/
@@ -356,16 +332,6 @@ TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 		DlogGroup * dg = new CryptoPpDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
 		test_all(dg);
 		//delete dg;
-	}
-	SECTION("testing DlogMiracl")
-	{
-		MiraclDlogECFp * md = new MiraclDlogECFp();
-		//test_all(dg);
-		test_multiply_group_elements(md, false);
-		test_simultaneous_multiple_exponentiations(md);
-		test_exponentiate(md);
-		//test_exponentiate_with_pre_computed_values(dg); - NOT WORKING!
-//		test_encode_decode(md); - NOT WORKING YET!
 	}
 	SECTION("test OpenSSLZpSafePrime implementation")
 	{
