@@ -3,7 +3,7 @@
 SCAPI in C++ (Beta)
 ---------------------
 
-Until recently Scapi was a java-only library that in some cases warpped native elements using JNI.
+Until recently Scapi was a java-only library that in some cases wrapped native elements using JNI.
 We recently started to implement a c++ version of Scapi.
 Java-Scapi is great for fast development of application and for POCing cryptographic protocols.
 However, when performance is a main concern, a c++ implementation might be more suitable.
