@@ -18,7 +18,7 @@ C++ Scapi is very simple to build, and link against.
 
 .. _Linux:
 
-Prequisities on Linux
+Prerequisites on Linux
 ---------------------
 There are a few prerequisites you must install before being able to compile scapi on your machine. 
 You'll need to install:
