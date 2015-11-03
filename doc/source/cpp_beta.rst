@@ -3,10 +3,10 @@
 SCAPI in C++ (Beta)
 ---------------------
 
-Until recently Scapi was a java-only library that in some cases warpped native constructs using JNI.
+Until recently Scapi was a java-only library that in some cases warpped native elements using JNI.
 We recently started to implement a c++ version of Scapi.
-Java scapi is great for fast development of application and protocols that need cryptographic constract.
-However, when performance is the main concern a c++ implementation might be more suitable.
+Java-Scapi is great for fast development of application and for POCing cryptographic protocols.
+However, when performance is a main concern, a c++ implementation might be more suitable.
 
 This is still "work in progress" and should be considered as beta. 
 Currently the main part that was implemented is the "primitive layer" of scapi
@@ -31,9 +31,10 @@ You'll need to install:
 
 On Ubuntu environment is should look like: ::
 
+  $ sudo apt-get update
   $ sudo apt-get install build-essential
   $ sudo apt-get install git
-  $ sudo apt-get install boost libboost-all-dev
+  $ sudo apt-get install libboost-all-dev
   $ sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
   $ sudo apt-get install libssl-ocaml-dev libsslcommon2-dev
 
@@ -48,7 +49,7 @@ In order to install scapi: ::
   
 Running the tests
 ---------------------------------------------------
-Compiling c++ scapi create file called ``ScapiTests.exe``. Exceuting this file with run all the c++ test.
+When building c++ Scapi, a file called ``ScapiTests.exe`` is created. Exceuting this file will run all the c++ related tests.
 All of them should pass and you should get a notification about it.
 
 Likning against the scapi lib
