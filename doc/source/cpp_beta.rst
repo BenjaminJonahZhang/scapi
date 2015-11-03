@@ -1,4 +1,4 @@
-.. _cpp:
+.. _cpp_beta:
 
 Introduction
 ============
