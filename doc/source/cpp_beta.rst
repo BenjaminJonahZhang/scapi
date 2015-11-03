@@ -1,7 +1,7 @@
 .. _cpp_beta:
 
-Introduction
-============
+SCAPI in C++ (Beta)
+---------------------
 
 Until recently Scapi was a java-only library that in some cases warpped native constructs using JNI.
 We recently started to implement a c++ version of Scapi.
@@ -13,7 +13,7 @@ Currently the main part that was implemented is the "primitive layer" of scapi
 but the scapi team is working these days on expending the c++ implementaion further.
 
 Installation
-============
+---------------------
 C++ Scapi is very simple to build, and link against.
 
 .. _Linux:
