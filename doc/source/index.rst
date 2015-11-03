@@ -16,6 +16,7 @@ SCAPI Documentation
    primitives
    mid_layer
    interactive_layer
+   c++
    license
 
 ..   circuits
