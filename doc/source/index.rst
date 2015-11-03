@@ -1,7 +1,7 @@
 Welcome to SCAPI
 ================
 
-SCAPI is an open-source Java library for implementing secure two-party and multiparty computation protocols (SCAPI stands for the "Secure Computation API"). It provides a reliable, efficient, and highly flexible cryptographic infrastructure. SCAPI is free and is licensed under an adaptation of the MIT license, you can read more about the license :ref:`here <license>`.
+SCAPI is an open-source Java library for implementing secure two-party and multiparty computation protocols (SCAPI stands for the "Secure Computation API"). It provides a reliable, efficient, and highly flexible cryptographic infrastructure. SCAPI also has a c++ version currently in beat. SCAPI is free and is licensed under an adaptation of the MIT license, you can read more about the license :ref:`here <license>`.
 
 SCAPI Documentation
 -------------------
