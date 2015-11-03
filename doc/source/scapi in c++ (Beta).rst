@@ -1,4 +1,4 @@
-.. _c++:
+.. _cpp:
 
 Introduction
 ============
