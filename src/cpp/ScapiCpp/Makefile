@@ -10,7 +10,7 @@ OUT_DIR = obj
 CPP_OPTIONS:= -std=c++11 -lcrypto++ -lcrypto -L/usr/lib
 CPP_LINK_OPTIONS:= -lcrypto++ -lcrypto
 
-all:: directories $(SLib) 
+all:: directories $(SLib) $(Program) 
 
 directories: $(OUT_DIR)
 
