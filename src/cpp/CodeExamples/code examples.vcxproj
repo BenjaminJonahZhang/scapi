@@ -79,14 +79,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="makefile" />
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="simple_dlog.cpp" />
     <ClCompile Include="simple_sha1.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ScapiCpp\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

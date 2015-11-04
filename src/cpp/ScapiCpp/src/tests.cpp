@@ -7,6 +7,7 @@
 #include "../include/DlogOpenSSL.hpp"
 #include "../include/HashOpenSSL.hpp"
 #include "../include/PrfOpenSSL.hpp"
+#include "../include/TrapdoorPermutationOpenSSL.hpp"
 #include "../include/Prg.hpp"
 #include "../include/Kdf.hpp"
 #include "../include/RandomOracle.hpp"
@@ -485,4 +486,21 @@ TEST_CASE("Random Oracle", "")
 		random_oracle_test(new HKDFBasedRO(&hkdf), "HKDFBasedRO");
 	}
 }
-/// TEST EC Utilities!
+
+TEST_CASE("TrapdoorPermutation", "")
+{
+	SECTION("OpenSSL") {
+		auto tp = OpenSSLRSAPermutation();
+		REQUIRE(tp.getAlgorithmName() == "OpenSSLRSA");
+		biginteger public_mod = 55;
+		int public_exponent = 3;
+		int private_exponent = 7;
+		tp.setKey(new RSAPublicKey(public_mod, public_exponent), new RSAPrivateKey(public_mod, private_exponent));
+		RSAElement * re_src = (RSAElement *) tp.generateRandomTPElement();
+		auto re_enc = tp.compute(re_src);
+		auto re_inv = tp.invert(re_enc);
+		CAPTURE(re_enc->getElement());
+		REQUIRE(re_inv->getElement() == re_src->getElement());
+	}
+}
+

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
+    <Text Include="makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="simple_dlog.cpp">
@@ -24,8 +25,5 @@
     <ClCompile Include="simple_sha1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ScapiCpp\Makefile" />
   </ItemGroup>
 </Project>

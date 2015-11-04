@@ -30,7 +30,62 @@ public:
 	vector<byte> getEncoded() override { return key; };
 };
 
+class PublicKey : public Key {};
+class PrivateKey : public Key {};
+class KeySpec {};
+
+class KeyPair {
+private:
+	PublicKey * publicKey;
+	PrivateKey * privateKey;
+public:
+	KeyPair(PublicKey * pubk, PrivateKey * pvk) {
+		publicKey = pubk;
+		privateKey = pvk;
+	};
+	PublicKey * GetPublic() { return publicKey; };
+	PrivateKey * GetPrivate() { return privateKey; };
+};
+
+class RSAKey {
+private:
+	biginteger modulus;
+public:
+	RSAKey(biginteger mod) { modulus = mod; };
+	biginteger getModulus() { return modulus; };
+};
+
+class RSAPublicKey : public RSAKey, public PublicKey {
+private:
+	biginteger publicExponent;
+public:
+	RSAPublicKey(biginteger mod, biginteger pubExp) : RSAKey(mod) { publicExponent = pubExp; };
+	biginteger getPublicExponent() { return publicExponent; };
+	string getAlgorithm() override { return "RSA"; };
+	vector<byte> getEncoded() override { throw NotImplementedException(""); };
+};
+
+class RSAPrivateKey : public RSAKey, public PrivateKey {
+private:
+	biginteger privateExponent;
+public:
+	RSAPrivateKey(biginteger mod, biginteger privExp) : RSAKey(mod) { privateExponent = privExp; };
+	biginteger getPrivateExponent() { return privateExponent; };
+	string getAlgorithm() override { return "RSA"; };
+	vector<byte> getEncoded() override { throw NotImplementedException(""); };
+};
+
+class RSAPrivateCrtKey : public RSAPrivateKey {
+public:
+	virtual biginteger getPublicExponent() = 0;
+	virtual biginteger getPrimeP() = 0;
+	virtual biginteger getPrimeQ() = 0;
+	virtual biginteger getPrimeExponentP() = 0;
+	virtual biginteger getPrimeExponentQ() = 0;
+	virtual biginteger getCrtCoefficient() = 0;
+};
+
 class AlgorithmParameterSpec {};
 
-
+class RSAKeyGenParameterSpec : public AlgorithmParameterSpec {};
 #endif

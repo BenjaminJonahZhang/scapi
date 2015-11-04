@@ -35,7 +35,7 @@
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
@@ -115,6 +115,8 @@
     <ClCompile Include="src\Prg.cpp" />
     <ClCompile Include="src\RandomOracle.cpp" />
     <ClCompile Include="src\tests.cpp" />
+    <ClCompile Include="src\TrapdoorPermutation.cpp" />
+    <ClCompile Include="src\TrapdoorPermutationOpenSSL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\catch.hpp" />
@@ -133,6 +135,8 @@
     <ClInclude Include="include\Prg.hpp" />
     <ClInclude Include="include\RandomOracle.hpp" />
     <ClInclude Include="include\SecurityLevel.hpp" />
+    <ClInclude Include="include\TrapdoorPermutationOpenSSL.hpp" />
+    <ClInclude Include="include\TrapdoorPermutations.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
