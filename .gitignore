@@ -1,0 +1,13 @@
+.classpath
+.project
+*.log
+*.tlog
+*.lastbuildstate
+*.obj
+*.idb
+*.pdb
+*.suo
+*.opensdf
+*.sdf
+*.exe
+*.ilk

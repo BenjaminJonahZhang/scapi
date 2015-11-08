@@ -1,7 +1,11 @@
+edu.biu.SCProtocols.YaoProtocol.src
 edu.biu.scapi.circuits.circuit
 edu.biu.scapi.circuits.encryption
+edu.biu.scapi.circuits.fastGarbledCircuit
 edu.biu.scapi.circuits.garbledCircuit
 edu.biu.scapi.comm
+edu.biu.scapi.comm.multiPartyComm
+edu.biu.scapi.comm.twoPartyComm
 edu.biu.scapi.exceptions
 edu.biu.scapi.generals
 edu.biu.scapi.interactiveMidProtocols
@@ -30,9 +34,11 @@ edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.and
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.cramerShoupEncryptedValue
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikEncryptedValue
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikEncryptedZero
+edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikKnowledge
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikProduct
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtended
+edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtendedStatistical
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge
 edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue
