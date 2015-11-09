@@ -12,12 +12,6 @@ This is still "work in progress" and should be considered as beta.
 Currently the main part that was implemented is the "primitive layer" of scapi
 but the scapi team is working these days on expending the c++ implementaion further.
 
-.. _Installation:
-
-Installation
----------------------
-C++ Scapi is very simple to build, and link against.
-
 .. _Linux:
 
 Prerequisites on Linux
@@ -54,7 +48,8 @@ In order to install scapi: ::
 .. _Tests:
 
 Running the tests
----------------------------------------------------
+-----------------
+
 When building c++ Scapi, a file called ``ScapiTests.exe`` is created. Exceuting this file will run all the c++ related tests.
 All of them should pass and you should get a notification about it.
 
@@ -62,6 +57,7 @@ All of them should pass and you should get a notification about it.
 
 Likning against the scapi lib
 -----------------------------
+
 We inlcuded few sample files for quick start: ::
 
   $ cd scapi/src/cpp/CodeExamples
