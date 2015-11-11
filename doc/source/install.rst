@@ -7,18 +7,18 @@ Scapi is simple enough to install, the installation varies on different operatin
 
 .. _Linux:
 
-Prequisities on Linux
+Prerequisites on Linux
 ---------------------
 
 There are a few prerequisites you must install before being able to compile scapi on your machine.
 
 1.  Install `git`_
-2.  Install `java`_ and `ant`_
+2.  Install `java`_, `junit4`_, and `ant`_
 3.  Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc. Under Ubuntu you can simply run ``sudo apt-get install build-essential``.
 
 .. _`Mac OS X`:
 
-Prequisities on Mac OS X
+Prerequisites on Mac OS X
 ------------------------
 
 On Mac OS X, `git`_ is usually preinstalled, and so are `java`_ and the `gcc`_ compiler environment.
@@ -26,7 +26,7 @@ However, `ant`_ is not preinstalled, and you must install it via `homebrew`_: ::
 
   $ brew install ant
 
-Prequisities OS X 10.9 (Mavericks) and above
+Prerequisites OS X 10.9 (Mavericks) and above
 --------------------------------------------
 
 Starting in OS X Mavericks, apple has switched the default compiler from `gcc`_ to `clang`_.
@@ -103,3 +103,4 @@ On Eclipse:
 .. _clang: http://clang.llvm.org/
 .. _homebrew: http://brew.sh/
 .. _jdk-1-8-on-linux: http://stackoverflow.com/questions/24996017/jdk-1-8-on-linux-missing-include-file
+.. _junit4: http://packages.ubuntu.com/precise/devel/junit4
