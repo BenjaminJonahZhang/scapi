@@ -4,13 +4,14 @@
   <!--build properties-->
   <property name="scapi.build.directory" value="build/scapi"/>
   <property name="scapi.build.output" value="build/scapi/classes"/>
-  <property name="scapi.build.version" value="2-3-0"/>
-  <property name="scapi.build.final.name" value="Scapi-V${scapi.build.version}"/>
+  <property name="scapi.build.version" value="2.4"/>
+  <property name="scapi.build.final.name" value="Scapi-${scapi.build.version}"/>
 
   <!--external dependencies-->
-  <property name="scapi.depend.bouncycastle.filename" value="bcprov-jdk15on-150"/>
+  <property name="scapi.depend.bouncycastle.filename" value="bcprov-jdk16-146"/>
   <property name="scapi.depend.apachecommons.filename" value="commons-exec-1.2"/>
   <property name="scapi.depend.activemq.filename" value="activemq-all-5.9.1"/>
+  <property name="scapi.depend.junit.filename" value="junit4"/>
   
   <!--paths-->
   <path id="bouncy-castle">
@@ -25,6 +26,10 @@
     <pathelement location="assets/${scapi.depend.activemq.filename}.jar"/>
   </path>
   
+ <path id="junit">
+	<pathelement location="/usr/share/java/${scapi.depend.junit.filename}.jar"/>
+ </path>  
+ 
   <!--targets-->
   <target name="clean" description="Clean the output directory">
     <delete dir="${scapi.build.directory}"/>
@@ -33,13 +38,13 @@
   <target name="compile" description="Compile the code">
     <mkdir dir="${scapi.build.output}"/>
     <javac destdir="${scapi.build.output}" debug="true" optimize="false" includeAntRuntime="false" encoding="ISO-8859-1">
-      <src>
-        <pathelement location="${basedir}/src/java"/>
-      </src>
+      <src path="${basedir}/src/java"/>
+       <exclude name="**/edu/biu/SCProtocols/**"/>
       <classpath>
         <path refid="bouncy-castle"/>
-	<path refid="apache-commons-exec"/>
-	<path refid="active-mq"/>
+		<path refid="apache-commons-exec"/>
+		<path refid="active-mq"/>
+		<path refid="junit"/>
       </classpath>
     </javac>
   </target>

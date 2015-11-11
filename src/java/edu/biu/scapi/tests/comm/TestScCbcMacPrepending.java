@@ -113,10 +113,10 @@ public class TestScCbcMacPrepending {
 	@Test
 	public void TestNativeConnectionSanity() throws UnknownHostException{
 		InetAddress ip = InetAddress.getByName("127.0.0.1");
-		SocketPartyData party0 = new SocketPartyData(ip, 25001);
-		SocketPartyData party1 = new SocketPartyData(ip, 25002);
-		String dataFrom0To1 = "Hi 1 this is 0";
-		String dataFrom1To0 = "Hi 0 this is 1";
+		final SocketPartyData party0 = new SocketPartyData(ip, 25001);
+		final SocketPartyData party1 = new SocketPartyData(ip, 25002);
+		final String dataFrom0To1 = "Hi 1 this is 0";
+		final String dataFrom1To0 = "Hi 0 this is 1";
 		(new Thread() {
 			  public void run() {
 				  Channel c0 = setCommunication(party0, party1);
@@ -129,10 +129,10 @@ public class TestScCbcMacPrepending {
 	@Test
 	public void TestNonNativeConnectionSanity() throws UnknownHostException{
 		InetAddress ip = InetAddress.getByName("127.0.0.1");
-		Party party0 = new Party(ip, 25003);
-		Party party1 = new Party(ip, 25004);
-		String dataFrom0To1 = "Hi 1 this is 0";
-		String dataFrom1To0 = "Hi 0 this is 1";
+		final Party party0 = new Party(ip, 25003);
+		final Party party1 = new Party(ip, 25004);
+		final String dataFrom0To1 = "Hi 1 this is 0";
+		final String dataFrom1To0 = "Hi 0 this is 1";
 		(new Thread() {
 			  public void run() {
 				  Channel c0 = setCommunicationNotNative(party0, party1);
