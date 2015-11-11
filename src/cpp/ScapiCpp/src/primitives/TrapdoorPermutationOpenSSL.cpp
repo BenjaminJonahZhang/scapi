@@ -1,4 +1,4 @@
-#include "../include/TrapdoorPermutationOpenSSL.hpp"
+#include "../../include/primitives/TrapdoorPermutationOpenSSL.hpp"
 
 
 void OpenSSLRSAPermutation::setKey(PublicKey* publicKey, PrivateKey* privateKey) {

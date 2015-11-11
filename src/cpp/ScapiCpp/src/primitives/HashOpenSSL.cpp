@@ -1,4 +1,4 @@
-#include "../include/HashOpenSSL.hpp"
+#include "../../include/primitives/HashOpenSSL.hpp"
 
 OpenSSLHash::OpenSSLHash(string hashName) {
 	//Instantiates a hash object in OpenSSL. We keep a pointer to the created hash object in c++.

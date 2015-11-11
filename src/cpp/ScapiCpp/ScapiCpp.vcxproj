@@ -103,43 +103,45 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Common.cpp" />
-    <ClCompile Include="src\Dlog.cpp" />
-    <ClCompile Include="src\DlogCryptopp.cpp" />
-    <ClCompile Include="src\DlogOpenSSL.cpp" />
-    <ClCompile Include="src\HashOpenSSL.cpp" />
-    <ClCompile Include="src\Kdf.cpp" />
-    <ClCompile Include="src\MathAlgorithms.cpp" />
-    <ClCompile Include="src\PrfOpenSSL.cpp" />
-    <ClCompile Include="src\Prf.cpp" />
-    <ClCompile Include="src\Prg.cpp" />
-    <ClCompile Include="src\RandomOracle.cpp" />
+    <ClCompile Include="src\primitives\Common.cpp" />
+    <ClCompile Include="src\primitives\Dlog.cpp" />
+    <ClCompile Include="src\primitives\DlogCryptopp.cpp" />
+    <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
+    <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
+    <ClCompile Include="src\primitives\Kdf.cpp" />
+    <ClCompile Include="src\primitives\MathAlgorithms.cpp" />
+    <ClCompile Include="src\primitives\prf.cpp" />
+    <ClCompile Include="src\primitives\PrfOpenSSL.cpp" />
+    <ClCompile Include="src\primitives\Prg.cpp" />
+    <ClCompile Include="src\primitives\RandomOracle.cpp" />
+    <ClCompile Include="src\primitives\TrapdoorPermutation.cpp" />
+    <ClCompile Include="src\primitives\TrapdoorPermutationOpenSSL.cpp" />
     <ClCompile Include="src\tests.cpp" />
-    <ClCompile Include="src\TrapdoorPermutation.cpp" />
-    <ClCompile Include="src\TrapdoorPermutationOpenSSL.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\catch.hpp" />
-    <ClInclude Include="include\Common.hpp" />
-    <ClInclude Include="include\Dlog.hpp" />
-    <ClInclude Include="include\DlogCryptopp.hpp" />
-    <ClInclude Include="include\Hash.hpp" />
-    <ClInclude Include="include\HashOpenSSL.hpp" />
-    <ClInclude Include="include\Kdf.hpp" />
-    <ClInclude Include="include\Key.hpp" />
-    <ClInclude Include="include\Mac.hpp" />
-    <ClInclude Include="include\MathAlgorithms.hpp" />
-    <ClInclude Include="include\DlogOpenSSL.hpp" />
-    <ClInclude Include="include\PrfOpenSSL.hpp" />
-    <ClInclude Include="include\Prf.hpp" />
-    <ClInclude Include="include\Prg.hpp" />
-    <ClInclude Include="include\RandomOracle.hpp" />
-    <ClInclude Include="include\SecurityLevel.hpp" />
-    <ClInclude Include="include\TrapdoorPermutationOpenSSL.hpp" />
-    <ClInclude Include="include\TrapdoorPermutations.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\comm\Comm.hpp" />
+    <ClInclude Include="include\comm\TwoPartyComm.hpp" />
+    <ClInclude Include="include\primitives\catch.hpp" />
+    <ClInclude Include="include\primitives\Common.hpp" />
+    <ClInclude Include="include\primitives\Dlog.hpp" />
+    <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
+    <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />
+    <ClInclude Include="include\primitives\Hash.hpp" />
+    <ClInclude Include="include\primitives\HashOpenSSL.hpp" />
+    <ClInclude Include="include\primitives\Kdf.hpp" />
+    <ClInclude Include="include\primitives\Key.hpp" />
+    <ClInclude Include="include\primitives\mac.hpp" />
+    <ClInclude Include="include\primitives\MathAlgorithms.hpp" />
+    <ClInclude Include="include\primitives\Prf.hpp" />
+    <ClInclude Include="include\primitives\PrfOpenSSL.hpp" />
+    <ClInclude Include="include\primitives\Prg.hpp" />
+    <ClInclude Include="include\primitives\RandomOracle.hpp" />
+    <ClInclude Include="include\primitives\SecurityLevel.hpp" />
+    <ClInclude Include="include\primitives\TrapdoorPermutationOpenSSL.hpp" />
+    <ClInclude Include="include\primitives\TrapdoorPermutations.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

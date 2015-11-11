@@ -1,4 +1,4 @@
-#include "../ScapiCpp/include/DlogOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/DlogOpenSSL.hpp"
 #include <boost/multiprecision/random.hpp>
 #include <iostream>
 

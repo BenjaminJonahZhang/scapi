@@ -1,4 +1,4 @@
-#include "../include/Dlog.hpp"
+#include "../../include/primitives/Dlog.hpp"
 
 /*************************************************/
 /*ZpSafePrimeElement*/

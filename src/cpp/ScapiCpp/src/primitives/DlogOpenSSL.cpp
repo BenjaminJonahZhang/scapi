@@ -1,4 +1,4 @@
-#include "../include/DlogOpenSSL.hpp"
+#include "../../include/primitives/DlogOpenSSL.hpp"
 
 biginteger opensslbignum_to_biginteger(BIGNUM * bint)
 {

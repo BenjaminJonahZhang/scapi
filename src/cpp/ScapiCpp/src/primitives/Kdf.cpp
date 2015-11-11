@@ -1,4 +1,4 @@
-#include "../include/Kdf.hpp"
+#include "../../include/primitives/Kdf.hpp"
 
 void HKDF::nextRounds(int outLen, const vector<byte> * iv, int hmacLength, vector<byte> & outBytes, vector<byte> & intermediateOutBytes) {
 	int rounds = (int)ceil((float)outLen / (float)hmacLength); // the smallest number so that  hmacLength * rounds >= outLen

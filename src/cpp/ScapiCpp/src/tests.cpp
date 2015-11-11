@@ -1,16 +1,16 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "../include/Common.hpp"
-#include "../include/catch.hpp"
-#include "../include/Dlog.hpp"
-#include "../include/DlogCryptopp.hpp"
-#include "../include/DlogOpenSSL.hpp"
-#include "../include/HashOpenSSL.hpp"
-#include "../include/PrfOpenSSL.hpp"
-#include "../include/TrapdoorPermutationOpenSSL.hpp"
-#include "../include/Prg.hpp"
-#include "../include/Kdf.hpp"
-#include "../include/RandomOracle.hpp"
+#include "../include/primitives/Common.hpp"
+#include "../include/primitives/catch.hpp"
+#include "../include/primitives/Dlog.hpp"
+#include "../include/primitives/DlogCryptopp.hpp"
+#include "../include/primitives/DlogOpenSSL.hpp"
+#include "../include/primitives/HashOpenSSL.hpp"
+#include "../include/primitives/PrfOpenSSL.hpp"
+#include "../include/primitives/TrapdoorPermutationOpenSSL.hpp"
+#include "../include/primitives/Prg.hpp"
+#include "../include/primitives/Kdf.hpp"
+#include "../include/primitives/RandomOracle.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {

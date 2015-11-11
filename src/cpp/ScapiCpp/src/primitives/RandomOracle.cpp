@@ -1,4 +1,4 @@
-#include "../include/RandomOracle.hpp"
+#include "../../include/primitives/RandomOracle.hpp"
 
 void HashBasedRO::compute(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) {
 	if (outLen > hash->getHashedMsgSize())

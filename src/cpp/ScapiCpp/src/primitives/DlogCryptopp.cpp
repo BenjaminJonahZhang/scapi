@@ -1,4 +1,4 @@
-#include "../include/DlogCryptopp.hpp"
+#include "../../include/primitives/DlogCryptopp.hpp"
 
 
 biginteger cryptoppint_to_biginteger(CryptoPP::Integer cint)

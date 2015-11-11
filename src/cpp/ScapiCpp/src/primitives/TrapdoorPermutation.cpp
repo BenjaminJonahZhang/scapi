@@ -1,4 +1,4 @@
-#include "../include/TrapdoorPermutations.hpp"
+#include "../../include/primitives/TrapdoorPermutations.hpp"
 
 /*************************************************/
 /*TrapdoorPermutationAbs                         */

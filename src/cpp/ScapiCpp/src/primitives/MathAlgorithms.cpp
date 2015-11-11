@@ -1,4 +1,4 @@
-#include "../include/MathAlgorithms.hpp"
+#include "../../include/primitives/MathAlgorithms.hpp"
 
 biginteger MathAlgorithms::modInverse(biginteger a, biginteger m)
 {

@@ -1,4 +1,4 @@
-#include "../ScapiCpp/include/HashOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/HashOpenSSL.hpp"
 #include <iostream>
 
 int main2()
