@@ -104,7 +104,7 @@ public interface TwoPartyCommunicationSetup {
 	public Map<String, Channel> prepareForCommunication(int connectionsNum, long timeOut) throws TimeoutException;
 	
 	/**
-	 * Enables to use Nagle algrithm in the communication. <p>
+	 * Enables to use Nagle algorithm in the communication. <p>
 	 * By default Nagle algorithm is disabled since it is much better for cryptographic algorithms.
 	 * 
 	 */
