@@ -152,7 +152,7 @@ SSL queue communication
 
 This is a special case of Queue communication that uses the SSL protocol during the communication with the JMS broker (server). 
 
-The way to construct an SSL queue differs from the way to construct an SSL socket. Unlike a socket construction, where there are unique classes for SSL sockets, in the JMS implementation the classes are the same. The only thing that determines the communication type is the URI given in the ``ConnectionFactory`` constructor. To create a plain and insecure communication use tcp://localhost:port uri; to create a secure connection that uses SSL protocol use **ssl**://localhost:port uri. In SCAPI's QueueCommunicationSetup class the connectionFactory is given as an argument to the constructor, when the factory is already initialized with the URI. As a result, the choice of whether or not to use the SSL protocol or not is the user responsibility.
+The way to construct an SSL queue differs from the way to construct an SSL socket. Unlike a socket construction, where there are unique classes for SSL sockets, in the JMS implementation the classes are the same. The only thing that determines the communication type is the URI given in the ``ConnectionFactory`` constructor. To create a plain and insecure communication use tcp://localhost:port uri; to create a secure connection that uses SSL protocol use **ssl**://localhost:port uri. In SCAPI's QueueCommunicationSetup class the connectionFactory is given as an argument to the constructor, when the factory is already initialized with the URI. As a result, the choice of whether or not to use the SSL protocol is the user's responsibility.
 
 We provide a concrete implementation of SSL queue communication that uses the ActiveMQ implementation, called :java:ref:`SSLActiveMQCommunicationSetup`. Like plain queue communication, the SSLActiveMQCommunicationSetup creates the factory inside the constructor and this way the user can avoid the factory construction. If a different SSL queue implementation is used, then the factory needs to be used, and the client and server certificates need to be loaded into the key store and trust store. 
 
@@ -185,7 +185,7 @@ Multiparty communication
 
 This is the communication layer for multiparty protocols, that provides a way to setup channels between all parties in a protocol and communicate between them. 
 
-Like the two party communciation, this implementation improves the previous SCAPI multiparty communication in some aspects, including letting the user choose the channel type and the amount of channels between each pair of parties, option to recover from communication failures and secure channels.
+Like the two party communication, this implementation improves the previous SCAPI multiparty communication in some aspects, including letting the user choose the channel type and the number of channels between each pair of parties, option to recover from communication failures and secure channels.
 
 All the classes in the multiparty communication are in the ``edu.biu.scapi.multiPartyComm`` package.
 
@@ -193,11 +193,11 @@ The previous multiparty implementation in the ``edu.biu.scapi.comm`` package is 
 
 The new multiparty implementation has two main parts: 
 
-	* The first part is a communication that uses ActiveMQ queues in order to communicate between the parties. It uses a :java:ref:`TwoPartyCommunicationSetup` instance between each pair of parties. Thus, the classes that implement the queue multiparty communication are very slim since they delegate all functionality to the underline two party instances.
+	* The first part is a communication that uses ActiveMQ queues in order to communicate between the parties. It uses a :java:ref:`TwoPartyCommunicationSetup` instance between each pair of parties. Thus, the classes that implement the queue multiparty communication are very slim since they delegate all functionality to the underlying two party instances.
 	
-	* The second part is a communication that uses sockets in order to communicate between the parties. In this implementation, using the two party communication will be less effective. A Two party object listens to incoming connection on a given fixed port. If the multiparty communication will use two party instances, every two party instance will have the same port number (given to the mltiparty comm) so all the objects will listen on the same port. This cannot be done in parallel since only one socket can be bind to each port at the same time. So the communication can be done only serially and that is not efficient. In light of this, we chose to have a different, but very similar, implementation that listens to incoming connections from **all** parties. When receiving a connection, the listenning thread will determine which party is calling and set the created socket to this party. The creation of the channels and the conneting step will be identical to the two party communication.
+	* The second part is a communication that uses sockets in order to communicate between the parties. In this implementation, using the two party communication will be less effective. A Two party object listens to incoming connection on a given fixed port. If the multiparty communication will use two party instances, every two party instance will have the same port number (given to the multiparty comm) so all the objects will listen on the same port. This cannot be done in parallel since only one socket can be bound to each port at the same time. So the communication can be done only serially which is not efficient. In light of this, we chose to have a different, but very similar, implementation that listens to incoming connections from **all** parties. When receiving a connection, the listening thread will determine which party is calling and set the created socket to this party. The creation of the channels and the connecting step will be identical to the two party communication.
  
-Both queues and sockets multiparty implementations have a plain communication and a secure communication channels. All the instructions (regarding the SSL protocol, ActiveMQ usage, etc) are the same as in the TwoPartyCommunicationSetup classes.
+Both queues' and sockets' multiparty implementation has a plain communication and a secure communication channel. All the instructions (regarding the SSL protocol, ActiveMQ usage, etc) are the same as in the TwoPartyCommunicationSetup classes.
 
 ---------------------------------
 Setting up communication
@@ -211,7 +211,7 @@ Fetch the list of parties from a properties file
 The first step towards obtaining communication services is to setup the connections between the different parties. Each party needs to run the setup process, at the end of which the established connections are obtained. The established connections are called channels. The list of parties and their addresses are usually obtained from a properties file. The format of the properties file depends on the concrete communication type.
 
 
-The format of the socket properties file is as follows: ::
+The format of a socket properties file is as follows: ::
 
 	NumOfParties = 2  
 	IP0 = <ip address of this application>  
@@ -219,7 +219,7 @@ The format of the socket properties file is as follows: ::
 	Port0 = <port number of this application>  
 	Port1 = <port number of party>
 
-The format of the queue properties file is as follows:  ::
+The format of a queue properties file is as follows:  ::
 
 	URL = <URL of the JMS broker> 
 	NumOfParties = 2  
@@ -228,7 +228,7 @@ The format of the queue properties file is as follows:  ::
 
 .. note::
 
-	The properties files and the classes that load them are not a necessary part of the communication. This is merely one way to construct the PartyData objects that are needed in the communication setup phase. However, an application can also just construct these objects directly.
+	The property files and the classes that load them are not a necessary part of the communication. This is merely a more decoupled way to construct the PartyData objects that are needed in the communication setup phase; an application can also just construct these objects directly.
 
 An example of the properties file used in socket communication (including SSL socket) called *SocketParties0.properties*, is as follows: ::
 
@@ -253,7 +253,7 @@ An example of the properties file used in queue communication called *JMSParties
     ID0 = 0
     ID1 = 1
  
-The socket and queue ``LoadParties`` classes are used for reading the properties file for socket and queue communication, respectively:   
+The socket and queue ``LoadParties`` classes are used for reading the properties file for socket and queue communication respectively:   
 
 .. code-block:: java
 
@@ -336,7 +336,7 @@ All constructors receive the data of the current and the other application. Note
 
 The :java:ref:`SSLSocketCommunicationSetup` constructor also receive the password of the keyStore and trustStore where the certificates are placed. This is needed for accessing the party's own private key. Also, there are constructors that get the key store and trust store files' names if the user does not want to use the default files.
 
-The :java:ref:`QueueCommunicationSetup` constructor also receives the JMS factory and destroyer as parameters. We implement a derived classes that uses the ActiveMQ implementation of JMS, called :java:ref:`ActiveMQCommunicationSetup` (for plain communication) and :java:ref:`SSLActiveMQCommunicationSetup` (for SSL communication). The constructors of these classes receive the parties' data and the ActiveMQ broker's URL and create both the factory and the ``DestroyDestinationUtil``. Thus, the user can use this class instead of dealing with the factory and destroyer construction. Thus, instead of using ``QueueCommunicationSetup`` described above, one can call:
+The :java:ref:`QueueCommunicationSetup` constructor also receives the JMS factory and destroyer as parameters. We implement derived classes that uses the ActiveMQ implementation of JMS, called :java:ref:`ActiveMQCommunicationSetup` (for plain communication) and :java:ref:`SSLActiveMQCommunicationSetup` (for SSL communication). The constructors of these classes receive the parties' data and the ActiveMQ broker's URL and create both the factory and the ``DestroyDestinationUtil``. Thus, the user can use this class instead of dealing with the factory and destroyer construction, i.e. instead of using ``QueueCommunicationSetup`` described above, one can call:
 
 .. java:method:: public void ActiveMQCommunicationSetup(String url, PartyData me, PartyData party)
     :outertype: ActiveMQCommunicationSetup
@@ -380,7 +380,7 @@ After calling the constructor of the communication setup class, the application 
 
 In both of the above functions, the user can generate one or more connections between the parties. The channels are connected using a **single port** for each application, specified in the PartyData objects given in the constructor. The first function is used when the user wishes to provide the name of each connection. The second function is used if the user wishes these “names” to be generated automatically. In this case, the name of a channel is actually the index of the channel. That is, the first created channel is named “1”, the second is “2” and so on. These functions can be called several times. The class internally stores the number of created channels so that the next index can be given, when using the second function.
 
-By default, Nagle algorithm is disabled since it has much better performance for cryptographic algorithms. In order to change the default value, call the ``enableNagle()`` function in the socket implementations. In the queue implementations the Nagle algorithm can be changes only in construction time so we added a constructor with ``boolean enableNagle`` to let the user determine if Nagle algorithm should be used or not.
+By default, Nagle's algorithm is disabled since this has much better performance for cryptographic algorithms. In order to change the default value, call the ``enableNagle()`` function in the socket implementations. In the queue implementations usage of Nagle's algorithm can be changed only on construction time so we've added a constructor with ``boolean enableNagle`` to let the user determine if Nagle's algorithm should be used or not.
 
 Here is an example on how to use the :java:ref:`SocketCommunicationSetup` class:
 
