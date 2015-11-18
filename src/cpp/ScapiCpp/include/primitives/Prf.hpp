@@ -1,6 +1,6 @@
 #ifndef SCAPI_PRF_H
 #define SCAPI_PRF_H
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 #include "mac.hpp"
 #include "SecurityLevel.hpp"
 #include "math.h"

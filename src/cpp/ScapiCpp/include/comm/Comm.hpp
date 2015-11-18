@@ -1,41 +1,37 @@
 #pragma once
 
-#include "../primitives/Common.hpp"
-#include <boost/asio/ip/address.hpp>
+#include "../infra/Common.hpp"
 
-using ipaddress = boost::asio::ip::address;     // Reduce the typing a bit later...
+class TimeoutException : public logic_error
+{
+public:
+	TimeoutException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "Timeout Occured"; }
+};
+
+class DuplicatePartyException : public logic_error
+{
+public:
+	DuplicatePartyException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "Duplicate Party"; }
+};
 
 /**
-* Class to use in the send and receive functions.
+* Struct to use in the send and receive functions.
 */
-class Message{
-private:
+struct Message{
 	byte* data = NULL;
 	int len = 0;
-public:
-	Message(byte* data, int len) { this->data = data; this->len = len; };
-	void setData(byte* data, int len) { this->data = data; this->len = len; };
-	pair<byte*, int> getData() { return pair<byte*, int>(data, len); };
+	//Message(byte* data, int len) { this->data = data; this->len = len; };
 };
 
 /**
 * Represents a connection between two parties. Once a channel is open and the connection is established it can be used to send and receive messages over it.
 * There are different types of channels and we use the Decorator Design Pattern to implement some of them.
 */
-class Channel {
+class Channel{
 public:
-	virtual void send(string data) =0;
-	virtual string receive() = 0;
-	virtual void close() = 0;
-	virtual bool isClosed()=0;
-};
-
-/*
-* Abstract class that holds data and functionality common to different types of concrete channels.
-*/
-class PlainChannel : public Channel {
-public:
-	static enum State {
+	enum State {
 		NOT_INIT,
 		CONNECTING,
 		SECURING,
@@ -46,17 +42,13 @@ private:
 	State state;
 
 public:
-	PlainChannel() { state = State::NOT_INIT; };
-	/**
-	* returns the state of the channel. This class that implements the channel interface has a private attribute state. Other classes
-	* that implement channel (and the decorator abstract class) need to pass the request thru their channel private attribute.
-	*/
+	Channel() { state = State::NOT_INIT; };
 	State getState() { return state; };
-	/**
-	* Sets the state of the channel. This class that implements the channel interface has a private attribute state. Other classes
-	* that implement channel (and the decorator abstract class) need to pass the request thru their channel private attribute.
-	*/
 	void setState(State state) { this->state = state; };
 	virtual bool connect() =0;
 	virtual bool isConnected()=0;
+	virtual void send(Message data) = 0;
+	virtual Message receive() = 0;
+	virtual void close() = 0;
+	virtual bool isClosed() = 0;
 };

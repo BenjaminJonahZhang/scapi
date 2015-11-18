@@ -25,14 +25,23 @@
     <Filter Include="Header Files\Comm">
       <UniqueIdentifier>{79a2cd36-752e-450e-835b-abf8f0c6e23c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\comm">
+      <UniqueIdentifier>{4fb4dc21-5d7a-4797-a223-c20a3da42368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\infra">
+      <UniqueIdentifier>{15ba0fb9-36ad-4a3e-8eae-a7456ec739e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tests">
+      <UniqueIdentifier>{54dd9b90-f1fa-4e17-8c08-3db09024ad14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\infra">
+      <UniqueIdentifier>{bab7e697-5caa-4f0a-a335-99e5585989ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\primitives\Common.cpp">
-      <Filter>Source Files\primitives</Filter>
-    </ClCompile>
     <ClCompile Include="src\primitives\Dlog.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
@@ -46,9 +55,6 @@
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
     <ClCompile Include="src\primitives\Kdf.cpp">
-      <Filter>Source Files\primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="src\primitives\MathAlgorithms.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
     <ClCompile Include="src\primitives\prf.cpp">
@@ -69,17 +75,23 @@
     <ClCompile Include="src\primitives\TrapdoorPermutationOpenSSL.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\tests.cpp">
+    <ClCompile Include="src\comm\TwoPartyComm.cpp">
+      <Filter>Source Files\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tests\tests.cpp">
       <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infra\Common.cpp">
+      <Filter>Source Files\infra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\infra\MathAlgorithms.cpp">
+      <Filter>Source Files\infra</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\primitives\Common.hpp">
-      <Filter>Header Files\Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="include\primitives\Dlog.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
@@ -104,9 +116,6 @@
     <ClInclude Include="include\primitives\mac.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="include\primitives\MathAlgorithms.hpp">
-      <Filter>Header Files\Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="include\primitives\Prf.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
@@ -128,13 +137,25 @@
     <ClInclude Include="include\primitives\TrapdoorPermutations.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="include\primitives\catch.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\comm\Comm.hpp">
       <Filter>Header Files\Comm</Filter>
     </ClInclude>
     <ClInclude Include="include\comm\TwoPartyComm.hpp">
+      <Filter>Header Files\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\Common.hpp">
+      <Filter>Header Files\infra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\MathAlgorithms.hpp">
+      <Filter>Header Files\infra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tests\catch.hpp">
+      <Filter>Header Files\tests</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\Log.hpp">
+      <Filter>Header Files\infra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\comm\Socket.hpp">
       <Filter>Header Files\Comm</Filter>
     </ClInclude>
   </ItemGroup>

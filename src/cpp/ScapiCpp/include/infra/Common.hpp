@@ -1,17 +1,17 @@
 #ifndef SCAPI_COMMON_H
 #define SCAPI_COMMON_H
 
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
-#include <string>
 #include <boost/multiprecision/random.hpp>
-#include <random>
 #include <boost/multiprecision/miller_rabin.hpp>
-#include <math.h> /* pow */
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <boost/algorithm/string.hpp>
+#include <math.h> /* pow */
+#include <random>
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+//#include "Log.hpp"
 
 using namespace std;
 

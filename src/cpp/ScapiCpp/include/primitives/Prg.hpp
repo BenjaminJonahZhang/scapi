@@ -1,7 +1,7 @@
 #ifndef SCAPI_PRG_H
 #define SCAPI_PRG_H
 
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 #include "Key.hpp"
 #include "Prf.hpp"
 #include <openssl/rc4.h>

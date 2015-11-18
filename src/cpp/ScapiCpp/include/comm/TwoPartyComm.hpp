@@ -1,7 +1,12 @@
 #pragma once
 
 #include "Comm.hpp"
+#include <boost/asio.hpp>
 #include <map>
+
+
+namespace boost_ip = boost::asio::ip; // reduce the typing a bit later...
+using IpAdress = boost_ip::address;
 
 /**
 * A marker interface. Each type of party should have a concrete class that implement this interface.
@@ -14,137 +19,89 @@ class PartyData{};
 */
 class SocketPartyData : public PartyData {
 private:
-	ipaddress ipAddress;	//Party's address.
-	int port; //Port number to listen on.
-
+	IpAdress ipAddress; // party's address.
+	int port; // port number to listen on.
+	int compare(const SocketPartyData &other) const;
 public:
 	/**
 	* Constructor that sets the given arguments.
 	* @param ip Party's address.
 	* @param port Port number to listen on.
 	*/
-	SocketPartyData(ipaddress ip, int port) {
-		this->ipAddress = ip;
+	SocketPartyData(IpAdress ip, int port) {
+		ipAddress = ip;
 		this->port = port;
 	};
-	ipaddress getIpAddress() { return ipAddress; };
+	IpAdress getIpAddress() { return ipAddress; };
 	int getPort() { return port; };
 	/**
 	* Compares two parties.
 	*<0 if this party's string is smaller than the otherParty's string representation.
 	*>0 if this party's string is larger than the otherParty's string representation.
 	*/
-	bool operator==(const SocketPartyData &other) const;
-	bool operator!=(const SocketPartyData &other) const;
-	bool operator<=(const SocketPartyData &other) const;
-	bool operator>=(const SocketPartyData &other) const;
-	bool operator>(const SocketPartyData &other) const;
-	bool operator<(const SocketPartyData &other) const;
+	bool operator==(const SocketPartyData &other) const { return (compare(other) == 0); };
+	bool operator!=(const SocketPartyData &other) const { return (compare(other) != 0); };
+	bool operator<=(const SocketPartyData &other) const { return (compare(other) <= 0); };
+	bool operator>=(const SocketPartyData &other) const { return (compare(other) >= 0); };
+	bool operator>(const SocketPartyData &other) const { return (compare(other) > 0); };
+	bool operator<(const SocketPartyData &other) const { return (compare(other) < 0); };
 };
 
-class Watchdog {};
-class SSLSocketFactory {};
-
-/**
-* This class represents a concrete channel in the Decorator Pattern used to create Channels. This channel ensures TCP
-* type of communication.
-* In order to enforce the right usage of the Channel class we will restrict the ability to instantiate one,
-* only to classes within the Two Party Communication Layer's package. This means that the constructor of the channel will be
-* unreachable from another package. However, the send, receive and close functions will be declared public, therefore
-* allowing anyone holding a channel to be able to use them.
-*
-* The difference between this implementation to the {@link PlainTCPChannel} is that here there are two sockets:
-* one used to receive messages and one used to send messages. The other {@link PlainTCPChannel} has one socket used
-* both to send and receive.
-*/
-class PlainTCPSocketChannel : public PlainChannel {
+class NativeChannel : public Channel {
 private:
-	//Socket receiveSocket;				//A socket used to receive messages.
-	//ObjectInputStream inStream;			//Used to receive a message.
-	Message intermediate;
-	Message msgObj;
-	byte* msgBytes;
-	SocketPartyData me;					//Used to send the identity if needed.
+	SocketPartyData * me;
+	SocketPartyData * other;
+	boost::asio::ip::tcp::socket* sendSocketPtr;
+	boost::asio::ip::tcp::socket* receiveSocketPtr;
+	bool _isClosed;
+
 public:
-	//Socket sendSocket;				//A socket used to send messages.
-	//ObjectOutputStream outStream;		//Used to send a message
-	//InetSocketAddress socketAddress;	//The address of the other party.
-	bool checkIdentity;			//Indicated if there is a need to verify identity.
-
-	/**
-	* A constructor that set the state of this channel to not ready.
-	*/
-	PlainTCPSocketChannel();
-
-	/**
-	* A constructor that create the socket address according to the given ip and port and set the state of this channel to not ready.
-	* @param ipAddress other party's IP address.
-	* @param port other party's port.
-	*/
-	PlainTCPSocketChannel(InetAddress ipAddress, int port, boolean checkIdentity, SocketPartyData me);
-
-	/**
-	* A constructor that set the given socket address and set the state of this channel to not ready.
-	* @param socketAddress other end's InetSocketAddress
-	*/
-	PlainTCPSocketChannel(InetSocketAddress socketAddress, boolean checkIdentity, SocketPartyData me);
-
-	/**
-	* Sends the message to the other user of the channel with TCP protocol.
-	*
-	* @param msg the object to send.
-	* @throws IOException Any of the usual Input/Output related exceptions.
-	*/
-	void send(Serializable msg);
-
-	/**
-	* Receives the message sent by the other user of the channel.
-	*/
-	Serializable receive();
-
-	/**
-	* Closes the sockets and all other used resources.
-	*/
-	void close();
-	/**
-	* Checks if the channel os closed or not.
-	* @return true if the channel is closed; False, otherwise.
-	*/
-	bool isClosed();
-
-	/**
-	* Connects the socket to the InetSocketAddress of this object. If the server we are trying to connect to
-	* is not up yet then we sleep for a while and try again until the connection is established.
-	* This is done by the {@link SocketCommunicationSetup} which keeps trying until it succeeds or a timeout has
-	* been reached.<p>
-	* After the connection has succeeded the output stream is set for the send function.
-	* @throws IOException
-	*/
-	bool connect();
-	void sendIdentity();
-
-	/**
-	* Returns if the send socket is connected.
-	*/
-	bool isSendConnected();
-	bool isConnected() { return isSendConnected(); };
-
-	/**
-	* Sets the receive socket and the input stream.
-	* @param socket the receive socket to set.
-	*/
-	void setReceiveSocket(Socket socket);
-
+	NativeChannel(SocketPartyData *me, SocketPartyData *other) {
+		this->me = me;
+		this->other = other;
+		sendSocketPtr = NULL;
+		receiveSocketPtr = NULL;
+	}
+	bool connect() override;
+	void send(Message message) override;
+	Message receive() override;
+	void close() override;
+	bool isClosed() override;
 	/**
 	* This function sets the channel state to READY in case both send and receive sockets are connected.
 	*/
 	void setReady();
+	/**
+	* Returns if the send socket is connected.
+	*/
+	bool isSendConnected() { return (sendSocketPtr != NULL); };
+	void setReceiveSocket(long receiveSocket);
+	void enableNagle();
+};
+
+class NativeSocketListenerThread {
+private:
+	SocketPartyData *me;
+	void * serverSocket;
+public:
+	vector<NativeChannel *> channels; // all connections between me and the other party. The received sockets of each channel should be set when accepted. 
+	bool bStopped = false; // a flag that indicates if to keep on listening or stop.
 
 	/**
-	* Enable/disable the Nagle algorithm according to the given boolean.
-	* @param enableNagle.
+	* Opens the server socket.
 	*/
-	void enableNage(bool enableNagle);
+	NativeSocketListenerThread(vector<NativeChannel *> & channels, SocketPartyData *me);
+	void stopConnecting() { bStopped = true; };
+	void run();
+};
+
+class TwoPartyCommunicationSetup;
+class Watchdog {
+public:
+	Watchdog(long timeout);
+	void addTimeoutObserver(TwoPartyCommunicationSetup * tpcs);
+	void start();
+	void stop();
 };
 
 /**
@@ -195,7 +152,7 @@ public:
 	* @return a map contains the connected channels. The key to the map is the id of the connection.
 	* @throws TimeoutException in case a timeout has occurred before all channels have been connected.
 	*/
-	virtual map<string, Channel *> prepareForCommunication(vector<string> & connectionsIds, long timeOut) = 0;
+	virtual map<string, Channel *> * prepareForCommunication(vector<string> & connectionsIds, long timeOut) = 0;
 
 	/**
 	* An application that wants to use the communication layer will call this function in order to prepare for
@@ -216,7 +173,7 @@ public:
 	* @return a map contains the connected channels. The key to the map is the id of the connection.
 	* @throws TimeoutException in case a timeout has occurred before all channels have been connected.
 	*/
-	virtual map<string, Channel *> prepareForCommunication(int connectionsNum, long timeOut)=0;
+	virtual map<string, Channel *> * prepareForCommunication(int connectionsNum, long timeOut)=0;
 
 	/**
 	* Enables to use Nagle algorithm in the communication. <p>
@@ -236,105 +193,9 @@ public:
 	virtual void timeoutOccured(Watchdog arg0) = 0;
 };
 
-/**
-* This class manage the socket channels in both two party and multiparty communications. <P>
-* The class does the creation of the channels and the connect step during the communication setup. <p>
-* Although it is declared "public" it is not for public usage and we recommend not to use it.
-* In order to setup a communication use one of the communication setup classes.
-*/
-class TwoPartySocketConnector {
+class NativeSocketCommunicationSetup : public TwoPartyCommunicationSetup {
 private:
-	SocketPartyData * me; //The data of the current application
-	SocketPartyData * other; //The data of the other application to communicate with.
-	bool bStopped = false; //A flag that indicates if to keep on listening or stop.
-	bool isSecure = false; // A flag that indicates to use SSL or not.
-	SSLSocketFactory factory; //In case of SSL communication, the sockets are created via this factory.
-	map<string, Channel *> connectionsMap;
-	/**
-	* @return true if all the channels are in READY state, false otherwise.
-	*/
-	bool areAllConnected();
-
-public:
-	/**
-	* A constructor that set the parties.<p>
-	* In case this constructor has been called, the created channels will be plain.
-	*/
-	TwoPartySocketConnector(SocketPartyData * me, SocketPartyData * party) {
-		this->me = me;
-		this->other = party;
-		this->isSecure = false;
-	};
-
-	/**
-	* A constructor that set the parties and the factory.<p>
-	* In case this constructor has been called, the created channels will be secure.
-	*/
-	TwoPartySocketConnector(SocketPartyData * me, SocketPartyData *party, SSLSocketFactory factory) : TwoPartySocketConnector(me, party) {
-		this->isSecure = true;
-		this->factory = factory;
-	}
-
-	/**
-	* Creates the channels and give them the names in connectionsIds array.
-	* @param connectionsIds Array of channels names.
-	* @param checkIdentity A flag that indicates whether or not to check that incoming connection is from the expected party.
-	* @return PlainTCPSocketChannel[] Array of created channels.
-	*/
-	vector<PlainTCPSocketChannel *> createChannels(vector<string> & connectionsIds, bool checkIdentity); 
-	/**
-	* This function calls each channel to connect to the other party.
-	*/
-	void connect(vector<PlainTCPSocketChannel *> channels);
-	/**
-	* Sets the flag bStopped to false. In the run function of this thread this flag is checked -
-	* if the flag is true the run functions returns, otherwise continues.
-	*/
-	void stopConnecting();
-	/**
-	* Returns the object that holds the connections.
-	* @return EstablishedSocketConnections
-	*/
-	map<string, Channel *> getConnections() { return connectionsMap; };
-	/**
-	* This function serves as a barrier. It is called from the prepareForCommunication function. The idea
-	* is to let all the threads finish running before proceeding.
-	*/
-	void verifyConnectingStatus();
-	/**
-	* Enables Nagle's algorithm.
-	*/
-	void enableNagle();
-	/**
-	* @return the number of created channels.
-	*/
-	int getConnectionsCount() { return connectionsMap.size(); };
-	/**
-	* Returned this object to a fresh state by removing all connections from the map and setting bStopped to false.
-	*/
-	void reset() { bStopped = false; };
-};
-
-/**
-* This class implements a communication between two parties using TCP sockets.<p>
-* Each created channel contains two sockets; one is used to send messages and one to receive messages.<p>
-* This class encapsulates the stage of connecting to other parties. In actuality, the connection to other parties is
-* performed in a few steps, which are not visible to the outside user.
-* These steps are:<p>
-* <ul>
-* <li>for each requested channel,</li>
-* <li>Create an actual TCP socket with the other party. This socket is used to send messages</li>
-* <li>Create a server socket that listen to the other party's call. When received, the created socket is used to receive messages from the other party.</li>
-* <li>run a protocol that checks if all the necessary connections were set between my party and other party.</li>
-* <li>In the end return to the calling application a set of connected and ready channels to be used throughout a cryptographic protocol.</li>
-* </ul>
-* From this point onwards, the application can send and receive messages in each connection as required by the protocol.<p>
-*/
-class SocketCommunicationSetup : public TwoPartyCommunicationSetup{
-private:
-	Watchdog watchdog; //Used to measure times.
-	bool enableNagle_ = false; //Indicated whether or not to use Nagle optimization algorithm.
-	int connectionsNumber; //Holds the number of created connections. 
+	map<string, Channel *> * connectionsMap;
 	/**
 	* This function does the actual creation of the communication between the parties.<p>
 	* A connected channel between two parties has two sockets. One is used by P1 to send messages and p2 receives them,
@@ -345,31 +206,44 @@ private:
 	* 2. Start a listening thread that accepts calls from the other party.
 	* 3. Calls the connector.connect function that calls each channel's connect function in order to connect each channel to the other party.
 	* @param connectionsIds The names of the requested connections.
-	*
 	*/
-	void establishConnections(vector<string> & connectionsIds);
+	void establishConnections(vector<string>& connectionsIds);
+	vector<NativeChannel *> createChannels(vector<string> & connectionsIds, bool checkIdentity);
+	void connect(vector<NativeChannel *> channels);
+	void verifyConnectingStatus();
+	bool areAllConnected();
 
 public:
-	bool bTimedOut = false; //Indicated whether or not to end the communication.
-	TwoPartySocketConnector connector; //Used to create and connect the channels to the other party.
-	SocketListenerThread listeningThread; //Listen to calls from the other party.
-	SocketPartyData me; //The data of the current application.
-	SocketPartyData other; //The data of the other application to communicate with.
+	bool bTimedOut = false; // indicates whether or not to end the communication.
+	Watchdog watchdog; // used to measure times.
+	bool enableNagle_ = false; // indicates whether or not to use Nagle optimization algorithm.
+	NativeSocketListenerThread listeningThread; // listen to calls from the other party.
+	int connectionsNumber; // holds the number of created connections. 
+	SocketPartyData* me;	 // the data of the current application.
+	SocketPartyData* other; // the data of the other application to communicate with.
 
 	/**
 	* A constructor that set the given parties.
 	* @param me The data of the current application.
 	* @param party The data of the other application to communicate with.
+	* @throws DuplicatePartyException
 	*/
-	SocketCommunicationSetup(PartyData me, PartyData party);
-	map<string, Channel *> prepareForCommunication(vector<string> & connectionsIds, long timeOut) override;
-	map<string, Channel *> prepareForCommunication(int connectionsNum, long timeOut) override;
-	void createListener(vector<PlainTCPSocketChannel *> channels);
+	NativeSocketCommunicationSetup(SocketPartyData * me, SocketPartyData* party);
+	map<string, Channel *> * prepareForCommunication(vector<string> & connectionsIds, long timeOut) override;
+	map<string, Channel *> * prepareForCommunication(int connectionsNum, long timeOut) override;
+	void createListener(vector<NativeChannel *> channels);
 	void enableNagle() override {
-		// Set to true the boolean indicates whether or not to use the Nagle optimization algorithm. 
-		// For Cryptographic algorithms is better to have it disabled.
-		this->enableNagle_= true;
+		//Set to true the boolean indicates whether or not to use the Nagle optimization algorithm. 
+		//For Cryptographic algorithms is better to have it disabled.
+		this->enableNagle_ = true;
 	};
 	void timeoutOccured(Watchdog w) override;
+
+	/**
+	* Sets the flag bStopped to false. In the run function of this thread this flag is checked -
+	* if the flag is true the run functions returns, otherwise continues.
+	*/
+	void stopConnecting();
 	void close() override {};
+	void enableNagleInChannels();
 };

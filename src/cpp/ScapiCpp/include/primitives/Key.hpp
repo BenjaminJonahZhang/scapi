@@ -1,7 +1,7 @@
 #ifndef SCAPI_KEY_H
 #define SCAPI_KEY_H
 
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 class Key {
 public:
 	/*

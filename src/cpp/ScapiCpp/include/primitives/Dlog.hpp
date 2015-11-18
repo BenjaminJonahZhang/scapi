@@ -1,9 +1,9 @@
 #ifndef SCAPI_DLOG_H
 #define SCAPI_DLOG_H
 
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 #include "SecurityLevel.hpp"
-#include "MathAlgorithms.hpp"
+#include "../infra/MathAlgorithms.hpp"
 
 
 /**

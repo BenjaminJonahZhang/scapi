@@ -82,11 +82,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\code\Builds\Miracl Build\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\Program Files\Boost\boost_1_59_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -103,29 +103,32 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\primitives\Common.cpp" />
+    <ClCompile Include="src\comm\TwoPartyComm.cpp" />
+    <ClCompile Include="src\infra\Common.cpp" />
+    <ClCompile Include="src\infra\MathAlgorithms.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogCryptopp.cpp" />
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
     <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
     <ClCompile Include="src\primitives\Kdf.cpp" />
-    <ClCompile Include="src\primitives\MathAlgorithms.cpp" />
     <ClCompile Include="src\primitives\prf.cpp" />
     <ClCompile Include="src\primitives\PrfOpenSSL.cpp" />
     <ClCompile Include="src\primitives\Prg.cpp" />
     <ClCompile Include="src\primitives\RandomOracle.cpp" />
     <ClCompile Include="src\primitives\TrapdoorPermutation.cpp" />
     <ClCompile Include="src\primitives\TrapdoorPermutationOpenSSL.cpp" />
-    <ClCompile Include="src\tests.cpp" />
+    <ClCompile Include="src\tests\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\comm\Comm.hpp" />
+    <ClInclude Include="include\comm\Socket.hpp" />
     <ClInclude Include="include\comm\TwoPartyComm.hpp" />
-    <ClInclude Include="include\primitives\catch.hpp" />
-    <ClInclude Include="include\primitives\Common.hpp" />
+    <ClInclude Include="include\infra\Common.hpp" />
+    <ClInclude Include="include\infra\Log.hpp" />
+    <ClInclude Include="include\infra\MathAlgorithms.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />
@@ -134,7 +137,6 @@
     <ClInclude Include="include\primitives\Kdf.hpp" />
     <ClInclude Include="include\primitives\Key.hpp" />
     <ClInclude Include="include\primitives\mac.hpp" />
-    <ClInclude Include="include\primitives\MathAlgorithms.hpp" />
     <ClInclude Include="include\primitives\Prf.hpp" />
     <ClInclude Include="include\primitives\PrfOpenSSL.hpp" />
     <ClInclude Include="include\primitives\Prg.hpp" />
@@ -142,6 +144,7 @@
     <ClInclude Include="include\primitives\SecurityLevel.hpp" />
     <ClInclude Include="include\primitives\TrapdoorPermutationOpenSSL.hpp" />
     <ClInclude Include="include\primitives\TrapdoorPermutations.hpp" />
+    <ClInclude Include="include\tests\catch.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

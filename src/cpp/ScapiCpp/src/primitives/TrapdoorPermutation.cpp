@@ -12,7 +12,7 @@ byte TrapdoorPermutationAbs::hardCorePredicate(TPElement * tpEl) {
 	*/
 	//gets the element value as byte array
 	biginteger elementValue = tpEl->getElement();
-	byte* bytesValue; 
+	byte* bytesValue=NULL; 
 	int bytesSize = allocateAndEncodeBigInteger(elementValue, bytesValue);
 
 	// returns the least significant bit (byte, as we said above)
@@ -30,7 +30,7 @@ byte* TrapdoorPermutationAbs::hardCoreFunction(TPElement * tpEl) {
 	*/
 	// gets the element value as byte array
 	biginteger elementValue = tpEl->getElement();
-	byte* bytesValue;
+	byte* bytesValue=NULL;
 	int bytesSize = allocateAndEncodeBigInteger(elementValue, bytesValue);
 
 	// the number of bytes to get the log (N) least significant bits

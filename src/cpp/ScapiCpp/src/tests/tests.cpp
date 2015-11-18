@@ -1,16 +1,16 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "../include/primitives/Common.hpp"
-#include "../include/primitives/catch.hpp"
-#include "../include/primitives/Dlog.hpp"
-#include "../include/primitives/DlogCryptopp.hpp"
-#include "../include/primitives/DlogOpenSSL.hpp"
-#include "../include/primitives/HashOpenSSL.hpp"
-#include "../include/primitives/PrfOpenSSL.hpp"
-#include "../include/primitives/TrapdoorPermutationOpenSSL.hpp"
-#include "../include/primitives/Prg.hpp"
-#include "../include/primitives/Kdf.hpp"
-#include "../include/primitives/RandomOracle.hpp"
+#include "../../include/infra/Common.hpp"
+#include "../../include/tests/catch.hpp"
+#include "../../include/primitives/Dlog.hpp"
+#include "../../include/primitives/DlogCryptopp.hpp"
+#include "../../include/primitives/DlogOpenSSL.hpp"
+#include "../../include/primitives/HashOpenSSL.hpp"
+#include "../../include/primitives/PrfOpenSSL.hpp"
+#include "../../include/primitives/TrapdoorPermutationOpenSSL.hpp"
+#include "../../include/primitives/Prg.hpp"
+#include "../../include/primitives/Kdf.hpp"
+#include "../../include/primitives/RandomOracle.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -487,7 +487,7 @@ TEST_CASE("Random Oracle", "")
 	}
 }
 
-TEST_CASE("TrapdoorPermutation", "")
+TEST_CASE("TrapdoorPermutation", "[OpenSSL]")
 {
 	SECTION("OpenSSL") {
 		auto tp = OpenSSLRSAPermutation();

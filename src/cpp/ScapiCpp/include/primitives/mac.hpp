@@ -1,6 +1,6 @@
 #ifndef SCAPI_MAC_H
 #define SCAPI_MAC_H
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 #include "Key.hpp"
 
 /**

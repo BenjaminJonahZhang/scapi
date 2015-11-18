@@ -1,7 +1,7 @@
 #ifndef SCAPI_HASH_H
 #define SCAPI_HASH_H
 
-#include "Common.hpp"
+#include "../infra/Common.hpp"
 #include "SecurityLevel.hpp"
 
 /**
