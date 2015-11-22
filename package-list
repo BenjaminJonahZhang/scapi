@@ -1,4 +1,11 @@
+
 edu.biu.SCProtocols.YaoProtocol.src
+edu.biu.protocols.CommitmentWithZkProofOfDifference
+edu.biu.protocols.yao.common
+edu.biu.protocols.yao.offlineOnline.primitives
+edu.biu.protocols.yao.offlineOnline.specs
+edu.biu.protocols.yao.offlineOnline.subroutines
+edu.biu.protocols.yao.primitives
 edu.biu.scapi.circuits.circuit
 edu.biu.scapi.circuits.encryption
 edu.biu.scapi.circuits.fastGarbledCircuit
@@ -90,6 +97,8 @@ edu.biu.scapi.primitives.trapdoorPermutation.cryptopp
 edu.biu.scapi.primitives.trapdoorPermutation.openSSL
 edu.biu.scapi.primitives.universalHash
 edu.biu.scapi.securityLevel
+edu.biu.scapi.tests.comm
+edu.biu.scapi.tests.dlog
 edu.biu.scapi.tools
 edu.biu.scapi.tools.Factories
 edu.biu.scapi.tools.Provider
