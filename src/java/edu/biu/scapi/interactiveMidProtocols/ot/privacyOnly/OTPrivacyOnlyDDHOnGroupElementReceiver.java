@@ -44,7 +44,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  * related to the group element inputs.<p>
  * 
  * For more information see Protocol 7.2.1 page 179 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.<p>
- * The pseudo code of this protocol can be found in Protocol 4.2 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 4.2 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

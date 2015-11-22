@@ -47,7 +47,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * 
  * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 3.1 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.1 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

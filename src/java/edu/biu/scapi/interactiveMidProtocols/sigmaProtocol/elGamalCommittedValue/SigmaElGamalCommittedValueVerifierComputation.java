@@ -42,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * 
  * This protocol is used for a committer to prove that the value committed to in the commitment (h,c1, c2) is x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.7 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.7 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

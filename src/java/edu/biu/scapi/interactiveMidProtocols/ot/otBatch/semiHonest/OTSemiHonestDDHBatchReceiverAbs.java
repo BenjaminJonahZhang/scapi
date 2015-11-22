@@ -54,7 +54,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * 
  * In spite that, there is a common behavior for both modes which this class is implementing.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 5.1 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 5.1 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
