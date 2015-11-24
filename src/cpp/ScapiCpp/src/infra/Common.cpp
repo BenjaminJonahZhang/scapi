@@ -1,19 +1,23 @@
 #include "../../include/infra/Common.hpp"
 #include <chrono>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 /******************************/
 /* Helper Methods *************/
 /******************************/
 
 int find_log2_floor(biginteger bi) {
+	if (bi < 0)
+		throw runtime_error("log for negative number is not supported");
 	int r = 0;
 	while (bi >>= 1) // unroll for more speed...
 		r++;
 	return r;
 }
 
-int NumberOfBits(biginteger bi) {
-	return find_log2_floor(bi) + 1;
+int NumberOfBits(const biginteger bi) {
+	auto bis = (bi>0) ? bi : -bi;
+	return find_log2_floor(bis)+ 1;
 }
 
 void gen_random_bytes_vector(vector<byte> &v, const int len, mt19937 random) {

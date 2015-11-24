@@ -2,6 +2,7 @@
 
 #include "../infra/Common.hpp"
 
+
 class TimeoutException : public logic_error
 {
 public:
@@ -14,15 +15,6 @@ class DuplicatePartyException : public logic_error
 public:
 	DuplicatePartyException(const string & msg) : logic_error(msg) {};
 	virtual char const * what() const throw() { return "Duplicate Party"; }
-};
-
-/**
-* Struct to use in the send and receive functions.
-*/
-struct Message{
-	byte* data = NULL;
-	int len = 0;
-	//Message(byte* data, int len) { this->data = data; this->len = len; };
 };
 
 /**
@@ -47,7 +39,7 @@ public:
 	void setState(State state) { this->state = state; };
 	virtual bool connect() =0;
 	virtual bool isConnected()=0;
-	virtual void send(Message data) = 0;
+	virtual void send(Message & message)=0;
 	virtual Message receive() = 0;
 	virtual void close() = 0;
 	virtual bool isClosed() = 0;

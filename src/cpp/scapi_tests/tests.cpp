@@ -1,16 +1,17 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "../../include/infra/Common.hpp"
-#include "../../include/tests/catch.hpp"
-#include "../../include/primitives/Dlog.hpp"
-#include "../../include/primitives/DlogCryptopp.hpp"
-#include "../../include/primitives/DlogOpenSSL.hpp"
-#include "../../include/primitives/HashOpenSSL.hpp"
-#include "../../include/primitives/PrfOpenSSL.hpp"
-#include "../../include/primitives/TrapdoorPermutationOpenSSL.hpp"
-#include "../../include/primitives/Prg.hpp"
-#include "../../include/primitives/Kdf.hpp"
-#include "../../include/primitives/RandomOracle.hpp"
+#include "../ScapiCpp/include/infra/Common.hpp"
+#include "catch.hpp"
+#include "../ScapiCpp/include/primitives/Dlog.hpp"
+#include "../ScapiCpp/include/primitives/DlogCryptopp.hpp"
+#include "../ScapiCpp/include/primitives/DlogOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/HashOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/PrfOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/TrapdoorPermutationOpenSSL.hpp"
+#include "../ScapiCpp/include/primitives/Prg.hpp"
+#include "../ScapiCpp/include/primitives/Kdf.hpp"
+#include "../ScapiCpp/include/primitives/RandomOracle.hpp"
+#include "../ScapiCpp/include/comm/TwoPartyComm.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -504,3 +505,23 @@ TEST_CASE("TrapdoorPermutation", "[OpenSSL]")
 	}
 }
 
+TEST_CASE("Comm basics", "[Communication]") {
+	SECTION("Comparing SocketPartyData") {
+		auto spd1 = SocketPartyData(IpAdress::from_string("127.0.0.1"), 3000);
+		auto spd2 = SocketPartyData(IpAdress::from_string("127.0.0.1"), 3001);
+		REQUIRE(spd1 < spd2);
+		REQUIRE(spd2 > spd1);
+		REQUIRE(spd2 >= spd1);
+		REQUIRE(spd1 <= spd2);
+		REQUIRE(spd1 != spd2);
+		REQUIRE(!(spd1 == spd2));
+	}
+	SECTION("connect") {
+		SocketPartyData sp1(IpAdress::from_string("127.0.0.1"), 3000);
+		SocketPartyData sp2(IpAdress::from_string("62.210.18.40"), 5201);
+		//NativeChannel nc(&sp1, &sp2);
+		//nc.connect();
+		//Message m(new byte[4]{ '1', '2', '3', '4' }, 4);
+		//nc.send(m);
+	}
+}

@@ -1,5 +1,6 @@
-#ifndef SCAPI_COMMON_H
-#define SCAPI_COMMON_H
+#pragma once
+
+#define WIN32_LEAN_AND_MEAN
 
 #include <boost/multiprecision/random.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
@@ -11,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-//#include "Log.hpp"
+#include "Log.hpp"
 
 using namespace std;
 
@@ -65,4 +66,3 @@ biginteger convert_hex_to_biginteger(const string & hex);
 
 string hexStr(vector<byte> const & data);
 
-#endif

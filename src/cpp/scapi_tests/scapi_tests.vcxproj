@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FEA1B7F4-8A51-42A4-B85F-F178B4E64595}</ProjectGuid>
+    <ProjectGuid>{FC86363A-5508-4F5E-A8A1-DBE48209BCC2}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -62,33 +62,40 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeOutput>code examples.exe</NMakeOutput>
+    <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
+    <NMakeOutput>scapi_tests.exe</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeOutput>code examples.exe</NMakeOutput>
+    <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
+    <NMakeOutput>scapi_tests.exe</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Program Files\Boost\boost_1_59_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\Boost\boost_1_59_0\stage\lib;C:\code\scapi\lib\CryptoPP;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\Boost\boost_1_59_0;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>C:\OpenSSL-Win64\lib\libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="makefile" />
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="comm_example.cpp" />
-    <ClCompile Include="simple_dlog.cpp" />
-    <ClCompile Include="simple_sha1.cpp" />
+    <ClInclude Include="catch.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Test Files">
-      <UniqueIdentifier>{7ebab63b-bb9f-46bb-8c38-b41c91b20898}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Primitives">
       <UniqueIdentifier>{51ffee10-00ef-441e-b350-b58ff84e0931}</UniqueIdentifier>
     </Filter>
@@ -30,9 +27,6 @@
     </Filter>
     <Filter Include="Header Files\infra">
       <UniqueIdentifier>{15ba0fb9-36ad-4a3e-8eae-a7456ec739e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\tests">
-      <UniqueIdentifier>{54dd9b90-f1fa-4e17-8c08-3db09024ad14}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\infra">
       <UniqueIdentifier>{bab7e697-5caa-4f0a-a335-99e5585989ea}</UniqueIdentifier>
@@ -77,9 +71,6 @@
     </ClCompile>
     <ClCompile Include="src\comm\TwoPartyComm.cpp">
       <Filter>Source Files\comm</Filter>
-    </ClCompile>
-    <ClCompile Include="src\tests\tests.cpp">
-      <Filter>Test Files</Filter>
     </ClCompile>
     <ClCompile Include="src\infra\Common.cpp">
       <Filter>Source Files\infra</Filter>
@@ -149,13 +140,13 @@
     <ClInclude Include="include\infra\MathAlgorithms.hpp">
       <Filter>Header Files\infra</Filter>
     </ClInclude>
-    <ClInclude Include="include\tests\catch.hpp">
-      <Filter>Header Files\tests</Filter>
-    </ClInclude>
     <ClInclude Include="include\infra\Log.hpp">
       <Filter>Header Files\infra</Filter>
     </ClInclude>
     <ClInclude Include="include\comm\Socket.hpp">
+      <Filter>Header Files\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\comm\Message.hpp">
       <Filter>Header Files\Comm</Filter>
     </ClInclude>
   </ItemGroup>

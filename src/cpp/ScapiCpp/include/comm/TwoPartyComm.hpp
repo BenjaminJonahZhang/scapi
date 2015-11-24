@@ -1,12 +1,15 @@
 #pragma once
 
-#include "Comm.hpp"
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include "Message.hpp"
+#include "Comm.hpp"
 #include <map>
 
 
 namespace boost_ip = boost::asio::ip; // reduce the typing a bit later...
 using IpAdress = boost_ip::address;
+using tcp = boost_ip::tcp;
 
 /**
 * A marker interface. Each type of party should have a concrete class that implement this interface.
@@ -51,22 +54,33 @@ class NativeChannel : public Channel {
 private:
 	SocketPartyData * me;
 	SocketPartyData * other;
-	boost::asio::ip::tcp::socket* sendSocketPtr;
-	boost::asio::ip::tcp::socket* receiveSocketPtr;
+	boost::asio::io_service& io_service_in;
+	boost::asio::io_service& io_service_out;
+	tcp::socket sendSocket;
+	tcp::socket receiveSocket;
+	tcp::acceptor acceptor_;
 	bool _isClosed;
+	deque<Message> write_msgs_;
+	Message read_msg_;
 
+	void do_write(Message msg);
+	void handle_write(const boost::system::error_code& error);
+	void handle_connect(const boost::system::error_code& error);
+	void handle_read_header(const boost::system::error_code& error);
+	void handle_read_body(const boost::system::error_code& error);
+	void start_accept();
+	void handle_accept(const boost::system::error_code& error);
 public:
-	NativeChannel(SocketPartyData *me, SocketPartyData *other) {
+	NativeChannel(SocketPartyData *me, SocketPartyData *other, boost::asio::io_service& io_service_in,
+		boost::asio::io_service& io_service_out) :
+		io_service_in(io_service_in), io_service_out(io_service_out),
+		acceptor_(io_service_in, tcp::endpoint(tcp::v4(), me->getPort())),
+		receiveSocket(io_service_in), sendSocket(io_service_out) {
+		Logger::configure_logging();
 		this->me = me;
 		this->other = other;
-		sendSocketPtr = NULL;
-		receiveSocketPtr = NULL;
-	}
-	bool connect() override;
-	void send(Message message) override;
-	Message receive() override;
-	void close() override;
-	bool isClosed() override;
+	};
+	bool isClosed() { return _isClosed; };
 	/**
 	* This function sets the channel state to READY in case both send and receive sockets are connected.
 	*/
@@ -74,9 +88,14 @@ public:
 	/**
 	* Returns if the send socket is connected.
 	*/
-	bool isSendConnected() { return (sendSocketPtr != NULL); };
-	void setReceiveSocket(long receiveSocket);
+	bool isSendConnected() { true; };
+	void setReceiveSocket(tcp::socket* receiveSocket);
 	void enableNagle();
+	virtual bool isConnected() { return true; };
+	bool connect() override;
+	void send(Message & message) override {};
+	Message receive() override { return Message(); };
+	void close() override {};
 };
 
 class NativeSocketListenerThread {

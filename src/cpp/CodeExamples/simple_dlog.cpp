@@ -55,7 +55,7 @@ void WorkerThread(boost::shared_ptr< boost::asio::io_service > io_service)
 	global_stream_lock.unlock();
 }
 
-int main(int argc, char * argv[])
+int main2(int argc, char * argv[])
 {
 	boost::shared_ptr< boost::asio::io_service > io_service(
 		new boost::asio::io_service

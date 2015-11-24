@@ -16,16 +16,14 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
-    <Text Include="makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="simple_dlog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="simple_sha1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="comm_example.cpp">
+    <ClInclude Include="catch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

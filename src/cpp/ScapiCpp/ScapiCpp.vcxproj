@@ -35,7 +35,7 @@
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
@@ -88,6 +88,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\OpenSSL-Win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -117,13 +118,13 @@
     <ClCompile Include="src\primitives\RandomOracle.cpp" />
     <ClCompile Include="src\primitives\TrapdoorPermutation.cpp" />
     <ClCompile Include="src\primitives\TrapdoorPermutationOpenSSL.cpp" />
-    <ClCompile Include="src\tests\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\comm\Comm.hpp" />
+    <ClInclude Include="include\comm\Message.hpp" />
     <ClInclude Include="include\comm\Socket.hpp" />
     <ClInclude Include="include\comm\TwoPartyComm.hpp" />
     <ClInclude Include="include\infra\Common.hpp" />
@@ -144,7 +145,6 @@
     <ClInclude Include="include\primitives\SecurityLevel.hpp" />
     <ClInclude Include="include\primitives\TrapdoorPermutationOpenSSL.hpp" />
     <ClInclude Include="include\primitives\TrapdoorPermutations.hpp" />
-    <ClInclude Include="include\tests\catch.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
