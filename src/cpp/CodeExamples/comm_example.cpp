@@ -1,40 +1,60 @@
 #include <boost/thread/thread.hpp>
 #include "../ScapiCpp/include/comm/TwoPartyComm.hpp"
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
 
 int main(int argc, char* argv[])
 {
 	try
 	{
-		//if (argc != 3)
-		//{
-		//	std::cerr << "Usage: chat_client <host> <port>\n";
-		//	return 1;
-		//}
+		if (argc != 4)
+		{
+			std::cerr << "Usage: chat_server <server port> <client ip> <client port>";
+			return 1;
+		}
 
-		boost::asio::io_service io_service_in;
-		boost::asio::io_service io_service_out;
-		SocketPartyData sp1(IpAdress::from_string("127.0.0.1"), 3000);
-		SocketPartyData sp2(IpAdress::from_string("127.0.0.1"), 5201);
-		if (sp1 == sp2)
-			cout << "equal! wrong!" << endl;
-		//NativeChannel c(&sp1, &sp2, io_service_in, io_service_out);
+		Logger::configure_logging();
+		boost::asio::io_service io_service;
 
-	//	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service_in));
-	//	boost::thread t2(boost::bind(&boost::asio::io_service::run, &io_service_out));
+		SocketPartyData me(IpAdress::from_string("127.0.0.1"), atoi(argv[1]));
+		SocketPartyData other(IpAdress::from_string(argv[2]), atoi(argv[3]));
+		ChannelServer * server = new ChannelServer(io_service, me, other);
+		boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 
-	//	char line[Message::max_body_length + 1];
-	//	while (std::cin.getline(line, Message::max_body_length + 1))
-	//	{
-	//		using namespace std; // For strlen and memcpy.
-	//		Message msg;
-	//		msg.body_length(strlen(line));
-	//		memcpy(msg.body(), line, msg.body_length());
-	//		msg.encode_header();
-	//		c.send(msg);
-	//	}
+		int i;
+		cout << "please click 0 when ready" << endl;
+		cin >> i;
+		server->connect();
+		this_thread::sleep_for(chrono::seconds(2));
+		if (!server->is_connected())
+		{
+			cout << "sorry. connection failed" << endl;
+			return -1;
+		}
+		else
+		{
+			cout << "connected. starting to send" << endl;
+		}
+			
+		cin.clear();
+		bool first = true;
+		char line[Message::max_body_length + 1];
+		while (std::cin.getline(line, Message::max_body_length + 1))
+		{
+			if (!first)
+			{
+				using namespace std; // For strlen and memcpy.
+				Message msg;
+				msg.body_length(strlen(line));
+				memcpy(msg.body(), line, msg.body_length());
+				msg.encode_header();
+				server->write(msg);
+			}
+			else
+				first = false;
+		}
 
-	//	c.close();
-	//	t.join();
+
 	}
 	catch (std::exception& e)
 	{

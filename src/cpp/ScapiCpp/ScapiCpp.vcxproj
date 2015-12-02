@@ -88,7 +88,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x06030000</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\code\Builds\CryptoPP\Output\Debug;C:\Program Files\Boost\boost_1_55_0\stage\lib;C:\OpenSSL-Win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -112,7 +112,7 @@
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
     <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
     <ClCompile Include="src\primitives\Kdf.cpp" />
-    <ClCompile Include="src\primitives\prf.cpp" />
+    <ClCompile Include="src\primitives\Prf.cpp" />
     <ClCompile Include="src\primitives\PrfOpenSSL.cpp" />
     <ClCompile Include="src\primitives\Prg.cpp" />
     <ClCompile Include="src\primitives\RandomOracle.cpp" />

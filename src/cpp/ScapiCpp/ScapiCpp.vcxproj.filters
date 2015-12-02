@@ -51,9 +51,6 @@
     <ClCompile Include="src\primitives\Kdf.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\primitives\prf.cpp">
-      <Filter>Source Files\primitives</Filter>
-    </ClCompile>
     <ClCompile Include="src\primitives\PrfOpenSSL.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
@@ -77,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="src\infra\MathAlgorithms.cpp">
       <Filter>Source Files\infra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\primitives\Prf.cpp">
+      <Filter>Source Files\primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

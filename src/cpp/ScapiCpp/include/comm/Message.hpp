@@ -1,4 +1,4 @@
-#pragma one
+#pragma once
 
 #include <cstdio>
 #include <cstdlib>
@@ -8,7 +8,7 @@ class Message
 {
 public:
 	enum { header_length = 4 };
-	enum { max_body_length = 1000*1000 };
+	enum { max_body_length = 1000};
 
 	Message()
 		: body_length_(0)
@@ -70,7 +70,7 @@ public:
 	{
 		using namespace std; // For sprintf and memcpy.
 		char header[header_length + 1] = "";
-		sprintf(header, "%4d", body_length_);
+		sprintf(header, "%4d", (int) body_length_);
 		memcpy(data_, header, header_length);
 	}
 

@@ -361,7 +361,9 @@ public:
 * (as long as input length = output length). We take the interpretation that there is essentially a different random permutation
 * for every input/output length.
 */
+#pragma vtordisp(push, 2)
 class LubyRackoffPrpFromPrfVarying : public PrpFromPrfVarying {
+#pragma vtordisp(pop)
 	LubyRackoffPrpFromPrfVarying();
 	/**
 	* Constructor that accepts a name of a prfVaryingIOLength to be the underlying PRF.
