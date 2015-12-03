@@ -12,6 +12,7 @@
 #include "../ScapiCpp/include/primitives/Kdf.hpp"
 #include "../ScapiCpp/include/primitives/RandomOracle.hpp"
 #include "../ScapiCpp/include/comm/TwoPartyComm.hpp"
+#include "../ScapiCpp/include/circuits/BooleanCircuits.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -516,12 +517,31 @@ TEST_CASE("Comm basics", "[Communication]") {
 		REQUIRE(spd1 != spd2);
 		REQUIRE(!(spd1 == spd2));
 	}
-	SECTION("connect") {
-		SocketPartyData sp1(IpAdress::from_string("127.0.0.1"), 3000);
-		SocketPartyData sp2(IpAdress::from_string("62.210.18.40"), 5201);
-		//NativeChannel nc(&sp1, &sp2);
-		//nc.connect();
-		//Message m(new byte[4]{ '1', '2', '3', '4' }, 4);
-		//nc.send(m);
+}
+
+TEST_CASE("Gates and Wires", "") {
+	/*
+	* Calculating the function f=(~X)vY. 
+	* 3 wires. 0-X, 1-Y, 2-f(x,y)
+	* Calculating once for x=0,y=0 (expecting 1) and for x=0, y=1 (expecting 0)
+	*/
+	SECTION("Compute Gate") {
+		vector<bool> truthT = { 1, 0, 1, 1 }; // Truth table for f=(~X)vY
+		vector<int> inputWireIndices = { 0,1 };
+		vector<int> outputWireIndices = { 2 };
+		Gate g(3, truthT, inputWireIndices, outputWireIndices);
+		map<int, Wire> computed_wires_map;
+		computed_wires_map[0] = 0; // x=0
+		computed_wires_map[1] = 0; // y=0
+		g.compute(computed_wires_map);
+		REQUIRE(computed_wires_map[0].getValue() == 0); // x still 0
+		REQUIRE(computed_wires_map[1].getValue() == 0); // y still 1
+		REQUIRE(computed_wires_map[2].getValue() == 1); // res = 1
+		computed_wires_map[1] = 1; // y=1 now
+		g.compute(computed_wires_map);
+		REQUIRE(computed_wires_map[0].getValue() == 0); // x is still 0
+		REQUIRE(computed_wires_map[1].getValue() == 1); // y is now 1
+		REQUIRE(computed_wires_map[2].getValue() == 0); // res = 0
 	}
 }
+

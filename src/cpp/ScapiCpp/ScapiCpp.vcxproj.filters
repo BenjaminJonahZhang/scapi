@@ -31,6 +31,12 @@
     <Filter Include="Source Files\infra">
       <UniqueIdentifier>{bab7e697-5caa-4f0a-a335-99e5585989ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Circuits">
+      <UniqueIdentifier>{88a348d2-e938-4485-a69a-e7bff58a0c69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Circuits">
+      <UniqueIdentifier>{f3a1c2e5-5eaf-4913-9d96-a9077922ff3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -77,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="src\primitives\Prf.cpp">
       <Filter>Source Files\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\circuits\BooleanCircuits.cpp">
+      <Filter>Source Files\Circuits</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="include\comm\Message.hpp">
       <Filter>Header Files\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\circuits\BooleanCircuits.hpp">
+      <Filter>Header Files\Circuits</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

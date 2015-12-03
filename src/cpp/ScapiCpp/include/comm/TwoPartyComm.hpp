@@ -72,6 +72,8 @@ public:
 	void write(const Message& msg);
 	void close();
 	bool is_connected() { return m_IsConnected; };
+	vector<byte> * NativeChannel::read_one();
+	//vector<Message> read_all();
 
 private:
 	tcp::socket serverSocket;
@@ -80,7 +82,7 @@ private:
 	SocketPartyData other;
 	deque<Message> write_msgs_;
 	Message read_msg_;
-	vector<vector<byte> *> read_msgs_;
+	deque<vector<byte> *> read_msgs_;
 	boost::asio::io_service& io_service_client_;
 	bool m_IsConnected = false;
 	void handle_connect(const boost::system::error_code& error);
@@ -111,6 +113,8 @@ public:
 	void connect() { channel->connect(); };
 	bool is_connected() { return channel->is_connected(); };
 	void write(const Message& msg) { channel->write(msg); };
+	vector<byte>* read_one() { return channel->read_one(); };
+	//vector<Message> read_all() { return channel->read_all(); };
 
 private:
 	void handle_accept(NativeChannel * new_channel, const boost::system::error_code& error) {

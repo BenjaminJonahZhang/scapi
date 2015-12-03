@@ -96,7 +96,9 @@
     <ClInclude Include="catch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests.cpp" />
+    <ClCompile Include="tests.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005;4297</DisableSpecificWarnings>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

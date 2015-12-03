@@ -104,11 +104,18 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\comm\TwoPartyComm.cpp" />
-    <ClCompile Include="src\infra\Common.cpp" />
+    <ClCompile Include="src\circuits\BooleanCircuits.cpp" />
+    <ClCompile Include="src\comm\TwoPartyComm.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="src\infra\Common.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4319</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="src\infra\MathAlgorithms.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
-    <ClCompile Include="src\primitives\DlogCryptopp.cpp" />
+    <ClCompile Include="src\primitives\DlogCryptopp.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4297</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
     <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
     <ClCompile Include="src\primitives\Kdf.cpp" />
@@ -123,6 +130,7 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\circuits\BooleanCircuits.hpp" />
     <ClInclude Include="include\comm\Comm.hpp" />
     <ClInclude Include="include\comm\Message.hpp" />
     <ClInclude Include="include\comm\Socket.hpp" />

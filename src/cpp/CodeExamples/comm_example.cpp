@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
 		cin.clear();
 		bool first = true;
 		char line[Message::max_body_length + 1];
+		vector<byte> * v;
 		while (std::cin.getline(line, Message::max_body_length + 1))
 		{
 			if (!first)
@@ -49,6 +50,11 @@ int main(int argc, char* argv[])
 				memcpy(msg.body(), line, msg.body_length());
 				msg.encode_header();
 				server->write(msg);
+				cout << "checking for recieved messages" << endl;
+				while ((v = server->read_one()) != NULL)
+				{
+					cout << "GOT MESSAGE: " << string(v->begin(), v->end()) << endl; 
+				}
 			}
 			else
 				first = false;
