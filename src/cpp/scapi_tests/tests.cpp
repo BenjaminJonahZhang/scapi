@@ -521,7 +521,7 @@ TEST_CASE("Comm basics", "[Communication]") {
 
 TEST_CASE("Gates and Wires", "") {
 	/*
-	* Calculating the function f=(~X)vY. 
+	* Calculating the function f=(~X)vY.
 	* 3 wires. 0-X, 1-Y, 2-f(x,y)
 	* Calculating once for x=0,y=0 (expecting 1) and for x=0, y=1 (expecting 0)
 	*/
@@ -542,6 +542,32 @@ TEST_CASE("Gates and Wires", "") {
 		REQUIRE(computed_wires_map[0].getValue() == 0); // x is still 0
 		REQUIRE(computed_wires_map[1].getValue() == 1); // y is now 1
 		REQUIRE(computed_wires_map[2].getValue() == 0); // res = 0
+	}
+
+	SECTION("Boolean Circuit") {
+		/*
+		* Calculating Circuit composed of 3 gates:
+		*  i0 ----\
+		*          > f1(X,Y)=(X or Y) -(i5 is x)\
+		*  i1 ----/                              \
+		*                                         --- > F3(x,y,z)= ((x or y) and z)   ----- i7 --->
+		*  i2 ----\                              /   /
+		*          > f2(X,Y)=(X and Y)-(i6 is y)/   /
+		*  i3 ----/                                /
+		*                                         /
+		*  i4 --------------------------(is z)---/
+		* Testing with i0=1, i1=0, i2=1, i3=0, i4=1.
+		* Should get i7=1
+		*/
+		Gate g1(1, { 0, 1, 1, 1 }, { 0, 1 }, { 5 }); // x || y
+		Gate g2(2, { 0, 0, 0, 1 }, { 2, 3 }, { 6 }); // x && y
+		Gate g3(3, { 0, 0, 0, 1, 0, 1, 0, 1 }, { 5, 6, 4 }, { 7 }); // (x || y) && z
+		BooleanCircuit bc({ g1, g2, g3 }, { 7 }, { {1,2,3,4} });
+		map<int, Wire> presetInputWires = { { 0, Wire(1) }, { 1, Wire(0) }, { 2, Wire(1) },
+											{ 3, Wire(0) }, { 4, Wire(1) } };
+		bc.setInputs(presetInputWires, 1);
+		auto bc_res_map = bc.compute();
+		REQUIRE(bc_res_map[7].getValue() == 1);
 	}
 }
 

@@ -70,7 +70,7 @@ int Gate::calculateIndexOfTruthTable(map<int, Wire> computedWires) const {
 /*                BooleanCircuit                    */
 /****************************************************/
 
-//public BooleanCircuit(Scanner s) throws CircuitFileFormatException {
+//BooleanCircuit(Scanner s) throws CircuitFileFormatException {
 //	//Read the number of gates.
 //	int numberOfGates = Integer.parseInt(read(s));
 //	gates = new Gate[numberOfGates];
@@ -138,3 +138,85 @@ int Gate::calculateIndexOfTruthTable(map<int, Wire> computedWires) const {
 //		gates[i] = new Gate(i, truthTable, inputWireIndices, outputWireIndices);
 //	}
 //}
+
+void BooleanCircuit::setInputs(const map<int, Wire> & presetInputWires, int partyNumber) {
+	if (partyNumber < 1 || partyNumber > numberOfParties)
+		throw NoSuchPartyException("wrong number of party. got: " + to_string(partyNumber));
+	computedWires.insert(presetInputWires.begin(), presetInputWires.end());
+	isInputSet[partyNumber - 1] = true;
+}
+
+void BooleanCircuit::setInputs(scannerpp::File * inputWiresFile, int partyNumber) {
+	if (partyNumber < 1 || partyNumber > numberOfParties)
+		throw NoSuchPartyException("wrong number of party. got: " + to_string(partyNumber));
+	scannerpp::Scanner s(inputWiresFile);
+	int numberOfInputWires = stoi(read(s));
+	if (numberOfInputWires != getNumberOfInputs(partyNumber))
+		throw InvalidInputException("number of input wires is different than real input");
+
+	map<int, Wire> presetInputWires;
+	for (int i = 0; i < numberOfInputWires; i++) 
+		presetInputWires[stoi(read(s))] = Wire((byte)read(s)[0]);
+		
+	setInputs(presetInputWires, partyNumber);
+}
+
+map<int, Wire> BooleanCircuit::compute() {
+	for (int i = 0; i < numberOfParties; i++)
+		if (!isInputSet[i])
+			throw NotAllInputsSetException("not all inputs set");
+
+	/* Computes each Gate.
+	* Since the Gates are provided in topological order, by the time the compute function on a given Gate is called,
+	* its input Wires will have already been assigned values
+	*/
+	for (Gate g : getGates())
+		g.compute(computedWires);
+
+	/*
+	* The computedWires array contains all the computed wire values, even those that it is no longer necessary to retain.
+	* So, we create a new Map called outputMap which only stores the Wires that are output Wires to the circuit.
+	* We return outputMap.
+	*/
+	map<int, Wire> outputMap;
+	for (int w : outputWireIndices)
+		outputMap[w] = computedWires[w];
+	return outputMap;
+}
+
+bool BooleanCircuit::operator==(const BooleanCircuit &other) const {
+	// first tests to see that the number of Gates is the same for each circuit. If it's not, then the two are not equal.
+	if (getGates().size() != other.getGates().size()) {
+		return false;
+	}
+	// calls the equals method of the Gate class to compare each corresponding Gate. 
+	// if any of them return false, the circuits are not the same.
+	for (int i = 0; i < getGates().size(); i++) 
+		if ( getGates()[i]!= other.getGates()[i] )
+			return false;
+
+	return true;
+}
+
+vector<int> BooleanCircuit::getInputWireIndices(int partyNumber) const {
+	if (partyNumber < 1 || partyNumber > numberOfParties) 
+		throw NoSuchPartyException("wrong number of party. got: " + to_string(partyNumber));
+	// we subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
+	return eachPartysInputWires[partyNumber - 1];
+}
+
+int BooleanCircuit::getNumberOfInputs(int partyNumber) const {
+	if (partyNumber < 1 || partyNumber > numberOfParties)
+		throw NoSuchPartyException("wrong number of party. got: " + to_string(partyNumber));
+	// we subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
+	return eachPartysInputWires[partyNumber - 1].size();
+}
+
+string BooleanCircuit::read(scannerpp::Scanner s) {
+	string token = s.next();
+	while (boost::starts_with(token, "#")) {
+		s.nextLine();
+		token = s.next();
+	}
+	return token;
+}

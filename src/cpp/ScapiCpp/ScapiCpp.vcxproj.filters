@@ -87,6 +87,9 @@
     <ClCompile Include="src\circuits\BooleanCircuits.cpp">
       <Filter>Source Files\Circuits</Filter>
     </ClCompile>
+    <ClCompile Include="src\infra\Scanner.cpp">
+      <Filter>Source Files\infra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -160,6 +163,12 @@
     </ClInclude>
     <ClInclude Include="include\circuits\BooleanCircuits.hpp">
       <Filter>Header Files\Circuits</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\Scanner.hpp">
+      <Filter>Header Files\infra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\File.hpp">
+      <Filter>Header Files\infra</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

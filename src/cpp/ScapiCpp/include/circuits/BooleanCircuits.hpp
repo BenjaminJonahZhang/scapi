@@ -1,8 +1,31 @@
 #pragma once
 #include "../infra/Common.hpp"
+#include "../infra/Scanner.hpp"
 #include <fstream>
 #include <iostream>
 #include <map>
+
+
+class NoSuchPartyException : public logic_error
+{
+public:
+	NoSuchPartyException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "No Such Party"; }
+};
+
+class InvalidInputException : public logic_error
+{
+public:
+	InvalidInputException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "Invalid input"; }
+};
+class NotAllInputsSetException : public logic_error
+{
+public:
+	NotAllInputsSetException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "Not all input is set"; };
+};
+
 
 /**
 * The {@code Wire} class is a software representation of a {@code Wire} in a circuit. <p>
@@ -155,7 +178,7 @@ public:
 	* @param s The {@link Scanner} from which the circuit is read.
 	* @throws CircuitFileFormatException if there is a problem with the format of the circuit.
 	*/
-	//BooleanCircuit(Scanner s);
+	BooleanCircuit(scannerpp::Scanner s);
 
 	/**
 	* Constructs a BooleanCircuit from a File. <p>
@@ -169,7 +192,7 @@ public:
 	* @throws FileNotFoundException if f is not found in the specified directory.
 	* @throws CircuitFileFormatException if there is a problem with the format of the file.
 	*/
-	BooleanCircuit(ifstream f); /*: BooleanCircuit(new Scanner(f))*/
+	BooleanCircuit(scannerpp::File * fp) : BooleanCircuit(scannerpp::Scanner(fp)) {};
 
 	/**
 	* Constructs a {code BooleanCircuit} from an array of gates. <p>
@@ -181,7 +204,14 @@ public:
 	* @param eachPartysInputWires An arrayList containing the indices of the input {@code Wire}s of this
 	* {@code BooleanCircuit} indexed by the party number.
 	*/
-	BooleanCircuit(vector<Gate> gates, vector<int> outputWireIndices, vector<vector<int>> eachPartysInputWires);
+	BooleanCircuit(const vector<Gate> & gates, const vector<int> & outputWireIndices, const vector<vector<int>> & eachPartysInputWires) :
+		isInputSet(eachPartysInputWires.size())
+	{
+		this->gates = gates;
+		this->outputWireIndices = outputWireIndices;
+		this->eachPartysInputWires = eachPartysInputWires;
+		numberOfParties = eachPartysInputWires.size();
+	}
 
 	/**
 	* Sets the specified party's input to the circuit from a map containing constructed and set {@link Wire}s. <p>
@@ -191,7 +221,7 @@ public:
 	* @param presetInputWires The circuit's input wires whose values have been previously set.
 	* @throws NoSuchPartyException if the party number is negative or bigger then the given number of parties.
 	*/
-	void setInputs(map<int, Wire> presetInputWires, int partyNumber);
+	void setInputs(const map<int, Wire> & presetInputWires, int partyNumber);
 
 	/**
 	* Sets the input to the circuit by reading it from a file. <p>
@@ -202,7 +232,7 @@ public:
 	* @throws InvalidInputException
 	* @throws NoSuchPartyException
 	*/
-	void setInputs(ifstream inputWires, int partyNumber);
+	void setInputs(scannerpp::File * inputWiresFile, int partyNumber);
 
 	/**
 	* Computes the circuit if the input has been set.<p>
@@ -224,7 +254,7 @@ public:
 	/**
 	* @return an array of the {@link Gate}s of this circuit.
 	*/
-	vector<Gate> getGates() { return gates; };
+	vector<Gate> getGates() const { return gates; };
 
 	/**
 	* @return an array of the output{@link Wire} indices of this circuit.
@@ -236,14 +266,14 @@ public:
 	* @return an ArrayList containing the input {@link Wire} indices of the specified party.
 	* @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
 	*/
-	vector<int> getInputWireIndices(int partyNumber);
+	vector<int> getInputWireIndices(int partyNumber) const;
 
 	/**
 	* @param partyNumber The number of the party whose number of input wires will be returned.
 	* @return the number of input wires for the specified party.
 	* @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
 	*/
-	int getNumberOfInputs(int partyNumber);
+	int getNumberOfInputs(int partyNumber) const;
 	
 	/**
 	* Returns the number of parties of this boolean circuit.
@@ -282,7 +312,7 @@ private:
 	*/
 	vector<vector<int>> eachPartysInputWires;
 
-	//string read(Scanner s);
+	string read(scannerpp::Scanner s);
 };
 
 

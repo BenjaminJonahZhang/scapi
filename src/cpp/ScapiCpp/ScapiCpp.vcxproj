@@ -112,6 +112,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4319</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="src\infra\MathAlgorithms.cpp" />
+    <ClCompile Include="src\infra\Scanner.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogCryptopp.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4297</DisableSpecificWarnings>
@@ -136,8 +137,10 @@
     <ClInclude Include="include\comm\Socket.hpp" />
     <ClInclude Include="include\comm\TwoPartyComm.hpp" />
     <ClInclude Include="include\infra\Common.hpp" />
+    <ClInclude Include="include\infra\File.hpp" />
     <ClInclude Include="include\infra\Log.hpp" />
     <ClInclude Include="include\infra\MathAlgorithms.hpp" />
+    <ClInclude Include="include\infra\Scanner.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />
