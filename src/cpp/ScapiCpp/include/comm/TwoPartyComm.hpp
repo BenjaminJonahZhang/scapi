@@ -100,6 +100,7 @@ private:
 	boost::asio::io_service& io_service_server;
 	boost::asio::io_service& io_service_client;
 	NativeChannel * channel;
+	Message msg;
 public:
 	ChannelServer(boost::asio::io_service& io_service, SocketPartyData me, SocketPartyData other) :
 		io_service_server(io_service), io_service_client(io_service),
@@ -112,7 +113,7 @@ public:
 	};
 	void connect() { channel->connect(); };
 	bool is_connected() { return channel->is_connected(); };
-	void write(const Message& msg) { channel->write(msg); };
+	void write(byte* data, int size);
 	vector<byte>* read_one() { return channel->read_one(); };
 	//vector<Message> read_all() { return channel->read_all(); };
 

@@ -146,3 +146,15 @@ vector<byte> * NativeChannel::read_one() {
 	return NULL;
 }
 
+
+
+/*****************************************/
+/* ChannelServer						 */
+/*****************************************/
+
+void ChannelServer::write(byte* data, int size) {
+	msg.body_length(size);
+	memcpy(msg.body(), &data[0], msg.body_length());
+	msg.encode_header();
+	channel->write(msg);
+}

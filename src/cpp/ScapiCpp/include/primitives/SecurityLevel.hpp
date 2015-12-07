@@ -59,4 +59,13 @@ class OneTime : public MacSignSecLevel {};
 */
 class UnlimitedTimes : public OneTime {};
 
+/**
+* This interface is the root interface of the security level hierarchy for (secure computation) protocols.<p>
+* There are three different subhierarchies in this family. The first relates to the adversary's capabilities and includes
+* Semihonest, Malicious and Covert. The second relates to the question of composition and includes StandAlone and UC (universally composable).
+* The third relates to the corruption strategy of the adversary and includes AdaptiveWithErasures and AdaptiveNoErasures
+* (if no interface here is implemented then static security is assumed).
+*/
+class ProtocolSecLevel : public SecurityLevel {};
+
 #endif

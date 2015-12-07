@@ -28,5 +28,8 @@
     <ClCompile Include="comm_example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Yao\App1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

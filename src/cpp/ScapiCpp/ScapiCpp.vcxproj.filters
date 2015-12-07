@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Circuits">
       <UniqueIdentifier>{f3a1c2e5-5eaf-4913-9d96-a9077922ff3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\InteractiveMidProtocols">
+      <UniqueIdentifier>{c4fd74e2-91c3-4318-ad2b-45c305e0302b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\InteractiveMidProtocols">
+      <UniqueIdentifier>{3d3b1c69-225b-48bc-b76c-866a5ded37d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -89,6 +95,12 @@
     </ClCompile>
     <ClCompile Include="src\infra\Scanner.cpp">
       <Filter>Source Files\infra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\interactive_mid_protocols\OTSemiHonestExtension.cpp">
+      <Filter>Source Files\InteractiveMidProtocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\circuits\FastGarbledBooleanCircuit.cpp">
+      <Filter>Source Files\Circuits</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +181,12 @@
     </ClInclude>
     <ClInclude Include="include\infra\File.hpp">
       <Filter>Header Files\infra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\OTSemiHonestExtension.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\circuits\FastGarbledBooleanCircuit.hpp">
+      <Filter>Header Files\Circuits</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

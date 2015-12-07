@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\code\Builds\Miracl Build;C:\code\scapi\lib;C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x06030000</PreprocessorDefinitions>
     </ClCompile>
@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\circuits\BooleanCircuits.cpp" />
+    <ClCompile Include="src\circuits\FastGarbledBooleanCircuit.cpp" />
     <ClCompile Include="src\comm\TwoPartyComm.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
@@ -113,6 +114,9 @@
     </ClCompile>
     <ClCompile Include="src\infra\MathAlgorithms.cpp" />
     <ClCompile Include="src\infra\Scanner.cpp" />
+    <ClCompile Include="src\interactive_mid_protocols\OTSemiHonestExtension.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogCryptopp.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4297</DisableSpecificWarnings>
@@ -132,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\circuits\BooleanCircuits.hpp" />
+    <ClInclude Include="include\circuits\FastGarbledBooleanCircuit.hpp" />
     <ClInclude Include="include\comm\Comm.hpp" />
     <ClInclude Include="include\comm\Message.hpp" />
     <ClInclude Include="include\comm\Socket.hpp" />
@@ -141,6 +146,7 @@
     <ClInclude Include="include\infra\Log.hpp" />
     <ClInclude Include="include\infra\MathAlgorithms.hpp" />
     <ClInclude Include="include\infra\Scanner.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\OTSemiHonestExtension.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />

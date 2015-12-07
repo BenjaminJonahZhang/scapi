@@ -45,11 +45,7 @@ int main(int argc, char* argv[])
 			if (!first)
 			{
 				using namespace std; // For strlen and memcpy.
-				Message msg;
-				msg.body_length(strlen(line));
-				memcpy(msg.body(), line, msg.body_length());
-				msg.encode_header();
-				server->write(msg);
+				server->write((byte *)line, strlen(line));
 				cout << "checking for recieved messages" << endl;
 				while ((v = server->read_one()) != NULL)
 				{
