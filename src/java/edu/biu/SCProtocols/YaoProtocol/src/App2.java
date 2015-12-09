@@ -1,24 +1,26 @@
-package edu.biu.SCProtocols.YaoProtocol.src;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
-import edu.biu.scapi.circuits.circuit.BooleanCircuit;
-import edu.biu.scapi.circuits.encryption.AESFixedKeyMultiKeyEncryption;
-import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
+import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.comm.CommunicationSetup;
 import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
 import edu.biu.scapi.comm.LoadParties;
 import edu.biu.scapi.comm.NaiveSuccess;
 import edu.biu.scapi.comm.Party;
+import edu.biu.scapi.comm.twoPartyComm.LoadSocketParties;
+import edu.biu.scapi.comm.twoPartyComm.NativeSocketCommunicationSetup;
+import edu.biu.scapi.comm.twoPartyComm.PartyData;
+import edu.biu.scapi.comm.twoPartyComm.TwoPartyCommunicationSetup;
+import edu.biu.scapi.exceptions.DuplicatePartyException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonestExtensionReceiver;
 
@@ -28,51 +30,53 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonest
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
+@SuppressWarnings("deprecation")
 public class App2 {
+	
+	static Party partySender;//the party of the sender side that is needed for creating the ot communication.
 	
 	/**
 	 * @param args no arguments should be passed
 	 */
 	public static void main(String[] args) {
-		Party party = null;
-		try {
-			party = new Party(InetAddress.getByName("127.0.0.1"), 7666);
-		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		//Set up the communication with the other side and get the created channel/
-		Channel channel = setCommunication();	
+		
+		//Set up the communication with the other side and get the created channel
+		//Channel channel = setCommunication();	
+		Channel channel = setCommunicationNotNative();
 		
 		try {
-			//Create the Boolean circuit of AES.
-			BooleanCircuit bc = new BooleanCircuit(new File("AES_Final-2.txt"));
-			//Create the OT sender.
-			//OTBatchReceiver otReceiver = new OTSemiHonestDDHBatchOnByteArrayReceiver(dlog, kdf, random);
-			OTBatchReceiver otReceiver = new OTSemiHonestExtensionReceiver(party,163,1);
-			
-			//Create the encryption scheme.
-			MultiKeyEncryptionScheme mes = new AESFixedKeyMultiKeyEncryption();
+		
+			//create the OT receiver.
 			Date start = new Date();
+			OTBatchReceiver otReceiver = new OTSemiHonestExtensionReceiver(partySender,163,1);
+			Date end = new Date();
+			long time = (end.getTime() - start.getTime());
+			System.out.println("init ot " +time + " milis");
+			
+			//create a fast garbling circuit based on native c++, with AES circuit and the half gates technique
+			FastGarbledBooleanCircuit circuit = new ScNativeGarbledBooleanCircuit("NigelAes.txt", CircuitType.FREE_XOR_HALF_GATES, false);
+
+			
+			start = new Date();
 			//Run the protocol multiple times.
 			for(int i=0; i<100;i++){
 				
 				Date before = new Date();
-				//Create Party two with the previous created objects.
-				//ArrayList<Byte> ungarbledInput = readInputs();
+				//Create Party two with the previous created objects			
 				byte[] ungarbledInput = readInputsAsArray();
+				
 				Date after = new Date();
-				long time = (after.getTime() - before.getTime());
+				 time = (after.getTime() - before.getTime());
 				System.out.println("read inputs took " +time + " milis");
 				
 				//init the P1 yao protocol
-				PartyTwo p2 = new PartyTwo(channel, bc, mes, otReceiver);
+				PartyTwo p2 = new PartyTwo(channel, otReceiver, circuit); 
 			
 				//Run party two of Yao protocol.
 				p2.run(ungarbledInput);
 			}
-			Date end = new Date();
-			long time = (end.getTime() - start.getTime())/100;
+			end = new Date();
+			time = (end.getTime() - start.getTime())/100;
 			System.out.println("Yao's protocol party 2 took " +time + " milis");
 			
 			
@@ -112,7 +116,42 @@ public class App2 {
 	 *  
 	 * @return the channel with the other party.
 	 */
+	@SuppressWarnings("unused")
 	private static Channel setCommunication() {
+		
+		List<PartyData> listOfParties = null;
+		
+		LoadSocketParties loadParties = new LoadSocketParties("Parties0.properties");
+	
+		//Prepare the parties list.
+		listOfParties = loadParties.getPartiesList();
+		
+	
+		//Create the communication setup.
+		TwoPartyCommunicationSetup commSetup = null;
+		try {
+			commSetup = new NativeSocketCommunicationSetup(listOfParties.get(0), listOfParties.get(1));
+		} catch (DuplicatePartyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+	
+		System.out.print("Before call to prepare\n");
+		
+		Map<String, Channel> connections = null;
+		try {
+			connections = commSetup.prepareForCommunication(1, 200000);
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+		//Return the channel with the other party. There was only one channel created.
+		return (Channel)((connections.values()).toArray())[0];
+	}
+	
+private static Channel setCommunicationNotNative() {
 		
 		List<Party> listOfParties = null;
 		
@@ -120,6 +159,9 @@ public class App2 {
 	
 		//Prepare the parties list.
 		listOfParties = loadParties.getPartiesList();
+		
+		//Set the sender party.
+		partySender = new Party(listOfParties.get(1).getIpAddress(), 7666);
 	
 		//Create the communication setup.
 		CommunicationSetup commSetup = new CommunicationSetup();

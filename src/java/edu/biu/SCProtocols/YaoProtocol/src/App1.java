@@ -1,25 +1,26 @@
-package edu.biu.SCProtocols.YaoProtocol.src;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
-import edu.biu.scapi.circuits.circuit.BooleanCircuit;
-import edu.biu.scapi.circuits.encryption.AESFixedKeyMultiKeyEncryption;
-import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
+import edu.biu.scapi.circuits.fastGarbledCircuit.FastGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit;
+import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.CircuitType;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.comm.CommunicationSetup;
 import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
 import edu.biu.scapi.comm.LoadParties;
 import edu.biu.scapi.comm.NaiveSuccess;
 import edu.biu.scapi.comm.Party;
+import edu.biu.scapi.comm.twoPartyComm.LoadSocketParties;
+import edu.biu.scapi.comm.twoPartyComm.NativeSocketCommunicationSetup;
+import edu.biu.scapi.comm.twoPartyComm.PartyData;
+import edu.biu.scapi.comm.twoPartyComm.TwoPartyCommunicationSetup;
+import edu.biu.scapi.exceptions.DuplicatePartyException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonestExtensionSender;
 
@@ -29,53 +30,53 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonest
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
+@SuppressWarnings("deprecation")
 public class App1 {
 	
+	static Party partySender;//the party of the sender side that is needed for creating the ot communication.
+	
 	/**
-	 * Execute Yao protocol's party one.
-	 * 
 	 * @param args no arguments should be passed
 	 */
 	public static void main(String[] args) {
-		//Create Party object to use in the OTExtension. 
-		//The communication in Ot Extension is done in the native code and thus, it does not receive a channel but a party.
-		Party party = null;
-		try {
-			party = new Party(InetAddress.getByName("127.0.0.1"), 7666);
-		} catch (UnknownHostException e1) {
-			// Should not occur since this is the localhost.
-		}
+		
+		
 		//Set up the communication with the other side and get the created channel.
-		//This channel is used in protocol parts others than the OT.
-		Channel channel = setCommunication();	
+		//Channel channel = setCommunication();	
+		Channel channel = setCommunicationNotNative();
+		
+		Date start = new Date();
+		OTBatchSender otSender = new OTSemiHonestExtensionSender(partySender,163,1);
+		Date end = new Date();
+		long time = (end.getTime() - start.getTime());
+		System.out.println("init ot took " +time + " milis");
+		
 		
 		try {
-			//Create the Boolean circuit of AES.
-			BooleanCircuit bc = new BooleanCircuit(new File("AES_Final-2.txt"));
-			//Create the OT sender.
-			OTBatchSender otSender = new OTSemiHonestExtensionSender(party,163,1);
-			//Create the encryption scheme.
-			MultiKeyEncryptionScheme mes = new AESFixedKeyMultiKeyEncryption();
-			Date start = new Date();
+			
+			FastGarbledBooleanCircuit circuit = new ScNativeGarbledBooleanCircuit("NigelAes.txt", CircuitType.FREE_XOR_HALF_GATES, false);
+			
+			start = new Date();
 			//Run the protocol multiple times.
 			for(int i=0; i<100;i++){
 				
 				Date before = new Date();
 				//Get the inputs of P1.
-				ArrayList<Byte> ungarbledInput = readInputs();
+				byte[] ungarbledInput = readInputsAsArray();
+				
 				Date after = new Date();
-				long time = (after.getTime() - before.getTime());
+				time = (after.getTime() - before.getTime());
 				System.out.println("read inputs took " +time + " milis");
 				//Create Party one with the previous created objects.
-				PartyOne p1 = new PartyOne(channel, bc, mes, otSender);
+				PartyOne p1 = new PartyOne(channel, otSender, circuit);
 			
-				//Run party 1 of Yao protocol.
 				p1.run(ungarbledInput);
+				
+				
 			}
-			Date end = new Date();
-			long time = (end.getTime() - start.getTime())/100;
+			end = new Date();
+			time = (end.getTime() - start.getTime())/100;
 			System.out.println("Yao's protocol party 1 took " +time + " milis");
-			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,7 +87,7 @@ public class App1 {
 	 * Create the inputs of party one from an input file.
 	 * @return an Array contains the inputs for party one.
 	 */
-	private static ArrayList<Byte> readInputs() {
+	private static byte[] readInputsAsArray() {
 		File file = new File("AESPartyOneInputs.txt");
 		
 		Scanner scanner = null;
@@ -96,26 +97,57 @@ public class App1 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		ArrayList<Byte> inputs = new ArrayList<Byte>();
-		//First, read the number of inputs.
-		int inputsNumber = scanner.nextInt();
-		//Read each input and set it in the inputs array.
+			int inputsNumber = scanner.nextInt();
+		byte[] inputs = new byte[inputsNumber];
+	
 		for (int i=0; i<inputsNumber; i++){
-			inputs.add((byte) scanner.nextInt());
+			inputs[i] =  (byte) scanner.nextInt();
 		}
 		
 		return inputs;
 	}
-
-
+	
 	/**
 	 * 
 	 * Loads parties from a file and sets up the channel.
 	 *  
 	 * @return the channel with the other party.
 	 */
+	@SuppressWarnings("unused")
 	private static Channel setCommunication() {
+		
+		List<PartyData> listOfParties = null;
+		
+		LoadSocketParties loadParties = new LoadSocketParties("Parties1.properties");
+	
+		//Prepare the parties list.
+		listOfParties = loadParties.getPartiesList();
+	
+		//Create the communication setup.
+		TwoPartyCommunicationSetup commSetup = null;
+		try {
+			commSetup = new NativeSocketCommunicationSetup(listOfParties.get(0), listOfParties.get(1));
+		} catch (DuplicatePartyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+	
+		System.out.print("Before call to prepare\n");
+		
+		Map<String, Channel> connections = null;
+		try {
+			connections = commSetup.prepareForCommunication(1, 200000);
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+		//Return the channel with the other party. There was only one channel created.
+		return (Channel)((connections.values()).toArray())[0];
+	}
+	
+private static Channel setCommunicationNotNative() {
 		
 		List<Party> listOfParties = null;
 		
@@ -123,6 +155,9 @@ public class App1 {
 	
 		//Prepare the parties list.
 		listOfParties = loadParties.getPartiesList();
+		
+		//Set the sender party.
+		partySender = new Party(listOfParties.get(0).getIpAddress(), 7666);
 	
 		//Create the communication setup.
 		CommunicationSetup commSetup = new CommunicationSetup();
