@@ -31,5 +31,8 @@
     <ClCompile Include="Yao\App1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Yao\App2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

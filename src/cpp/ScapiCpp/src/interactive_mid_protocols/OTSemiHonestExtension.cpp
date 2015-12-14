@@ -7,6 +7,7 @@
 /***********************************/
 
 const char * OTSemiHonestExtensionSender::m_nSeed = string("437398417012387813714564100").c_str();
+const char * OTSemiHonestExtensionReceiver::m_nSeed = string("437398417012387813714564100").c_str();
 
 OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, int koblitzOrZpSize, int numOfThreads) {
 	//use ECC koblitz
@@ -230,5 +231,170 @@ bool OTSemiHonestExtensionSender::ObliviouslySend(OTExtensionSender* sender, CBi
 	int nSndVals = 2; //Perform 1-out-of-2 OT
 	// Execute OT sender routine 	
 	success = sender->send(numOTs, bitlength, X1, X2, delta, version, m_nNumOTThreads, m_fMaskFct);
+	return success;
+}
+
+/***********************************/
+/*   OTSemiHonestExtensionReceiver */
+/***********************************/
+
+bool OTSemiHonestExtensionReceiver::Init(int numOfThreads)
+{
+	// Random numbers
+	SHA_CTX sha;
+	OTEXT_HASH_INIT(&sha);
+	OTEXT_HASH_UPDATE(&sha, (BYTE*)&m_nPID, sizeof(m_nPID));
+	OTEXT_HASH_UPDATE(&sha, (BYTE*)OTSemiHonestExtensionReceiver::m_nSeed, sizeof(m_nSeed));
+	OTEXT_HASH_FINAL(&sha, m_aSeed);
+	m_nCounter = 0;
+	//Number of threads that will be used in OT extension
+	m_nNumOTThreads = numOfThreads;
+	m_vSockets.resize(m_nNumOTThreads);
+	bot = new NaorPinkas(m_nSecParam, m_aSeed, m_bUseECC);
+	return true;
+}
+
+bool OTSemiHonestExtensionReceiver::Connect(){
+	bool bFail = false;
+	LONG lTO = CONNECT_TIMEO_MILISEC;
+	for (int k = m_nNumOTThreads - 1; k >= 0; k--)
+	{
+		for (int i = 0; i<RETRY_CONNECT; i++)
+		{
+			if (!m_vSockets[k].Socket())
+			{
+				printf("Socket failure: ");
+				goto connect_failure;
+			}
+
+			if (m_vSockets[k].Connect(m_nAddr, m_nPort, lTO))
+			{
+				// send pid when connected
+				m_vSockets[k].Send(&k, sizeof(int));
+				if (k == 0)
+					return TRUE;
+				else
+					break;
+				SleepMiliSec(10);
+				m_vSockets[k].Close();
+			}
+			SleepMiliSec(20);
+			if (i + 1 == RETRY_CONNECT)
+				goto server_not_available;
+		}
+	}
+server_not_available:
+	printf("Server not available: ");
+connect_failure:
+	cerr << " (" << !m_nPID << ") connection failed" << endl;
+	return false;
+}
+
+bool OTSemiHonestExtensionReceiver::PrecomputeNaorPinkasReceiver()
+{
+	int nSndVals = 2;
+	// Execute NP receiver routine and obtain the key 
+	BYTE* pBuf = new BYTE[SHA1_BYTES * NUM_EXECS_NAOR_PINKAS * nSndVals];
+	//=================================================	
+	// N-P sender: send: C0 (=g^r), C1, C2, C3 
+	bot->Sender(nSndVals, NUM_EXECS_NAOR_PINKAS, m_vSockets[0], pBuf);
+	//Key expansion
+	BYTE* pBufIdx = pBuf;
+	for (int i = 0; i<NUM_EXECS_NAOR_PINKAS * nSndVals; i++)
+	{
+		memcpy(vKeySeedMtx + i * AES_KEY_BYTES, pBufIdx, AES_KEY_BYTES);
+		pBufIdx += SHA1_BYTES;
+	}
+	delete[] pBuf;
+	return true;
+}
+
+OTSemiHonestExtensionReceiver::OTSemiHonestExtensionReceiver(SocketPartyData party, int koblitzOrZpSize, int numOfThreads) {
+	int nSndVals = 2;
+	m_nPort = (USHORT)party.getPort();
+	m_nAddr = party.getIpAddress().to_string().c_str();
+	vKeySeedMtx = (byte*)malloc(AES_KEY_BYTES*NUM_EXECS_NAOR_PINKAS * nSndVals);
+	
+	//Initialize values
+	Init(numOfThreads);
+
+	//Client connect
+	Connect();
+	PrecomputeNaorPinkasReceiver();
+	receiverPtr = new OTExtensionReceiver(nSndVals, m_vSockets.data(), vKeySeedMtx, m_aSeed);
+}
+
+OTBatchROutput* OTSemiHonestExtensionReceiver::transfer(OTBatchRInput* input) {
+	// we set the version to be the general case, if a different call was made we will change it later to the relevant version.
+	string version = "general";
+	
+	if (input->getType() != OTBatchRInputTypes::OTExtensionGeneralRInput)
+		throw invalid_argument("input should be instance of OTExtensionGeneralRInput");
+
+	////If the user gave correlated input, change the version of the OT to correlated.
+	//if (input instanceof OTExtensionCorrelatedRInput) {
+	//	version = "correlated";
+	//}
+
+	////If the user gave random input, change the version of the OT to random.
+	//if (input instanceof OTExtensionRandomRInput) {
+	//	version = "random";
+	//}
+
+	byte* sigmaArr = ((OTExtensionRInput *)input)->getSigmaArr();
+	int numOfOts = ((OTExtensionRInput *)input)->getSigmaArrSize();
+	int elementSize = ((OTExtensionRInput *)input)->getElementSize();
+
+	int outbytesLength = numOfOts*elementSize / 8;
+	byte* outputBytes = new byte[outbytesLength];
+
+	//Run the protocol using the native code in the dll.
+	runOtAsReceiver(sigmaArr, numOfOts, elementSize, outputBytes, version);
+	return new OTOnByteArrayROutput(outputBytes, outbytesLength);
+}
+
+void OTSemiHonestExtensionReceiver::runOtAsReceiver(byte* sigma, int numOfOts, int bitLength, byte* output, std::string version) {
+	BYTE ver;
+	//supports all of the SHA hashes. Get the name of the required hash and instanciate that hash.
+	if (version=="general")
+		ver = G_OT;
+	if (version=="correlated") {
+		ver = C_OT;
+		m_fMaskFct = new XORMasking(bitLength);
+	}
+	if (version=="random") 
+		ver = R_OT;
+
+	CBitVector choices, response;
+	choices.Create(numOfOts);
+
+	// pre-generate the respose vector for the results
+	response.Create(numOfOts, bitLength);
+
+	// copy the sigma values received from java
+	for (int i = 0; i<numOfOts; i++) {
+		choices.SetBit((i / 8) * 8 + 7 - (i % 8), sigma[i]);
+		//choices.SetBit(i, sigmaArr[i]);
+	}
+
+	//run the ot extension as the receiver
+	ObliviouslyReceive(choices, response, numOfOts, bitLength, ver);
+
+	//prepare the out array
+	for (int i = 0; i < numOfOts*bitLength / 8; i++)
+		//copy each byte result to out
+		output[i] = response.GetByte(i);
+
+	// free the pointer of choises and reponse
+	choices.delCBitVector();
+	response.delCBitVector();
+	if (ver == C_OT) 
+		delete m_fMaskFct;
+}
+
+bool OTSemiHonestExtensionReceiver::ObliviouslyReceive(CBitVector& choices, CBitVector& ret, int numOTs, int bitlength, BYTE version) {
+	bool success = false;
+	// Execute OT receiver routine 	
+	success = receiverPtr->receive(numOTs, bitlength, choices, ret, version, m_nNumOTThreads, m_fMaskFct);
 	return success;
 }

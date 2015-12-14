@@ -104,10 +104,10 @@ public:
 			x0Arr.insert(x0Arr.end(), &allInputWireValues[beginIndex0], &allInputWireValues[beginIndex0 + SIZE_OF_BLOCK]);
 			x1Arr.insert(x1Arr.end(), &allInputWireValues[beginIndex1], &allInputWireValues[beginIndex1 + SIZE_OF_BLOCK]);
 		}
-		//Create an OT input object with the keys arrays.
+		// create an OT input object with the keys arrays.
 		OTBatchSInput * input = new OTExtensionGeneralSInput(&x0Arr[0], x0Arr.size(), &x1Arr[0], x1Arr.size(), p2InputSize);
 		
-		//Run the OT's transfer phase.
+		// run the OT's transfer phase.
 		otSender->transfer(input);
 	}
 };
@@ -115,7 +115,7 @@ public:
 /**
 * @param args no arguments should be passed
 */
-int main(int argc, char* argv[]) {
+int main2(int argc, char* argv[]) {
 	boost::asio::io_service io_service;
 	SocketPartyData party(IpAdress::from_string("127.0.0.1"), 7666);
 	SocketPartyData other(IpAdress::from_string("127.0.0.1"), 7667);
