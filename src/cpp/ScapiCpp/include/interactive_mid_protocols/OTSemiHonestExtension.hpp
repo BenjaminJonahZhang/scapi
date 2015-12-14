@@ -3,6 +3,7 @@
 #include "../infra/Common.hpp"
 #include "../primitives/SecurityLevel.hpp"
 #include "../comm/TwoPartyComm.hpp"
+
 #include <OTExtension/util/typedefs.h>
 #include <OTExtension/util/socket.h>
 #include <OTExtension/ot/naor-pinkas.h>
@@ -125,7 +126,7 @@ public:
 */
 class OTSemiHonestExtensionSender : public SemiHonest, public OTBatchSender {
 private:
-	static const char* m_nSeed;// = "437398417012387813714564100";
+	static const char* m_nSeed;
 	USHORT m_nPort = 7766;
 	const char* m_nAddr;// = "localhost";
 

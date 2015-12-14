@@ -1,7 +1,11 @@
 #include <boost/thread/thread.hpp>
 #include "../../ScapiCpp/include/comm/TwoPartyComm.hpp"
+#define AES_KEY BC_AES_KEY
 #include "../../ScapiCpp/include/circuits/FastGarbledBooleanCircuit.hpp"
+#undef AES_KEY
+#define AES_KEY OT_AES_KEY
 #include "../../ScapiCpp/include/interactive_mid_protocols/OTSemiHonestExtension.hpp"
+#undef AES_KEY
 
 /**
 * This is an implementation of party one of Yao protocol.
@@ -117,6 +121,10 @@ int main(int argc, char* argv[]) {
 	SocketPartyData other(IpAdress::from_string("127.0.0.1"), 7667);
 	ChannelServer * server = new ChannelServer(io_service, party, other);
 
+	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey("NigelMinCircuit.txt", false);
+	OTBatchSender * otSender = new OTSemiHonestExtensionSender(party, 163, 1);
+
+
 	int i;
 	cout << "please click 0 when ready" << endl;
 	cin >> i;
@@ -129,8 +137,7 @@ int main(int argc, char* argv[]) {
 	else
 		cout << "connected. starting to send" << endl;
 
-	OTBatchSender * otSender = new OTSemiHonestExtensionSender(party, 163, 1);
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey("NigelMinCircuit.txt", false);
+
 
 	//Get the inputs of P1.
 	byte* ungarbledInput = new byte[250000];

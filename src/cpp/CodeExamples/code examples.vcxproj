@@ -79,7 +79,7 @@
       <PreprocessorDefinitions>_WIN32_WINNT=0x06030000;_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Debug\ec2.obj;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Debug\ecn.obj;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Debug\big.obj;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Debug\MiraclWin64.lib;C:\code\scapi\lib\OTExtension\OTExtension\x64\Debug\OTExtension1.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;C:\code\scapi\lib\ScGarbledCircuitNoFixedKey\ScGarbledCircuitNoFixedKey1\x64\Debug\ScGarbledCircuitNoFixedKey1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

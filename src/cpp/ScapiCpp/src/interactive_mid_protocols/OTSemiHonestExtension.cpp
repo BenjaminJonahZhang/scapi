@@ -6,6 +6,8 @@
 /*   OTSemiHonestExtensionSender   */
 /***********************************/
 
+const char * OTSemiHonestExtensionSender::m_nSeed = string("437398417012387813714564100").c_str();
+
 OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, int koblitzOrZpSize, int numOfThreads) {
 	//use ECC koblitz
 	if (koblitzOrZpSize == 163 || koblitzOrZpSize == 233 || koblitzOrZpSize == 283) {
@@ -20,8 +22,8 @@ OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, 
 		//The security parameter (163,233,283 for ECC or 1024, 2048, 3072 for FFC)
 		m_nSecParam = koblitzOrZpSize;
 	}
-	const char* adrr = party.getIpAddress().to_string().c_str();
-	senderPtr = InitOTSender(adrr, party.getPort(), numOfThreads);
+	senderPtr = InitOTSender(party.getIpAddress().to_string().c_str(), 
+		party.getPort(), numOfThreads);
 }
 
 bool OTSemiHonestExtensionSender::Init(int numOfThreads)
@@ -30,7 +32,7 @@ bool OTSemiHonestExtensionSender::Init(int numOfThreads)
 	SHA_CTX sha;
 	OTEXT_HASH_INIT(&sha);
 	OTEXT_HASH_UPDATE(&sha, (BYTE*)&m_nPID, sizeof(m_nPID));
-	OTEXT_HASH_UPDATE(&sha, (BYTE*)m_nSeed, sizeof(m_nSeed));
+	OTEXT_HASH_UPDATE(&sha, (BYTE*)OTSemiHonestExtensionSender::m_nSeed, sizeof(m_nSeed));
 	OTEXT_HASH_FINAL(&sha, m_aSeed);
 	m_nCounter = 0;
 	//Number of threads that will be used in OT extension

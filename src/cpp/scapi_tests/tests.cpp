@@ -517,6 +517,12 @@ TEST_CASE("Comm basics", "[Communication]") {
 		REQUIRE(spd1 != spd2);
 		REQUIRE(!(spd1 == spd2));
 	}
+	SECTION("string", "[]") {
+		auto x = (long)1 << 32;
+		cout << "x= " << x << endl;
+		cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+
+	}
 }
 
 TEST_CASE("Gates and Wires", "") {
