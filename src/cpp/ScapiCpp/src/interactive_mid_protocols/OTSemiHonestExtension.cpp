@@ -6,8 +6,7 @@
 /*   OTSemiHonestExtensionSender   */
 /***********************************/
 
-const char * OTSemiHonestExtensionSender::m_nSeed = string("437398417012387813714564100").c_str();
-const char * OTSemiHonestExtensionReceiver::m_nSeed = string("437398417012387813714564100").c_str();
+const char * OTSemiHonestExtensionBase::m_nSeed = "437398417012387813714564100";
 
 OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, int koblitzOrZpSize, int numOfThreads) {
 	//use ECC koblitz
@@ -26,23 +25,6 @@ OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, 
 	senderPtr = InitOTSender(party.getIpAddress().to_string().c_str(), 
 		party.getPort(), numOfThreads);
 }
-
-bool OTSemiHonestExtensionSender::Init(int numOfThreads)
-{
-	// Random numbers
-	SHA_CTX sha;
-	OTEXT_HASH_INIT(&sha);
-	OTEXT_HASH_UPDATE(&sha, (BYTE*)&m_nPID, sizeof(m_nPID));
-	OTEXT_HASH_UPDATE(&sha, (BYTE*)OTSemiHonestExtensionSender::m_nSeed, sizeof(m_nSeed));
-	OTEXT_HASH_FINAL(&sha, m_aSeed);
-	m_nCounter = 0;
-	//Number of threads that will be used in OT extension
-	m_nNumOTThreads = numOfThreads;
-	m_vSockets.resize(m_nNumOTThreads);
-	bot = new NaorPinkas(m_nSecParam, m_aSeed, m_bUseECC);
-	return true;
-}
-
 bool OTSemiHonestExtensionSender::Listen()
 {
 	if (!m_vSockets[0].Socket())
@@ -238,13 +220,13 @@ bool OTSemiHonestExtensionSender::ObliviouslySend(OTExtensionSender* sender, CBi
 /*   OTSemiHonestExtensionReceiver */
 /***********************************/
 
-bool OTSemiHonestExtensionReceiver::Init(int numOfThreads)
+bool OTSemiHonestExtensionBase::Init(int numOfThreads)
 {
 	// Random numbers
 	SHA_CTX sha;
 	OTEXT_HASH_INIT(&sha);
 	OTEXT_HASH_UPDATE(&sha, (BYTE*)&m_nPID, sizeof(m_nPID));
-	OTEXT_HASH_UPDATE(&sha, (BYTE*)OTSemiHonestExtensionReceiver::m_nSeed, sizeof(m_nSeed));
+	OTEXT_HASH_UPDATE(&sha, (BYTE*)OTSemiHonestExtensionBase::m_nSeed, sizeof(m_nSeed));
 	OTEXT_HASH_FINAL(&sha, m_aSeed);
 	m_nCounter = 0;
 	//Number of threads that will be used in OT extension
@@ -310,15 +292,28 @@ bool OTSemiHonestExtensionReceiver::PrecomputeNaorPinkasReceiver()
 }
 
 OTSemiHonestExtensionReceiver::OTSemiHonestExtensionReceiver(SocketPartyData party, int koblitzOrZpSize, int numOfThreads) {
+	//use ECC koblitz
+	if (koblitzOrZpSize == 163 || koblitzOrZpSize == 233 || koblitzOrZpSize == 283) {
+		m_bUseECC = true;
+		//The security parameter (163,233,283 for ECC or 1024, 2048, 3072 for FFC)
+		m_nSecParam = koblitzOrZpSize;
+	}
+	//use Zp
+	else if (koblitzOrZpSize == 1024 || koblitzOrZpSize == 2048 || koblitzOrZpSize == 3072) {
+		m_bUseECC = false;
+		//The security parameter (163,233,283 for ECC or 1024, 2048, 3072 for FFC)
+		m_nSecParam = koblitzOrZpSize;
+	}
 	int nSndVals = 2;
 	m_nPort = (USHORT)party.getPort();
-	m_nAddr = party.getIpAddress().to_string().c_str();
+	const std::string& tmp = party.getIpAddress().to_string();
+	m_nAddr = tmp.c_str();
 	vKeySeedMtx = (byte*)malloc(AES_KEY_BYTES*NUM_EXECS_NAOR_PINKAS * nSndVals);
 	
-	//Initialize values
+	// initialize values
 	Init(numOfThreads);
 
-	//Client connect
+	// client connect
 	Connect();
 	PrecomputeNaorPinkasReceiver();
 	receiverPtr = new OTExtensionReceiver(nSndVals, m_vSockets.data(), vKeySeedMtx, m_aSeed);

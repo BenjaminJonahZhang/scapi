@@ -33,3 +33,4 @@ make.dependencies
 .lastbuildstate
 *.idb
 *.lib
+*.obj.enc

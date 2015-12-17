@@ -106,6 +106,38 @@ public:
 };
 
 
+class OTSemiHonestExtensionBase : public SemiHonest {
+protected:
+	static const char* m_nSeed;
+	USHORT m_nPort = 7766;
+	const char* m_nAddr;// = "localhost";
+	// Naor-Pinkas OT
+	BaseOT* bot;
+	// Network Communication
+	vector<CSocket> m_vSockets;
+	byte *vKeySeedMtx;
+	int m_nCounter;
+	int m_nNumOTThreads;
+	int m_nPID; // thread id
+	int m_nSecParam;
+	bool m_bUseECC;
+	MaskingFunction* m_fMaskFct;
+	// SHA PRG
+	BYTE m_aSeed[SHA1_BYTES];
+	bool Init(int numOfThreads);
+};
+
+/*
+* The native code that runs the OT extension as the receiver.
+* @param sigma An array holding the input of the receiver, that is, the 0 and 1 choices for each OT.
+* @param numOfOts The number or OTs that the protocol runs.
+* @param bitLength The length of each item in the OT. The size of each x0, x1 which must be the same for all x0, x1.
+* @param output The output of all the OTs. This is provided as a one dimensional array that gets all the data serially one after the other. The
+* 				 array is given empty and the native code fills it with the result of the multiple OT results.
+* @param version The particular OT type to run.
+*/
+void runOtAsReceiver(byte* sigma, int numOfOts, int bitLength, byte* output, std::string version);
+
 /**
 * A concrete class for Semi-Honest OT extension sender. <P>
 *
@@ -125,72 +157,20 @@ public:
 *
 * NOTE: Unlike a regular implementation the connection is done via the native code and thus the channel provided in the transfer function is ignored.
 */
-class OTSemiHonestExtensionSender : public SemiHonest, public OTBatchSender {
+class OTSemiHonestExtensionSender : public OTSemiHonestExtensionBase, public OTBatchSender {
 private:
-	static const char* m_nSeed;
-	USHORT m_nPort = 7766;
-	const char* m_nAddr;// = "localhost";
-
-	// Network Communication
-	vector<CSocket> m_vSockets;
-	int m_nPID; // thread id
-	int m_nSecParam;
-	bool m_bUseECC;
+	OTExtensionSender* senderPtr;
 	int m_nBitLength;
 	int m_nMod;
-	MaskingFunction* m_fMaskFct;
-
-	// Naor-Pinkas OT
-	BaseOT* bot;
 	CBitVector U;
 	BYTE *vKeySeeds;
-	BYTE *vKeySeedMtx;
-
-	int m_nNumOTThreads;
-
-	// SHA PRG
-	BYTE m_aSeed[SHA1_BYTES];
-	int m_nCounter;
 	double rndgentime;
-
-	OTExtensionSender* senderPtr;
 
 	OTExtensionSender* InitOTSender(const char* address, int port, int numOfThreads);
 	bool ObliviouslySend(OTExtensionSender* sender, CBitVector& X1, CBitVector& X2, int numOTs, int bitlength, byte version, CBitVector& delta);
-	bool Init(int numOfThreads);
 	bool Listen();
 	bool PrecomputeNaorPinkasSender();
 	void runOtAsSender(byte *x1, byte * x2, byte * deltaArr, int numOfOts, int bitLength, string version);
-	//BOOL Connect();
-
-	//OTExtensionSender* InitOTSender(const char* address, int port);
-	//OTExtensionReceiver* InitOTReceiver(const char* address, int port);
-
-	
-	//BOOL PrecomputeNaorPinkasReceiver();
-	//BOOL ObliviouslyReceive(OTExtensionReceiver* receiver, CBitVector& choices, CBitVector& ret, int numOTs, int bitlength, BYTE version);
-	//BOOL ObliviouslySend(OTExtensionSender* sender, CBitVector& X1, CBitVector& X2, int numOTs, int bitlength, BYTE version, CBitVector& delta);
-
-
-	//// This function initializes the sender. It creates sockets to communicate with the sender and attaches these sockets to the receiver object.
-	//// It outputs the receiver object with communication abilities built in. 
-	//private native long initOtSender(String ipAddress, int port, int koblitzOrZpSize, int numOfThreads);
-
-	///*
-	//* The native code that runs the OT extension as the sender.
-	//* @param senderPtr The pointer initialized via the function initOtSender.
-	//* @param x0 An array that holds all the x0 values for each of the OT's serially.
-	//* @param x1 An array that holds all the x1 values for each of the OT's serially.
-	//* @param delta
-	//* @param numOfOts The number of OTs that the protocol runs.
-	//* @param bitLength The length of each item in the OT. The size of each x0, x1 which must be the same for all x0, x1.
-	//* @param version the OT extension version the user wants to use.
-	//*/
-	//private native void runOtAsSender(long senderPtr, byte[] x0, byte[]x1, byte[] delta, int numOfOts, int bitLength, String version);
-
-	////Deletes the native sender.
-	//private native void deleteSender(long senderPtr);
-
 public:
 	/**
 	* A constructor that creates the native sender with communication abilities. It uses the ip address and port given in the party object.<p>
@@ -324,7 +304,7 @@ public:
 *
 * NOTE: Unlike a regular implementation, the connection is done via the native code and thus the channel provided in the transfer function is ignored.
 */
-class OTSemiHonestExtensionReceiver : public SemiHonest, public OTBatchReceiver {
+class OTSemiHonestExtensionReceiver : public OTSemiHonestExtensionBase, public OTBatchReceiver {
 public:
 	/**
 	* A constructor that creates the native receiver with communication abilities. <p>
@@ -356,24 +336,7 @@ public:
 	*/
 	~OTSemiHonestExtensionReceiver() { delete receiverPtr; };
 private:
-	static const char* m_nSeed;
 	OTExtensionReceiver * receiverPtr; 
-	USHORT m_nPort = 7766;
-	byte *vKeySeedMtx;
-	int m_nCounter;
-	int m_nNumOTThreads;
-	vector<CSocket> m_vSockets;
-	BaseOT* bot; // Naor-Pinkas OT
-	const char* m_nAddr;// = "localhost";
-	int m_nPID; // thread id
-	int m_nSecParam;
-	BYTE m_aSeed[SHA1_BYTES];
-	MaskingFunction* m_fMaskFct;
-	bool m_bUseECC;
-	
-
-
-	bool Init(int numOfThreads);
 	bool Connect();
 	bool PrecomputeNaorPinkasReceiver();
 	bool ObliviouslyReceive(CBitVector& choices, CBitVector& ret, int numOTs, int bitlength, BYTE version);

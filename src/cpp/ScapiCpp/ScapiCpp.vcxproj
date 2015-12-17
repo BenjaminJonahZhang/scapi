@@ -81,7 +81,7 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\code\Builds\Miracl Build\test_folder;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
+    <IncludePath>C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
     <LibraryPath>C:\code\scapi\lib\CryptoPP;C:\code\scapi\lib\ScGarbledCircuitNoFixedKey\ScGarbledCircuitNoFixedKey1\Debug;C:\Program Files\Boost\boost_1_59_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

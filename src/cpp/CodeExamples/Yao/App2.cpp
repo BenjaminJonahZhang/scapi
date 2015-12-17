@@ -132,14 +132,17 @@ int main(int argc, char* argv[]) {
 	SocketPartyData party(IpAdress::from_string("127.0.0.1"), 7667);
 	SocketPartyData other(IpAdress::from_string("127.0.0.1"), 7666);
 	ChannelServer * server = new ChannelServer(io_service, party, other);
-	
+
+	// create the garbled circuit
+	auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\YaoProtocol\NigelAes.txt)";
+	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(circuit_file, false);
+
 	// create the OT receiver.
 	clock_t begin0 = clock();
 	OTBatchReceiver * otReceiver = new OTSemiHonestExtensionReceiver(party, 163, 1);
 	cout << "init ot took: " << double(clock() - begin0) / CLOCKS_PER_SEC << " secs" << endl;
 	
-	// create the garbled circuit
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey("NigelMinCircuit.txt", false);
+
 
 	// create Party two with the previous created objects			
 	int inputSize = 250000;

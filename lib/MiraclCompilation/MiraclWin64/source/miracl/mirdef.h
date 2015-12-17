@@ -17,3 +17,4 @@
 #define MAXBASE 2//((mr_small)1<<(MIRACL-1))
 #define MR_BITSINCHAR 8
 
+

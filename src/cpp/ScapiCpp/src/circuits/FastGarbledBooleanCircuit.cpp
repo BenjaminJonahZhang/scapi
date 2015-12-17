@@ -6,18 +6,12 @@
 /* ScNativeGarbledBooleanCircuitNoFixedKey */
 /*******************************************/
 ScNativeGarbledBooleanCircuitNoFixedKey::ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor) {
-	this->isFreeXor = isFreeXor;
 	//create the relevant garbled circuit
 	if (isFreeXor) 
 		garbledCircuitPtr = new FastGarblingFreeXorHalfGatesFixedKeyAssumptions(fileName.c_str());
 	else 
 		//the best implementation for non free xor is the 4 to 2 
 		garbledCircuitPtr = new FastGarblingFourToTwoNoAssumptions(fileName.c_str());
-
-	// get the size of the output wire numbers
-	outputWireIndices = garbledCircuitPtr->getOutputIndices();
-	inputsIndices = garbledCircuitPtr->getInputIndices();
-	numOfInputsForEachParty = garbledCircuitPtr->getNumOfInputsForEachParty();
 }
 
 /**
@@ -46,9 +40,9 @@ FastCircuitCreationValues ScNativeGarbledBooleanCircuitNoFixedKey::garble(byte* 
 byte* ScNativeGarbledBooleanCircuitNoFixedKey::getGarbledInputFromUngarbledInput(
 	byte* ungarbledInputBits, byte * allInputWireValues, int partyNumber) {
 	int startingIndex = 0;
-	for (int i = 0; i<partyNumber - 1; i++)
-		startingIndex += numOfInputsForEachParty[i];
-	int numberOfInputsForThisParty = numOfInputsForEachParty[partyNumber - 1];
+	for (int i = 0; i < partyNumber - 1; i++)
+		startingIndex += getNumberOfInputs(i);
+	int numberOfInputsForThisParty = getNumberOfInputs(partyNumber - 1);
 
 	byte* result = new byte[SCAPI_NATIVE_KEY_SIZE*numberOfInputsForThisParty];
 	int destBeginIndex, sourceBeginIndex;
@@ -188,10 +182,11 @@ void ScNativeGarbledBooleanCircuitNoFixedKey::setGarbledTables(GarbledTablesHold
 int* ScNativeGarbledBooleanCircuitNoFixedKey::getInputWireIndices(int partyNumber) {
 	int startingIndex = 0;
 	for (int i = 0; i<partyNumber - 1; i++)
-		startingIndex += numOfInputsForEachParty[i];
-	int numberOfInputsForThisParty = numOfInputsForEachParty[partyNumber - 1];
+		startingIndex += getNumberOfInputs(i);
+	int numberOfInputsForThisParty = getNumberOfInputs(partyNumber - 1);
 	int* result = new int[numberOfInputsForThisParty];
 	// copy the relevant key of the input into the result array.
+	auto inputsIndices = garbledCircuitPtr->getInputIndices();
 	memcpy(result, &inputsIndices[startingIndex], numberOfInputsForThisParty);
 	return result;
 }

@@ -279,12 +279,6 @@ class ScNativeGarbledBooleanCircuitNoFixedKey : public FastGarbledBooleanCircuit
 private:
 	static const int SCAPI_NATIVE_KEY_SIZE = 16;//The number of bytes in each just garbled key 
 	GarbledBooleanCircuit * garbledCircuitPtr = NULL; //Pointer to the native garbledCircuit object
-	int numberOfParties;
-	int * inputsIndices;
-	int * outputWireIndices;
-	int * numOfInputsForEachParty;
-	bool isFreeXor;
-	bool isRowReduction;
 	vector<byte> garbledInputs;
 
 public:
@@ -295,7 +289,6 @@ public:
 	*
 	* @param fileName the name of the circuit file.
 	* @param isFreeXor a flag indicating the use of the optimization of FreeXor
-	* @param isRowReduction a flag indicating the use of the optimization of Row Reduction
 	*/
 	ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor);
 	/**
@@ -413,11 +406,11 @@ public:
 	* @throws NoSuchPartyException In case the given party number is not valid.
 	*/
 	int* getInputWireIndices(int partyNumber) override;
-	int* getOutputWireIndices() override{ return outputWireIndices; };
-	int getNumberOfInputs(int partyNumber) override{ return numOfInputsForEachParty[partyNumber - 1]; };
-	int getNumberOfParties() override { return numberOfParties; };
+	int* getOutputWireIndices() override{ return garbledCircuitPtr->getOutputIndices(); };
+	int getNumberOfInputs(int partyNumber) override{ return garbledCircuitPtr->getNumOfInputsForEachParty()[partyNumber - 1]; };
+	int getNumberOfParties() override { return garbledCircuitPtr->getNumberOfParties(); };
 	bool verifyTranslationTable(byte* allOutputWireValues) override;
-	int* getInputWireIndices() override { return inputsIndices; };
+	int* getInputWireIndices() override { return garbledCircuitPtr->getInputIndices(); };
 	int getKeySize() override { return SCAPI_NATIVE_KEY_SIZE; };
 	~ScNativeGarbledBooleanCircuitNoFixedKey() { delete garbledCircuitPtr; };
 };
