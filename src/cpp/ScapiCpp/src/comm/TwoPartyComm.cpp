@@ -132,11 +132,12 @@ void NativeChannel::handle_msg(const Message& msg) {
 	copy_byte_array_to_byte_vector((byte *)read_msg_.body(), read_msg_.body_length(), *v, 0);
 	read_msgs_.push_back(v);
 	size_t len = read_msg_.body_length();
-	string s(reinterpret_cast<char const*>(read_msg_.body()), len);
-	cout << "got string: " << s << endl;
+	//string s(reinterpret_cast<char const*>(read_msg_.body()), len);
+	cout << "got message. size: " << len << endl;
 }
 
 vector<byte> * NativeChannel::read_one() {
+	cout << "reading one message. queue size: " << read_msgs_.size() << endl;
 	if (!read_msgs_.empty())
 	{
 		vector<byte>* v = read_msgs_.front();

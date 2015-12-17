@@ -93,9 +93,10 @@
     <ClCompile Include="Yao\App1.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="Yao\App2.cpp">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
-    </ClCompile>
+    <ClCompile Include="Yao\YaoParties.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Yao\YaoExample.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

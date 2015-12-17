@@ -72,7 +72,7 @@ public:
 	void write(const Message& msg);
 	void close();
 	bool is_connected() { return m_IsConnected; };
-	vector<byte> * NativeChannel::read_one();
+	vector<byte> * read_one();
 	//vector<Message> read_all();
 
 private:
@@ -106,7 +106,7 @@ public:
 		io_service_server(io_service), io_service_client(io_service),
 		acceptor_(io_service, tcp::endpoint(tcp::v4(), me.getPort())) 
 	{
-		Logger::log("Craeting ChannelServer Beteen me (" + me.to_log_string() + ") and other (" + other.to_log_string() + ")");
+		Logger::log("Craeting ChannelServer Between me (" + me.to_log_string() + ") and other (" + other.to_log_string() + ")");
 		channel = new NativeChannel(io_service_server, io_service_client, me, other);
 		acceptor_.async_accept(channel->getServerSocket(), boost::bind(&ChannelServer::handle_accept, 
 			this, channel, boost::asio::placeholders::error));

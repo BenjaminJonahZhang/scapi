@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\YaoSemiHonest">
+      <UniqueIdentifier>{a9dba6ec-313c-480c-ab38-51fb2ffd846d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -29,10 +32,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Yao\App1.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\YaoSemiHonest</Filter>
     </ClCompile>
-    <ClCompile Include="Yao\App2.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Yao\YaoParties.cpp">
+      <Filter>Source Files\YaoSemiHonest</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Yao\YaoExample.hpp">
+      <Filter>Source Files\YaoSemiHonest</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

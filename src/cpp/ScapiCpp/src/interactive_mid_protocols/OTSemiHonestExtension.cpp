@@ -38,6 +38,7 @@ bool OTSemiHonestExtensionSender::Listen()
 
 	for (int i = 0; i<m_nNumOTThreads; i++) //twice the actual number, due to double sockets for OT
 	{
+		cout << "starting to listen inside sender addr: " << m_nAddr << " port: " << m_nPort << endl;
 		CSocket sock;
 		//cerr << "New round! " << endl;
 		if (!m_vSockets[0].Accept(sock))
@@ -45,6 +46,7 @@ bool OTSemiHonestExtensionSender::Listen()
 			cerr << "Error in accept" << endl;
 			goto listen_failure;
 		}
+		cout << "accepted " << endl;
 		UINT threadID;
 		sock.Receive(&threadID, sizeof(int));
 		if (threadID >= m_nNumOTThreads)
@@ -88,9 +90,9 @@ OTExtensionSender* OTSemiHonestExtensionSender::InitOTSender(const char* address
 	m_nPort = (USHORT)port;
 	m_nAddr = address;
 	vKeySeeds = (BYTE*)malloc(AES_KEY_BYTES*NUM_EXECS_NAOR_PINKAS);
-	//Initialize values
+	// initialize values
 	Init(numOfThreads);
-	//Server listen
+	// server listen
 	Listen();
 	PrecomputeNaorPinkasSender();
 	return new OTExtensionSender(nSndVals, m_vSockets.data(), U, vKeySeeds);
@@ -239,6 +241,7 @@ bool OTSemiHonestExtensionBase::Init(int numOfThreads)
 bool OTSemiHonestExtensionReceiver::Connect(){
 	bool bFail = false;
 	LONG lTO = CONNECT_TIMEO_MILISEC;
+	cout << "connecting to addr: " << m_nAddr << " port: " << m_nPort << endl;
 	for (int k = m_nNumOTThreads - 1; k >= 0; k--)
 	{
 		for (int i = 0; i<RETRY_CONNECT; i++)
@@ -251,6 +254,7 @@ bool OTSemiHonestExtensionReceiver::Connect(){
 
 			if (m_vSockets[k].Connect(m_nAddr, m_nPort, lTO))
 			{
+
 				// send pid when connected
 				m_vSockets[k].Send(&k, sizeof(int));
 				if (k == 0)

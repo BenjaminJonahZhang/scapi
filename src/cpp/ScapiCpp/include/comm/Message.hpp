@@ -7,22 +7,21 @@
 class Message
 {
 public:
-	enum { header_length = 4 };
-	enum { max_body_length = 1000};
+	enum { header_length = 6 };
+	enum { max_body_length = 1000000};
 
 	Message()
-		: body_length_(0)
-	{
-	}
+		: body_length_(0), data_(header_length + max_body_length)
+	{}
 
 	const char* data() const
 	{
-		return data_;
+		return &(data_[0]);
 	}
 
 	char* data()
 	{
-		return data_;
+		return &(data_[0]);
 	}
 
 	size_t length() const
@@ -32,12 +31,12 @@ public:
 
 	const char* body() const
 	{
-		return data_ + header_length;
+		return &data_[0] + header_length;
 	}
 
 	char* body()
 	{
-		return data_ + header_length;
+		return &data_[header_length];
 	}
 
 	size_t body_length() const
@@ -56,7 +55,7 @@ public:
 	{
 		using namespace std; // For strncat and atoi.
 		char header[header_length + 1] = "";
-		strncat(header, data_, header_length);
+		strncat(header, &data_[0], header_length);
 		body_length_ = atoi(header);
 		if (body_length_ > max_body_length)
 		{
@@ -71,10 +70,12 @@ public:
 		using namespace std; // For sprintf and memcpy.
 		char header[header_length + 1] = "";
 		sprintf(header, "%4d", (int) body_length_);
-		memcpy(data_, header, header_length);
+		memcpy(&data_[0], header, header_length);
 	}
 
 private:
-	char data_[header_length + max_body_length];
+	int vector_size = header_length + max_body_length;
+	std::vector<char> data_;
+	//char data_[header_length + max_body_length];
 	size_t body_length_;
 };
