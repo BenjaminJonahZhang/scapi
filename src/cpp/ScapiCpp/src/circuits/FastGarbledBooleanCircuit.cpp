@@ -181,9 +181,9 @@ void ScNativeGarbledBooleanCircuitNoFixedKey::setGarbledTables(GarbledTablesHold
 
 int* ScNativeGarbledBooleanCircuitNoFixedKey::getInputWireIndices(int partyNumber) {
 	int startingIndex = 0;
-	for (int i = 0; i<partyNumber - 1; i++)
+	for (int i = 1; i<partyNumber; i++)
 		startingIndex += getNumberOfInputs(i);
-	int numberOfInputsForThisParty = getNumberOfInputs(partyNumber - 1);
+	int numberOfInputsForThisParty = getNumberOfInputs(partyNumber);
 	int* result = new int[numberOfInputsForThisParty];
 	// copy the relevant key of the input into the result array.
 	auto inputsIndices = garbledCircuitPtr->getInputIndices();

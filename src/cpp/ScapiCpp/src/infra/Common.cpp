@@ -124,3 +124,13 @@ mt19937 get_seeded_random() {
 	mt.seed(seed);
 	return mt;
 }
+
+void print_elapsed_ms(std::chrono::time_point<std::chrono::system_clock> start, string message) {
+	auto end = std::chrono::system_clock::now();
+	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	cout << message << " took: " << elapsed_ms << " ms" << endl;
+}
+
+std::chrono::time_point<std::chrono::system_clock> scapi_now() {
+	return chrono::system_clock::now();
+}

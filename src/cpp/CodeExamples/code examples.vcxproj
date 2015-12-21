@@ -93,7 +93,9 @@
     <ClCompile Include="Yao\App1.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="Yao\YaoParties.cpp" />
+    <ClCompile Include="Yao\YaoParties.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Yao\YaoExample.hpp" />

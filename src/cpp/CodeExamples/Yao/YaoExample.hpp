@@ -8,7 +8,6 @@
 #define AES_KEY OT_AES_KEY
 #include "../../ScapiCpp/include/interactive_mid_protocols/OTSemiHonestExtension.hpp"
 #undef AES_KEY
-#include <chrono>
 #include <thread>
 
 
@@ -107,7 +106,9 @@ public:
 	*/
 	OTBatchROutput * runOTProtocol(byte* sigmaArr, int arrSize) {
 		//Create an OT input object with the given sigmaArr.
-		OTBatchRInput * input = new OTExtensionGeneralRInput(sigmaArr, 128, arrSize);
+		int elementSize = 128;
+		OTBatchRInput * input = new OTExtensionGeneralRInput(sigmaArr, arrSize, elementSize);
+		cout << "created input. starting transfer" << endl;
 		//Run the Ot protocol.
 		return otReceiver->transfer(input);
 	};

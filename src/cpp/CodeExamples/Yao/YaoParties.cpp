@@ -20,18 +20,20 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 }
 
 void PartyOne::run(byte * ungarbledInput) {
-	//Constructs the garbled circuit.
 	values = circuit->garble();
-	//Send garbled tables and the translation table to p2.
+	// send garbled tables and the translation table to p2.
+	auto start = chrono::system_clock::now();
 	GarbledTablesHolder * tables = circuit->getGarbledTables();
 	channel->write(tables->toDoubleByteArray()[0], tables->getArraySize(0));
-
 	channel->write(circuit->getTranslationTable(), circuit->getTranslationTableSize());
-	//Send p1 input keys to p2.
+	// send p1 input keys to p2.
 	sendP1Inputs(ungarbledInput);
+	print_elapsed_ms(start, "Sent garbled tables, translation table and p1Input to p2");
 
-	//Run OT protocol in order to send p2 the necessary keys without revealing any information.
+	// run OT protocol in order to send p2 the necessary keys without revealing any information.
+	start = chrono::system_clock::now();
 	runOTProtocol();
+	print_elapsed_ms(start, "PartyOne: OT protocol run");
 }
 
 void PartyOne::runOTProtocol() {
@@ -41,22 +43,23 @@ void PartyOne::runOTProtocol() {
 	byte* allInputWireValues = values.getAllInputWireValues();
 	p1InputSize = circuit->getNumberOfInputs(1);
 	p2InputSize = circuit->getNumberOfInputs(2);
-	vector<byte> x0Arr;
-	x0Arr.reserve(p2InputSize * SIZE_OF_BLOCK);
-	vector<byte> x1Arr;
-	x1Arr.reserve(p2InputSize * SIZE_OF_BLOCK);
+	auto x0Arr = new vector<byte>();
+	x0Arr->reserve(p2InputSize * SIZE_OF_BLOCK);
+	auto x1Arr = new vector<byte>();
+	x1Arr->reserve(p2InputSize * SIZE_OF_BLOCK);
 	int beginIndex0, beginIndex1;
 	for (int i = 0; i<p2InputSize; i++) {
 		beginIndex0 = p1InputSize * 2 * SIZE_OF_BLOCK + 2 * i*SIZE_OF_BLOCK;
 		beginIndex1 = p1InputSize * 2 * SIZE_OF_BLOCK + (2 * i + 1)*SIZE_OF_BLOCK;
-		x0Arr.insert(x0Arr.end(), &allInputWireValues[beginIndex0], &allInputWireValues[beginIndex0 + SIZE_OF_BLOCK]);
-		x1Arr.insert(x1Arr.end(), &allInputWireValues[beginIndex1], &allInputWireValues[beginIndex1 + SIZE_OF_BLOCK]);
+		x0Arr->insert(x0Arr->end(), &allInputWireValues[beginIndex0], &allInputWireValues[beginIndex0 + SIZE_OF_BLOCK]);
+		x1Arr->insert(x1Arr->end(), &allInputWireValues[beginIndex1], &allInputWireValues[beginIndex1 + SIZE_OF_BLOCK]);
 	}
 	// create an OT input object with the keys arrays.
-	OTBatchSInput * input = new OTExtensionGeneralSInput(&x0Arr[0], x0Arr.size(), &x1Arr[0], x1Arr.size(), p2InputSize);
-
+	OTBatchSInput * input = new OTExtensionGeneralSInput(&(x0Arr->at(0)), x0Arr->size(), &(x1Arr->at(0)), x1Arr->size(), p2InputSize);
 	// run the OT's transfer phase.
+	auto start = chrono::system_clock::now();
 	otSender->transfer(input);
+	print_elapsed_ms(start, "PartyOne: transfer part of OT");
 }
 
 /*********************************/
@@ -64,6 +67,7 @@ void PartyOne::runOTProtocol() {
 /*********************************/
 
 byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
+	auto start = scapi_now();
 	// Get the output of the protocol.
 	byte* p2Inputs = ((OTOnByteArrayROutput *)otOutput)->getXSigma();
 	int p2InputsSize = ((OTOnByteArrayROutput *)otOutput)->getLength();
@@ -73,59 +77,65 @@ byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
 	vector<byte> allInputs(p1InputsSize + p2InputsSize);
 	memcpy(&allInputs[0], p1Inputs, p1InputsSize);
 	memcpy(&allInputs[p1InputsSize], p2Inputs, p2InputsSize);
+	print_elapsed_ms(start, "PartyTow: ComputeCircuit: init");
+	
 	// set the input to the circuit.
+	start = scapi_now();
 	circuit->setInputs(allInputs);
+	print_elapsed_ms(start, "PartyTow: ComputeCircuit: setInputs");
+	
 	// compute the circuit.
+	start = scapi_now();
 	byte* garbledOutput = NULL;
 	garbledOutput = circuit->compute();
+	print_elapsed_ms(start, "PartyTow: ComputeCircuit: compute");
+	
 	// translate the result from compute.
+	start = scapi_now();
 	byte* circuitOutput = circuit->translate(garbledOutput);
+	print_elapsed_ms(start, "PartyTow: ComputeCircuit: translate");
 	return circuitOutput;
 }
 
 void PartyTwo::run(byte * ungarbledInput, int inputSize) {
 	// receive tables and inputs
-	cout << "party 2 starting to receive circuit and p1Inputs" << endl;
-	clock_t begin0 = clock();
+	auto start = scapi_now();
 	receiveCircuit();
 	receiveP1Inputs();
-	cout << "Receive garbled tables and translation tables and p1 inpustfrom p1 took "
-		<< double(clock() - begin0) / CLOCKS_PER_SEC << " secs" << endl;
+	print_elapsed_ms(start, "PartyTwo: receive garbled tables,translation table and p1 inpust from p1");
 
 	// run OT protocol in order to get the necessary keys without revealing any information.
-	clock_t begin = clock();
+	start = scapi_now();
 	OTBatchROutput * output = runOTProtocol(ungarbledInput, inputSize);
-	cout << "run OT took" << double(clock() - begin) / CLOCKS_PER_SEC << " secs" << endl;
+	print_elapsed_ms(start, "PartyTwo: run OT protocol");
 
 	// Compute the circuit.
-	begin = clock();
+	start = scapi_now();
 	byte* circuitOutput = computeCircuit(output);
-	cout << "compute the circuit took" << double(clock() - begin) / CLOCKS_PER_SEC << " secs" << endl;
+	print_elapsed_ms(start, "PartyTwo: Compute the circuit took");
 
 	// we're done print the output
-	cout << "run one protocol took" << double(clock() - begin0) / CLOCKS_PER_SEC << " secs. printing output" << endl;
 	int outputSize = circuit->getNumberOfParties();
+	cout << "PartyTwo: printing outputSize: " << outputSize << endl;
 	for (int i = 0; i<outputSize; i++)
 		cout << circuitOutput[i];
 }
 
 void PartyTwo::receiveCircuit() {
 	// receive garbled tables.
-	cout << "receiving circuit" << endl;
 	vector<byte> * msg;
+	int sleep_seconds = 3;
 	while ((msg = channel->read_one()) == NULL)
 	{
-		cout << "sleeping for 2 seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(2));
+		cout << "sleeping for: " << sleep_seconds << " seconds" << endl;
+		this_thread::sleep_for(chrono::seconds(sleep_seconds));
 	}
-	cout << endl << "msg is not null. size: " << msg->size() << endl;
 	GarbledTablesHolder * garbledTables = new JustGarbledGarbledTablesHolder(&(msg->at(0)), msg->size());
 	while ((msg = channel->read_one()) == NULL)
 	{
-		cout << "sleeping for 2 seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(2));
+		cout << "sleeping for: " << sleep_seconds << " seconds" << endl;
+		this_thread::sleep_for(chrono::seconds(sleep_seconds-1));
 	}
-	cout << endl << "msg is not null (again)! size: " << msg->size() << endl;
 	// receive translation table.
 	byte* translationTable = &(msg->at(0));
 	// set garbled tables and translation table to the circuit.

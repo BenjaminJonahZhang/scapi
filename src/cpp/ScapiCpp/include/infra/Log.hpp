@@ -24,7 +24,7 @@ public:
 	};
 	
 	static void log(string message) {
-		cout << message << endl;
+		//cout << message << endl;
 		src::logger_mt& lg = my_logger::get();
 		BOOST_LOG(lg) << message;
 	};

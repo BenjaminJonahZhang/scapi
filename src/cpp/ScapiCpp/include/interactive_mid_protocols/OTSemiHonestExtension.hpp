@@ -166,7 +166,7 @@ private:
 	BYTE *vKeySeeds;
 	double rndgentime;
 
-	OTExtensionSender* InitOTSender(const char* address, int port, int numOfThreads);
+	OTExtensionSender* InitOTSender(const char* address, int port, int numOfThreads, bool b_print = false);
 	bool ObliviouslySend(OTExtensionSender* sender, CBitVector& X1, CBitVector& X2, int numOTs, int bitlength, byte version, CBitVector& delta);
 	bool Listen();
 	bool PrecomputeNaorPinkasSender();
@@ -256,8 +256,8 @@ public:
 	*/
 	OTExtensionRInput(byte* sigmaArr, int sigmeArrSize, int elementSize) {
 		this->sigmaArr = sigmaArr;
-		this->elementSize = elementSize;
 		this->sigmeArrSize = sigmeArrSize;
+		this->elementSize = elementSize;
 	};
 	byte* getSigmaArr() { return sigmaArr; };
 	int getSigmaArrSize() { return sigmeArrSize; };
@@ -282,7 +282,7 @@ public:
 	* @param sigmaArr An array of sigma for each OT.
 	* @param elementSize The size of each element in the OT extension, in bits.
 	*/
-	OTExtensionGeneralRInput(byte* sigmaArr, int elementSize, int arrSize) : OTExtensionRInput(sigmaArr, elementSize, arrSize) {};
+	OTExtensionGeneralRInput(byte* sigmaArr, int arrSize, int elementSize) : OTExtensionRInput(sigmaArr, arrSize, elementSize) {};
 };
 
 /**

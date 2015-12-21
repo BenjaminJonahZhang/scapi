@@ -23,7 +23,7 @@ OTSemiHonestExtensionSender::OTSemiHonestExtensionSender(SocketPartyData party, 
 		m_nSecParam = koblitzOrZpSize;
 	}
 	senderPtr = InitOTSender(party.getIpAddress().to_string().c_str(), 
-		party.getPort(), numOfThreads);
+		party.getPort(), numOfThreads, true);
 }
 bool OTSemiHonestExtensionSender::Listen()
 {
@@ -38,7 +38,7 @@ bool OTSemiHonestExtensionSender::Listen()
 
 	for (int i = 0; i<m_nNumOTThreads; i++) //twice the actual number, due to double sockets for OT
 	{
-		cout << "starting to listen inside sender addr: " << m_nAddr << " port: " << m_nPort << endl;
+		cout << "Waiting for receiver to connect on port: " << m_nPort << endl;
 		CSocket sock;
 		//cerr << "New round! " << endl;
 		if (!m_vSockets[0].Accept(sock))
@@ -46,7 +46,7 @@ bool OTSemiHonestExtensionSender::Listen()
 			cerr << "Error in accept" << endl;
 			goto listen_failure;
 		}
-		cout << "accepted " << endl;
+		cout << "Receiver connected" << endl;
 		UINT threadID;
 		sock.Receive(&threadID, sizeof(int));
 		if (threadID >= m_nNumOTThreads)
@@ -84,7 +84,7 @@ bool OTSemiHonestExtensionSender::PrecomputeNaorPinkasSender()
 	return true;
 }
 
-OTExtensionSender* OTSemiHonestExtensionSender::InitOTSender(const char* address, int port, int numOfThreads)
+OTExtensionSender* OTSemiHonestExtensionSender::InitOTSender(const char* address, int port, int numOfThreads, bool b_print)
 {
 	int nSndVals = 2;
 	m_nPort = (USHORT)port;
@@ -94,8 +94,12 @@ OTExtensionSender* OTSemiHonestExtensionSender::InitOTSender(const char* address
 	Init(numOfThreads);
 	// server listen
 	Listen();
+	auto start = scapi_now();
 	PrecomputeNaorPinkasSender();
-	return new OTExtensionSender(nSndVals, m_vSockets.data(), U, vKeySeeds);
+	auto otes = new OTExtensionSender(nSndVals, m_vSockets.data(), U, vKeySeeds);
+	if (b_print)
+		print_elapsed_ms(start, "PrecomputeNaorPinkasSender and OTExtensionSender init");
+	return otes;
 }
 
 OTBatchSOutput* OTSemiHonestExtensionSender::transfer(OTBatchSInput * input) {
@@ -149,11 +153,10 @@ OTBatchSOutput* OTSemiHonestExtensionSender::transfer(OTBatchSInput * input) {
 		throw invalid_argument("input should be an instance of OTExtensionGeneralSInput or OTExtensionCorrelatedSInput or OTExtensionRandomSInput.");
 }
 void OTSemiHonestExtensionSender::runOtAsSender(byte *x1, byte * x2, byte * deltaArr, int numOfOts, int bitLength, string version) {
-
 	//The masking function with which the values that are sent in the last communication step are processed
 	//Choose OT extension version: G_OT, C_OT or R_OT
 	BYTE ver;
-	//supports all of the SHA hashes. Get the name of the required hash and instanciate that hash.
+	// supports all of the SHA hashes. Get the name of the required hash and instanciate that hash.
 	if (version=="general")
 		ver = G_OT;
 	else if (version=="correlated")
@@ -162,7 +165,7 @@ void OTSemiHonestExtensionSender::runOtAsSender(byte *x1, byte * x2, byte * delt
 		ver = R_OT;
 
 	CBitVector delta, X1, X2;
-	//Create X1 and X2 as two arrays with "numOTs" entries of "bitlength" bit-values
+	// create X1 and X2 as two arrays with "numOTs" entries of "bitlength" bit-values
 	X1.Create(numOfOts, bitLength);
 	X2.Create(numOfOts, bitLength);
 	if (ver == G_OT) {
@@ -348,7 +351,9 @@ OTBatchROutput* OTSemiHonestExtensionReceiver::transfer(OTBatchRInput* input) {
 	byte* outputBytes = new byte[outbytesLength];
 
 	//Run the protocol using the native code in the dll.
+	auto start = scapi_now();
 	runOtAsReceiver(sigmaArr, numOfOts, elementSize, outputBytes, version);
+	print_elapsed_ms(start, "PartyTwo: runOtAsReceiver");
 	return new OTOnByteArrayROutput(outputBytes, outbytesLength);
 }
 
@@ -394,6 +399,7 @@ void OTSemiHonestExtensionReceiver::runOtAsReceiver(byte* sigma, int numOfOts, i
 bool OTSemiHonestExtensionReceiver::ObliviouslyReceive(CBitVector& choices, CBitVector& ret, int numOTs, int bitlength, BYTE version) {
 	bool success = false;
 	// Execute OT receiver routine 	
+
 	success = receiverPtr->receive(numOTs, bitlength, choices, ret, version, m_nNumOTThreads, m_fMaskFct);
 	return success;
 }

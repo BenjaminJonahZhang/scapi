@@ -7,11 +7,13 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/timer/timer.hpp>
 #include <math.h> /* pow */
 #include <random>
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <chrono>
 #include "Log.hpp"
 
 using namespace std;
@@ -66,3 +68,6 @@ biginteger convert_hex_to_biginteger(const string & hex);
 
 string hexStr(vector<byte> const & data);
 
+void print_elapsed_ms(std::chrono::time_point<std::chrono::system_clock> start, string message);
+
+std::chrono::time_point<std::chrono::system_clock> scapi_now();
