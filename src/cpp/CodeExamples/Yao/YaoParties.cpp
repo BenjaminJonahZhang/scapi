@@ -20,9 +20,13 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 }
 
 void PartyOne::run(byte * ungarbledInput) {
-	values = circuit->garble();
+	auto start = scapi_now();
+	for (int i = 0; i < 1000; i++) {
+		values = circuit->garble();
+	}
+	print_elapsed_ms(start, "Garbling");
 	// send garbled tables and the translation table to p2.
-	auto start = chrono::system_clock::now();
+	start = scapi_now();
 	GarbledTablesHolder * tables = circuit->getGarbledTables();
 	channel->write(tables->toDoubleByteArray()[0], tables->getArraySize(0));
 	channel->write(circuit->getTranslationTable(), circuit->getTranslationTableSize());
@@ -85,9 +89,12 @@ byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
 	print_elapsed_ms(start, "PartyTow: ComputeCircuit: setInputs");
 	
 	// compute the circuit.
+	byte* garbledOutput;
 	start = scapi_now();
-	byte* garbledOutput = NULL;
-	garbledOutput = circuit->compute();
+	for (int i = 0; i < 1000; i++) {
+		garbledOutput = NULL;
+		garbledOutput = circuit->compute();
+	}
 	print_elapsed_ms(start, "PartyTow: ComputeCircuit: compute");
 	
 	// translate the result from compute.

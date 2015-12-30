@@ -5,7 +5,7 @@ auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\YaoProtocol\Ni
 auto localhost_ip = IpAdress::from_string("127.0.0.1");
 
 void connect(ChannelServer * channel_server) {
-	cout << "PartyOne: Connecting to Receiver..." << endl;
+	cout << "P artyOne: Connecting to Receiver..." << endl;
 	int sleep_time = 3;
 	this_thread::sleep_for(chrono::seconds(sleep_time));
 	channel_server->connect();
@@ -32,7 +32,7 @@ void execute_party_one() {
 	
 	// create the garbled circuit
 	start = chrono::system_clock::now();
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(circuit_file, false);
+	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(circuit_file, true);
 	print_elapsed_ms(start, "PartyOne: Creating FastGarbledBooleanCircuit");
 	
 	// create the semi honest OT extension sender
@@ -71,7 +71,7 @@ void execute_party_two() {
 
 	// create the garbled circuit
 	start = scapi_now();
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(circuit_file, false);
+	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(circuit_file, true);
 	print_elapsed_ms(start, "PartyTwo: creating FastGarbledBooleanCircuit");
 
 	// create the OT receiver.

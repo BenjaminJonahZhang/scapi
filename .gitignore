@@ -34,3 +34,5 @@ make.dependencies
 *.idb
 *.lib
 *.obj.enc
+*.iobj
+*.ipdb

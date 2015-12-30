@@ -79,6 +79,9 @@
     <LibraryPath>C:\Program Files\Boost\boost_1_59_0\stage\lib;C:\code\scapi\lib\CryptoPP;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files\Boost\boost_1_59_0;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>C:\local\boost_1_60_0\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -88,6 +91,15 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\code\scapi\lib\CryptoPP;C:\OpenSSL-Win64\include;C:\local\boost_1_60_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Release\cryptlib.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Release\ScapiCpp.lib;C:\local\boost_1_59_0\lib32-msvc-14.0\libboost_system-vc140-mt-s-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
