@@ -21,7 +21,7 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 
 void PartyOne::run(byte * ungarbledInput) {
 	auto start = scapi_now();
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 1; i++) {
 		values = circuit->garble();
 	}
 	print_elapsed_ms(start, "Garbling");
@@ -91,7 +91,7 @@ byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
 	// compute the circuit.
 	byte* garbledOutput;
 	start = scapi_now();
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 1; i++) {
 		garbledOutput = NULL;
 		garbledOutput = circuit->compute();
 	}

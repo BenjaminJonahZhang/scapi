@@ -36,3 +36,4 @@ make.dependencies
 *.obj.enc
 *.iobj
 *.ipdb
+*.pch
