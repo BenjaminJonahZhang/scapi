@@ -65,8 +65,8 @@ byte* ScNativeGarbledBooleanCircuitNoFixedKey::compute() {
 		throw NotAllInputsSetException("missing inputs");
 	
 	// allocate memory for the input keys and the output keys that will be filled
-	block *inputs = (block *)_aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfInputs(), 16);
-	block *outputs = (block *)_aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
+	block *inputs = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfInputs(), 16);
+	block *outputs = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
 	
 	// copy the bothInputKeys to the the aligned inputs
 	memcpy(inputs, &garbledInputs[0], garbledCircuitPtr->getNumberOfInputs() * 16);
@@ -77,21 +77,21 @@ byte* ScNativeGarbledBooleanCircuitNoFixedKey::compute() {
 	memcpy(result, outputs, garbledCircuitPtr->getNumberOfOutputs() * 16);
 
 	// free dynamicallly allocated memory
-	_aligned_free(outputs);
-	_aligned_free(inputs);
+	aligned_free(outputs);
+	aligned_free(inputs);
 
 	return result;
 }
 
 bool ScNativeGarbledBooleanCircuitNoFixedKey::verify(byte* allInputWireValues) {
 	//allocate memory for the input keys and the output keys that will be filled
-	block *inputs = (block *)_aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
+	block *inputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
 	//copy the bothInputKeys to the the aligned inputs
 	memcpy(inputs, allInputWireValues, garbledCircuitPtr->getNumberOfInputs() * 2 * 16);
 	//get the result of verify from the native circuit
 	bool isVerified = garbledCircuitPtr->verify(inputs);
 	//free and inputs array
-	_aligned_free(inputs);
+	aligned_free(inputs);
 
 	//now, after memory has been free return the value of the native verify call.
 	return isVerified;
@@ -99,16 +99,16 @@ bool ScNativeGarbledBooleanCircuitNoFixedKey::verify(byte* allInputWireValues) {
 
 bool ScNativeGarbledBooleanCircuitNoFixedKey::internalVerify(byte * allInputWireValues, byte* allOutputWireValues) {
 	//allocate memory for the input keys and the output keys that will be filled
-	block *inputs = (block *)_aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
-	block *outputs = (block *)_aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfOutputs(), 16);
+	block *inputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
+	block *outputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfOutputs(), 16);
 	//copy the bothInputKeys to the the aligned inputs
 	memcpy(inputs, allInputWireValues, garbledCircuitPtr->getNumberOfInputs() * 2 * 16);
 	//call the internal verify of the native circuit
 	bool isVerified = garbledCircuitPtr->internalVerify(inputs, outputs);
 	//set the output from the native internal verify to the empty array of outputs received as argument
 	memcpy(allOutputWireValues, outputs, 2 * garbledCircuitPtr->getNumberOfOutputs()*SIZE_OF_BLOCK);
-	_aligned_free(inputs);
-	_aligned_free(outputs);
+	aligned_free(inputs);
+	aligned_free(outputs);
 
 	return isVerified;
 }
@@ -116,7 +116,7 @@ bool ScNativeGarbledBooleanCircuitNoFixedKey::internalVerify(byte * allInputWire
 byte* ScNativeGarbledBooleanCircuitNoFixedKey::translate(byte * garbledOutput) {
 	byte* answer = new byte[garbledCircuitPtr->getNumberOfOutputs()];
 	//allocate memory for the input keys and the output keys that will be filled
-	block *outputResults = (block *)_aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
+	block *outputResults = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
 	//copy the outputKeys to the the aligned outputs
 	memcpy(outputResults, garbledOutput, garbledCircuitPtr->getNumberOfOutputs() * 16);
 	// get the answer of translate from the native circuit
@@ -129,8 +129,8 @@ byte* ScNativeGarbledBooleanCircuitNoFixedKey::verifyTranslate(byte* garbledOutp
 	bool flagSuccess = true;
 	byte* answer = new byte[garbledCircuitPtr->getNumberOfOutputs()];
 	//allocate memory for the input keys and the output keys that will be filled
-	block *singleOutputResultsBlocks = (block *)_aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
-	block *bothOutputKeysBlocks = (block *)_aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
+	block *singleOutputResultsBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
+	block *bothOutputKeysBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
 	//copy the outputKeys to the the aligned singleOutputResultsBlocks
 	memcpy(singleOutputResultsBlocks, garbledOutput, garbledCircuitPtr->getNumberOfOutputs() * 16);
 	//copy the bothOutputKeys to the the aligned bothOutputKeysBlocks
@@ -194,12 +194,12 @@ int* ScNativeGarbledBooleanCircuitNoFixedKey::getInputWireIndices(int partyNumbe
 bool ScNativeGarbledBooleanCircuitNoFixedKey::verifyTranslationTable(byte* allOutputWireValues) {
 	bool result = false;
 	//allocate memory for the output keys of both keys
-	block *bothOutputResults = (block *)_aligned_malloc(sizeof(block) * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
+	block *bothOutputResults = (block *)aligned_malloc(sizeof(block) * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
 	//copy the bothInputKeys to the the aligned inputs
 	memcpy(bothOutputResults, allOutputWireValues, garbledCircuitPtr->getNumberOfOutputs() * 2 * 16);
 	//call the native function
 	result = garbledCircuitPtr->verifyTranslationTable(bothOutputResults);
-	_aligned_free(bothOutputResults);
+	aligned_free(bothOutputResults);
 	//now, after memory has been free return the value of the native verifyTranslationTable call.
 	return result;
 }

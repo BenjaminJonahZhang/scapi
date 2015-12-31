@@ -30,10 +30,8 @@
     <ClCompile Include="..\..\OTExtension\ot\ot-extension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\OTExtension\util\cbitvector.h">
+    <ClCompile Include="..\..\OTExtension\util\cbitvector.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
 </Project>

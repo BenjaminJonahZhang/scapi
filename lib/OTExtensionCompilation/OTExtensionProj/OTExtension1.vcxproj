@@ -154,9 +154,7 @@
     <ClCompile Include="..\..\OTExtension\ot\baseOT.cpp" />
     <ClCompile Include="..\..\OTExtension\ot\naor-pinkas.cpp" />
     <ClCompile Include="..\..\OTExtension\ot\ot-extension.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\OTExtension\util\cbitvector.h" />
+    <ClCompile Include="..\..\OTExtension\util\cbitvector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

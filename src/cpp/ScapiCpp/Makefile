@@ -1,31 +1,34 @@
 include ./rules/make.hdr
-Program=ScapiTests.$(EXE_EXT)
 
 SLib = scapi.$(LIB_EXT)
-CPP_FILES :=$(wildcard src/*.cpp)
+CPP_FILES :=$(wildcard src/*/*.cpp)
 OBJ_FILES := $(patsubst src/%.cpp,obj/%.$(OBJ_EXT),$(CPP_FILES))
-OBJ_FILES_NO_TESTS := $(filter-out obj/tests.$(OBJ_EXT), $(OBJ_FILES))
-OUT_DIR = obj
+OUT_DIR = obj obj/circuits obj/comm obj/infra obj/interactive_mid_protocols obj/primitives
 
-CPP_OPTIONS:= -std=c++11 -lcrypto++ -lcrypto -L/usr/lib
+CPP_OPTIONS:= -std=c++11 -lcrypto++ -lcrypto -L/usr/lib -maes -mpclmul
 CPP_LINK_OPTIONS:= -lcrypto++ -lcrypto
 
-all:: directories $(SLib) $(Program) 
+all:: directories $(SLib)
 
 directories: $(OUT_DIR)
 
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
 
-$(SLib): $(OBJ_FILES_NO_TESTS)
+$(SLib): $(OBJ_FILES)
 	ar ru $@ $^ 
 	ranlib $@
 
-$(Program):	$(OBJ_FILES) 
-	$(LINK.cpp)
-
-obj/%.$(OBJ_EXT): src/%.cpp
+obj/circuits/%.$(OBJ_EXT): src/circuits/%.cpp
 	$(COMPILE.cpp) 
+obj/comm/%.$(OBJ_EXT): src/comm/%.cpp
+	$(COMPILE.cpp) 
+obj/infra/%.$(OBJ_EXT): src/infra/%.cpp
+	$(COMPILE.cpp) 
+obj/interactive_mid_protocols/%.$(OBJ_EXT): src/interactive_mid_protocols/%.cpp
+	$(COMPILE.cpp) 
+obj/primitives/%.$(OBJ_EXT): src/primitives/%.cpp
+	$(COMPILE.cpp) 	
 
 tests:: all
 	$(Program)
