@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../include/interactive_mid_protocols/OTSemiHonestExtension.hpp"
 
 /***********************************/

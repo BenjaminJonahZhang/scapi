@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../include/circuits/FastGarbledBooleanCircuit.hpp"
 
 /*******************************************/
