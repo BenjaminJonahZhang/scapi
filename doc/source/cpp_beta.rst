@@ -50,15 +50,18 @@ In order to install scapi: ::
 Running the tests
 -----------------
 
-When building c++ Scapi, a file called ``ScapiTests.exe`` is created. Exceuting this file will run all the c++ related tests.
-All of them should pass and you should get a notification about it.
+Go to the scapi_test folder and run make and then execute test.exe: ::
+
+  $ cd ~/scapi/src/cpp/scapi_tests
+  $ make
+  $ ./test.exe
 
 .. _Link:
 
 Likning against the scapi lib
 -----------------------------
 
-We inlcuded few sample files for quick start: ::
+Can look at the different make file for reference. We inlcuded few sample files for quick start: ::
 
   $ cd scapi/src/cpp/CodeExamples
   $ g++ -std=c++11 -static simple_dlog.cpp ../ScapiCpp/scapi.a -lcrypto -lcrypto++ -ldl -lc
