@@ -1,18 +1,22 @@
 #include "YaoExample.hpp"
 
 int number_of_iterations = 15;
+#ifdef __linux__ 
+auto circuit_file = R"(../../../java/edu/biu/SCProtocols/YaoProtocol/NigelAes.txt)";
+#else
 auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\YaoProtocol\NigelAes.txt)";
+#endif
 auto localhost_ip = IpAdress::from_string("127.0.0.1");
 
 void connect(ChannelServer * channel_server) {
-	cout << "P artyOne: Connecting to Receiver..." << endl;
-	int sleep_time = 3;
-	this_thread::sleep_for(chrono::seconds(sleep_time));
+	cout << "PartyOne: Connecting to Receiver..." << endl;
+	int sleep_time = 50;
+	this_thread::sleep_for(chrono::milliseconds(sleep_time));
 	channel_server->connect();
 	while(!channel_server->is_connected())
 	{
-		cout << "Failed to connect. sleeping for " << sleep_time << " seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(sleep_time));
+		cout << "Failed to connect. sleeping for " << sleep_time << " milliseconds" << endl;
+		this_thread::sleep_for(chrono::milliseconds(sleep_time));
 	}
 	cout << "Sender Connected!" << endl;
 }
@@ -56,6 +60,7 @@ void execute_party_one() {
 		p1->run(ungarbledInput);
 		print_elapsed_ms(start, "PartyOne: all run");
 	}
+	delete p1;
 }
 
 void execute_party_two() {
@@ -95,6 +100,7 @@ void execute_party_two() {
 		p2->run(ungarbledInput, inputSize);
 		print_elapsed_ms(start, "PartyTwo: run");
 	}
+	delete p2;
 }
 
 void Usage(char * argv0) {

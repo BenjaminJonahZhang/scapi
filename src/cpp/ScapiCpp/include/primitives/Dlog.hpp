@@ -1,6 +1,6 @@
-#ifndef SCAPI_DLOG_H
-#define SCAPI_DLOG_H
+#pragma once
 
+#include <boost/multiprecision/miller_rabin.hpp>
 #include "../infra/Common.hpp"
 #include "SecurityLevel.hpp"
 #include "../infra/MathAlgorithms.hpp"
@@ -576,6 +576,3 @@ public:
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
 
 };
-
-
-#endif

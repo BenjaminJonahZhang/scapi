@@ -92,7 +92,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\code\scapi\lib\ScGarbledCircuitNoFixedKey\ScGarbledCircuitNoFixedKey1\x64\Release\ScGarbledCircuitNoFixedKey1.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Release\ScapiCpp.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\lib\OTExtension\OTExtension\x64\Release\OTExtension1.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\MiraclWin64.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\big.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\code\scapi\lib\ScGarbledCircuitNoFixedKey\WindowsSolution\x64\Release\ScGarbledCircuitNoFixedKey1.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Release\ScapiCpp.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\lib\OTExtensionCompilation\x64\Release\OTExtension1.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\MiraclWin64.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\big.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

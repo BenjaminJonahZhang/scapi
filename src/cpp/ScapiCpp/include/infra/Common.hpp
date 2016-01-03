@@ -2,8 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 
-#include <boost/multiprecision/random.hpp>
-#include <boost/multiprecision/miller_rabin.hpp>
+#include <boost/random.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <boost/algorithm/string.hpp>

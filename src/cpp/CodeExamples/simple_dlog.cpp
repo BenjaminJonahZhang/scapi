@@ -1,5 +1,5 @@
 #include "../ScapiCpp/include/primitives/DlogOpenSSL.hpp"
-#include <boost/multiprecision/random.hpp>
+#include <boost/random.hpp>
 #include <iostream>
 
 int main20(){

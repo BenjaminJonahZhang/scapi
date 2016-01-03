@@ -32,7 +32,7 @@ void PartyOne::run(byte * ungarbledInput) {
 	channel->write(circuit->getTranslationTable(), circuit->getTranslationTableSize());
 	// send p1 input keys to p2.
 	sendP1Inputs(ungarbledInput);
-	print_elapsed_ms(start, "Sent garbled tables, translation table and p1Input to p2");
+	print_elapsed_ms(start, "Sent garbled tables, tranlation tables and p1Input to p2");
 
 	// run OT protocol in order to send p2 the necessary keys without revealing any information.
 	start = chrono::system_clock::now();
@@ -130,19 +130,9 @@ void PartyTwo::run(byte * ungarbledInput, int inputSize) {
 
 void PartyTwo::receiveCircuit() {
 	// receive garbled tables.
-	vector<byte> * msg;
-	int sleep_seconds = 3;
-	while ((msg = channel->read_one()) == NULL)
-	{
-		cout << "sleeping for: " << sleep_seconds << " seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(sleep_seconds));
-	}
+	auto msg = channel->read_one();
 	GarbledTablesHolder * garbledTables = new JustGarbledGarbledTablesHolder(&(msg->at(0)), msg->size());
-	while ((msg = channel->read_one()) == NULL)
-	{
-		cout << "sleeping for: " << sleep_seconds << " seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(sleep_seconds-1));
-	}
+	msg = channel->read_one();
 	// receive translation table.
 	byte* translationTable = &(msg->at(0));
 	// set garbled tables and translation table to the circuit.
@@ -151,12 +141,7 @@ void PartyTwo::receiveCircuit() {
 }
 
 void PartyTwo::receiveP1Inputs() {
-	vector<byte> * msg;
-	while ((msg = channel->read_one()) == NULL)
-	{
-		cout << "sleeping for 2 seconds" << endl;
-		this_thread::sleep_for(chrono::seconds(2));
-	}
+	auto msg = channel->read_one();
 	p1Inputs = &(msg->at(0));
 	p1InputsSize = msg->size();
 };

@@ -3,6 +3,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/bind.hpp>
+#include <mutex>
+#include <condition_variable>
 #include "Message.hpp"
 #include "Comm.hpp"
 
@@ -76,6 +78,8 @@ public:
 	//vector<Message> read_all();
 
 private:
+	std::mutex m;
+	std::condition_variable cv;
 	tcp::socket serverSocket;
 	tcp::socket clientSocket;
 	SocketPartyData me;
@@ -92,6 +96,7 @@ private:
 	void handle_msg(const Message& msg);
 	void handle_read_body(const boost::system::error_code& error);
 	void handle_read_header(const boost::system::error_code& error);
+	bool IsQueueEmpty();
 };
 
 class ChannelServer {

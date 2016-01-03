@@ -1,6 +1,4 @@
-#ifndef SCAPI_DLOG_CryptoPP_H
-#define SCAPI_DLOG_CryptoPP_H
-
+#pragma once
 
 #include "Dlog.hpp"
 #include <random>
@@ -109,5 +107,3 @@ public:
 	virtual const vector<byte>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
 	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
 };
-
-#endif

@@ -31,7 +31,6 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt
 		throw invalid_argument("p must be equal to 2q+1");
 	}
 	// if p is not a prime throw exception
-
 	if (!miller_rabin_test(p, 40, prime_gen)) {
 		throw invalid_argument("p must be a prime");
 	}

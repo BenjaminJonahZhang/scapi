@@ -1,5 +1,6 @@
 #include "../../include/comm/TwoPartyComm.hpp"
 
+
 /*****************************************/
 /* SocketPartyData						 */
 /*****************************************/
@@ -45,7 +46,6 @@ void NativeChannel::handle_connect(const boost::system::error_code& error)
 
 void NativeChannel::write(const Message& msg)
 {
-	Logger::log("Channel (" + me.to_log_string() + ") - writing message. size of message: " + to_string(msg.body_length()));
 	io_service_client_.post(boost::bind(&NativeChannel::do_write, this, msg));
 }
 
@@ -128,25 +128,25 @@ void NativeChannel::handle_read_body(const boost::system::error_code& error)
 }
 
 void NativeChannel::handle_msg(const Message& msg) {
-	auto v = new vector<byte>();
-	copy_byte_array_to_byte_vector((byte *)read_msg_.body(), read_msg_.body_length(), *v, 0);
+	int m_len = read_msg_.body_length();
+	auto v = new vector<byte>(m_len);
+	memcpy(&(v->at(0)), read_msg_.body(), m_len);
+	std::unique_lock<std::mutex> lk(m);
 	read_msgs_.push_back(v);
-	size_t len = read_msg_.body_length();
-	//string s(reinterpret_cast<char const*>(read_msg_.body()), len);
-	//cout << "got message. size: " << len << endl;
+	lk.unlock();
+	cv.notify_one();
 }
 
 vector<byte> * NativeChannel::read_one() {
-	if (!read_msgs_.empty())
-	{
-		vector<byte>* v = read_msgs_.front();
-		read_msgs_.pop_front();
-		return v;
-	}
-	return NULL;
+	// Wait until main() sends data
+	std::unique_lock<std::mutex> lk(m);
+	while (read_msgs_.empty())
+		cv.wait(lk);
+
+	auto item = read_msgs_.front();
+	read_msgs_.pop_front();
+	return item;
 }
-
-
 
 /*****************************************/
 /* ChannelServer						 */
