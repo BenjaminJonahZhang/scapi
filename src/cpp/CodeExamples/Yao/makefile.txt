@@ -1,0 +1,15 @@
+all:: YaoParties.o
+	g++ -std=c++11 -o App1.exe App1.cpp -DBOOST_LOG_DYN_LINK=1 ../ScapiCpp/scapi.a -lcrypto -lcrypto++ -ldl -lOTExtension -lScGarbledCircuitNoFixedKey -lboost_log -lboost_system -lboost_thread -lpthread -maes -mpclmul
+
+YaoParties.o : 
+	g++ -c -std=c++11 -o YaoParties.o YaoParties.cpp -DBOOST_LOG_DYN_LINK
+
+tests:: all
+	$(Program)
+
+clean::
+	rm YaoParties.o
+	rm App1.exe
+
+
+

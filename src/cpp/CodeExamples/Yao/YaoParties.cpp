@@ -157,7 +157,6 @@ void PartyTwo::receiveP1Inputs() {
 		cout << "sleeping for 2 seconds" << endl;
 		this_thread::sleep_for(chrono::seconds(2));
 	}
-	cout << endl << "msg is not null (again)! size: " << msg->size() << endl;
 	p1Inputs = &(msg->at(0));
 	p1InputsSize = msg->size();
 };
