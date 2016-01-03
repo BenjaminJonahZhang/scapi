@@ -64,10 +64,19 @@ Likning against the scapi lib
 Can look at the different make file for reference. We inlcuded few sample files for quick start: ::
 
   $ cd scapi/src/cpp/CodeExamples
-  $ g++ -std=c++11 -static simple_dlog.cpp ../ScapiCpp/scapi.a -lcrypto -lcrypto++ -ldl -lc
-  $ ./a.out
+  $ make
+  $ ./simple_dlog.exe
+  $ ./simple_sha1.exe
 
-Running the exectuble that was created (``a.out``) should produce few prints after using the OpenSSL implementation of Dlog. 
+More advenced examples can be found under Yao folder. This example require two instance running on the same machine. To compile and run: ::
+
+  $ cd scapi/src/cpp/CodeExamples/Yao
+  $ make
+  $ ./App1.exe 1
+
+and in another instance: ::
+  
+  $ ./App1.exe 2
 
 .. _Further: 
 
