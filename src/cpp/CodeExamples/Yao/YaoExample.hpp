@@ -108,7 +108,6 @@ public:
 		//Create an OT input object with the given sigmaArr.
 		int elementSize = 128;
 		OTBatchRInput * input = new OTExtensionGeneralRInput(sigmaArr, arrSize, elementSize);
-		cout << "created input. starting transfer" << endl;
 		//Run the Ot protocol.
 		return otReceiver->transfer(input);
 	};

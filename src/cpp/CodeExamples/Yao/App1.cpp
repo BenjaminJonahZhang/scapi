@@ -1,6 +1,6 @@
 #include "YaoExample.hpp"
 
-int number_of_iterations = 15;
+int number_of_iterations = 1000;
 #ifdef __linux__ 
 auto circuit_file = R"(../../../java/edu/biu/SCProtocols/YaoProtocol/NigelAes.txt)";
 #else
@@ -50,16 +50,16 @@ void execute_party_one() {
 	byte* ungarbledInput = readInputsAsArray();
 	
 	PartyOne * p1;
+	auto all = scapi_now();
 	for (int i = 0; i < number_of_iterations ; i++) {
-		cout << endl  << "************" << endl << "Running iteration: " << i << endl << "************" << endl;
 		// create Party one with the previous created objects.
 		p1 = new PartyOne(channel_server, otSender, circuit);
-
 		// run Party one
-		start = scapi_now();
+		if (i==0)
+			all = scapi_now();
 		p1->run(ungarbledInput);
-		print_elapsed_ms(start, "PartyOne: all run");
 	}
+	print_elapsed_ms(all, "********************* PartyOne: 900 iterations ALL");
 	delete p1;
 }
 
@@ -84,22 +84,20 @@ void execute_party_two() {
 	OTBatchReceiver * otReceiver = new OTSemiHonestExtensionReceiver(receiverParty, 163, 1);
 	print_elapsed_ms(start, "PartyTwo: creating OTSemiHonestExtensionReceiver");
 
-	// create Party two with the previous created objects			
+	// create Party two with the previous created objec ts			
 	int inputSize = 128;
 	byte* ungarbledInput = new byte[inputSize];
 
 	PartyTwo * p2;
+	auto all = scapi_now();
 	for (int i = 0; i < number_of_iterations ; i++) {
-		cout << endl << "************" << endl << "Running iteration: " << i << endl << "************" << endl;
 		// init the P1 yao protocol and run party two of Yao protocol.
-		start = scapi_now();
+		if (i == 0)
+			all = scapi_now();
 		p2 = new PartyTwo(server, otReceiver, circuit);
-		print_elapsed_ms(start, "PartyTwo: creating PartyTwo");
-
-		start = scapi_now();
 		p2->run(ungarbledInput, inputSize);
-		print_elapsed_ms(start, "PartyTwo: run");
 	}
+	print_elapsed_ms(all, "********************* PartyTwo: 900 iterations ALL");
 	delete p2;
 }
 

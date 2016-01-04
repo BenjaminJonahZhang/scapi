@@ -351,7 +351,7 @@ OTBatchROutput* OTSemiHonestExtensionReceiver::transfer(OTBatchRInput* input) {
 	//Run the protocol using the native code in the dll.
 	auto start = scapi_now();
 	runOtAsReceiver(sigmaArr, numOfOts, elementSize, outputBytes, version);
-	print_elapsed_ms(start, "PartyTwo: runOtAsReceiver");
+	//print_elapsed_ms(start, "PartyTwo: runOtAsReceiver");
 	return new OTOnByteArrayROutput(outputBytes, outbytesLength);
 }
 

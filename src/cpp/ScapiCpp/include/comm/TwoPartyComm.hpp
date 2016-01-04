@@ -96,7 +96,6 @@ private:
 	void handle_msg(const Message& msg);
 	void handle_read_body(const boost::system::error_code& error);
 	void handle_read_header(const boost::system::error_code& error);
-	bool IsQueueEmpty();
 };
 
 class ChannelServer {

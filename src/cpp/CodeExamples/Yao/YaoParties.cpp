@@ -20,24 +20,16 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 }
 
 void PartyOne::run(byte * ungarbledInput) {
-	auto start = scapi_now();
-	for (int i = 0; i < 1; i++) {
-		values = circuit->garble();
-	}
-	print_elapsed_ms(start, "Garbling");
+	values = circuit->garble();
 	// send garbled tables and the translation table to p2.
-	start = scapi_now();
 	GarbledTablesHolder * tables = circuit->getGarbledTables();
 	channel->write(tables->toDoubleByteArray()[0], tables->getArraySize(0));
 	channel->write(circuit->getTranslationTable(), circuit->getTranslationTableSize());
 	// send p1 input keys to p2.
 	sendP1Inputs(ungarbledInput);
-	print_elapsed_ms(start, "Sent garbled tables, tranlation tables and p1Input to p2");
 
 	// run OT protocol in order to send p2 the necessary keys without revealing any information.
-	start = chrono::system_clock::now();
 	runOTProtocol();
-	print_elapsed_ms(start, "PartyOne: OT protocol run");
 }
 
 void PartyOne::runOTProtocol() {
@@ -63,7 +55,7 @@ void PartyOne::runOTProtocol() {
 	// run the OT's transfer phase.
 	auto start = chrono::system_clock::now();
 	otSender->transfer(input);
-	print_elapsed_ms(start, "PartyOne: transfer part of OT");
+	//print_elapsed_ms(start, "PartyOne: transfer part of OT");
 }
 
 /*********************************/
@@ -71,7 +63,6 @@ void PartyOne::runOTProtocol() {
 /*********************************/
 
 byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
-	auto start = scapi_now();
 	// Get the output of the protocol.
 	byte* p2Inputs = ((OTOnByteArrayROutput *)otOutput)->getXSigma();
 	int p2InputsSize = ((OTOnByteArrayROutput *)otOutput)->getLength();
@@ -81,51 +72,35 @@ byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
 	vector<byte> allInputs(p1InputsSize + p2InputsSize);
 	memcpy(&allInputs[0], p1Inputs, p1InputsSize);
 	memcpy(&allInputs[p1InputsSize], p2Inputs, p2InputsSize);
-	print_elapsed_ms(start, "PartyTow: ComputeCircuit: init");
 	
 	// set the input to the circuit.
-	start = scapi_now();
 	circuit->setInputs(allInputs);
-	print_elapsed_ms(start, "PartyTow: ComputeCircuit: setInputs");
 	
 	// compute the circuit.
 	byte* garbledOutput;
-	start = scapi_now();
-	for (int i = 0; i < 1; i++) {
-		garbledOutput = NULL;
-		garbledOutput = circuit->compute();
-	}
-	print_elapsed_ms(start, "PartyTow: ComputeCircuit: compute");
+	garbledOutput = circuit->compute();
 	
 	// translate the result from compute.
-	start = scapi_now();
 	byte* circuitOutput = circuit->translate(garbledOutput);
-	print_elapsed_ms(start, "PartyTow: ComputeCircuit: translate");
 	return circuitOutput;
 }
 
 void PartyTwo::run(byte * ungarbledInput, int inputSize) {
 	// receive tables and inputs
-	auto start = scapi_now();
 	receiveCircuit();
 	receiveP1Inputs();
-	print_elapsed_ms(start, "PartyTwo: receive garbled tables,translation table and p1 inpust from p1");
 
 	// run OT protocol in order to get the necessary keys without revealing any information.
-	start = scapi_now();
 	OTBatchROutput * output = runOTProtocol(ungarbledInput, inputSize);
-	print_elapsed_ms(start, "PartyTwo: run OT protocol");
 
 	// Compute the circuit.
-	start = scapi_now();
 	byte* circuitOutput = computeCircuit(output);
-	print_elapsed_ms(start, "PartyTwo: Compute the circuit took");
 
-	// we're done print the output
-	int outputSize = circuit->getNumberOfParties();
-	cout << "PartyTwo: printing outputSize: " << outputSize << endl;
-	for (int i = 0; i<outputSize; i++)
-		cout << circuitOutput[i];
+	//// we're done print the output
+	//int outputSize = circuit->getNumberOfParties();
+	//cout << "PartyTwo: printing outputSize: " << outputSize << endl;
+	//for (int i = 0; i<outputSize; i++)
+	//	cout << circuitOutput[i];
 }
 
 void PartyTwo::receiveCircuit() {

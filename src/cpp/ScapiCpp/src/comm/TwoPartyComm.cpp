@@ -21,6 +21,10 @@ void NativeChannel::start_listening()
 		boost::asio::buffer(read_msg_.data(), Message::header_length),
 		boost::bind(&NativeChannel::handle_read_header, this,
 			boost::asio::placeholders::error));
+	boost::asio::ip::tcp::no_delay option(true);
+	boost::asio::socket_base::do_not_route option2(true);
+	serverSocket.set_option(option);
+	serverSocket.set_option(option2);
 }
 
 void NativeChannel::connect() {
@@ -31,6 +35,10 @@ void NativeChannel::connect() {
 	boost::asio::async_connect(clientSocket, endpoint_iterator,
 		boost::bind(&NativeChannel::handle_connect, this,
 			boost::asio::placeholders::error));
+	boost::asio::ip::tcp::no_delay option(true);
+	boost::asio::socket_base::do_not_route option2(true);
+	clientSocket.set_option(option);
+	clientSocket.set_option(option2);
 }
 
 void NativeChannel::handle_connect(const boost::system::error_code& error)
