@@ -76,8 +76,8 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Program Files\Boost\boost_1_59_0\stage\lib;C:\code\scapi\lib\CryptoPP;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files\Boost\boost_1_59_0;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\boost_1_60_0\lib64-msvc-14.0;C:\code\scapi\lib\CryptoPP;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\local\boost_1_60_0\lib64-msvc-14.0;C:\code\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>C:\local\boost_1_60_0\lib64-msvc-14.0;$(LibraryPath)</LibraryPath>
@@ -87,7 +87,7 @@
       <AdditionalDependencies>C:\code\Builds\CryptoPP\Output\Debug\cryptlib.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Debug\ScapiCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\Program Files\Boost\boost_1_59_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenSSL-Win64\include;C:\local\boost_1_60_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
