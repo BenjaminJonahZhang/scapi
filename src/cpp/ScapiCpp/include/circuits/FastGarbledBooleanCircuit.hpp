@@ -396,7 +396,7 @@ public:
 	* @param translationTable This value should match the garbled tables of the circuit.
 	*/
 	void setTranslationTable(byte* translationTable) override {
-		memcpy(garbledCircuitPtr->getTranslationTable(), translationTable, garbledCircuitPtr->getNumberOfOutputs());
+		garbledCircuitPtr->setTranslationTable(translationTable);
 	};
 	/**
 	* Returns the input wires' indices of the given party.

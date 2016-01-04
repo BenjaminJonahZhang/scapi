@@ -16,15 +16,15 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 		memcpy(p1Inputs + i*SIZE_OF_BLOCK, allInputs + inputStartIndex, SIZE_OF_BLOCK);
 	}
 	//Send the keys to p2.
-	channel->write(p1Inputs, inputsSize);
+	channel->write_fast(p1Inputs, inputsSize);
 }
 
 void PartyOne::run(byte * ungarbledInput) {
 	values = circuit->garble();
 	// send garbled tables and the translation table to p2.
 	GarbledTablesHolder * tables = circuit->getGarbledTables();
-	channel->write(tables->toDoubleByteArray()[0], tables->getArraySize(0));
-	channel->write(circuit->getTranslationTable(), circuit->getTranslationTableSize());
+	channel->write_fast(tables->toDoubleByteArray()[0], tables->getArraySize(0));
+	channel->write_fast(circuit->getTranslationTable(), circuit->getTranslationTableSize());
 	// send p1 input keys to p2.
 	sendP1Inputs(ungarbledInput);
 

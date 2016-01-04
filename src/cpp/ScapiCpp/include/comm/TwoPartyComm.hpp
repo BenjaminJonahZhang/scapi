@@ -75,6 +75,7 @@ public:
 	void close();
 	bool is_connected() { return m_IsConnected; };
 	vector<byte> * read_one();
+	void write_fast(const Message& msg);
 	//vector<Message> read_all();
 
 private:
@@ -90,8 +91,10 @@ private:
 	boost::asio::io_service& io_service_client_;
 	bool m_IsConnected = false;
 	void handle_connect(const boost::system::error_code& error);
-	void do_write(Message msg);
+	void do_write(const Message & msg);
+	void do_write_fast(byte * data, int len);
 	void handle_write(const boost::system::error_code& error);
+	void handle_write_fast(const boost::system::error_code& error);
 	void do_close() { clientSocket.close(); };
 	void handle_msg(const Message& msg);
 	void handle_read_body(const boost::system::error_code& error);
@@ -120,6 +123,7 @@ public:
 	void write(byte* data, int size);
 	vector<byte>* read_one() { return channel->read_one(); };
 	//vector<Message> read_all() { return channel->read_all(); };
+	void write_fast(byte * data, int size);
 
 private:
 	void handle_accept(NativeChannel * new_channel, const boost::system::error_code& error) {

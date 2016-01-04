@@ -22,9 +22,7 @@ void NativeChannel::start_listening()
 		boost::bind(&NativeChannel::handle_read_header, this,
 			boost::asio::placeholders::error));
 	boost::asio::ip::tcp::no_delay option(true);
-	boost::asio::socket_base::do_not_route option2(true);
 	serverSocket.set_option(option);
-	serverSocket.set_option(option2);
 }
 
 void NativeChannel::connect() {
@@ -36,9 +34,7 @@ void NativeChannel::connect() {
 		boost::bind(&NativeChannel::handle_connect, this,
 			boost::asio::placeholders::error));
 	boost::asio::ip::tcp::no_delay option(true);
-	boost::asio::socket_base::do_not_route option2(true);
 	clientSocket.set_option(option);
-	clientSocket.set_option(option2);
 }
 
 void NativeChannel::handle_connect(const boost::system::error_code& error)
@@ -57,13 +53,21 @@ void NativeChannel::write(const Message& msg)
 	io_service_client_.post(boost::bind(&NativeChannel::do_write, this, msg));
 }
 
+void NativeChannel::write_fast(const Message& msg)
+{
+	boost::system::error_code ignored_error;
+	boost::asio::write(clientSocket,
+		boost::asio::buffer(msg.data(), msg.length()),
+		boost::asio::transfer_all(), ignored_error);
+}
+
 void NativeChannel::close()
 {
 	Logger::log("Channel (" + me.to_log_string() + ") - closing");
 	io_service_client_.post(boost::bind(&NativeChannel::do_close, this));
 }
 
-void NativeChannel::do_write(Message msg)
+void NativeChannel::do_write(const Message& msg)
 {
 	bool write_in_progress = !write_msgs_.empty();
 	write_msgs_.push_back(msg);
@@ -75,6 +79,18 @@ void NativeChannel::do_write(Message msg)
 			boost::bind(&NativeChannel::handle_write, this,
 				boost::asio::placeholders::error));
 	}
+}
+
+void NativeChannel::do_write_fast(byte * data, int len)
+{
+	boost::system::error_code ignored_error;
+	boost::asio::write(clientSocket,
+		boost::asio::buffer(data, len),
+		boost::asio::transfer_all(), ignored_error);
+}
+
+void NativeChannel::handle_write_fast(const boost::system::error_code& error) {
+
 }
 
 void NativeChannel::handle_write(const boost::system::error_code& error)
@@ -90,7 +106,6 @@ void NativeChannel::handle_write(const boost::system::error_code& error)
 				boost::bind(&NativeChannel::handle_write, this,
 					boost::asio::placeholders::error));
 		}
-		Logger::log("Channel( " + me.to_log_string() + "): done writing.");
 	}
 	else
 	{
@@ -165,4 +180,11 @@ void ChannelServer::write(byte* data, int size) {
 	memcpy(msg.body(), &data[0], msg.body_length());
 	msg.encode_header();
 	channel->write(msg);
+}
+
+void ChannelServer::write_fast(byte * data, int size) {
+	msg.body_length(size);
+	memcpy(msg.body(), &data[0], msg.body_length());
+	msg.encode_header();
+	channel->write_fast(msg);
 }

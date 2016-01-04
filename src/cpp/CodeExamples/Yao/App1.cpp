@@ -55,12 +55,16 @@ void execute_party_one() {
 		// create Party one with the previous created objects.
 		p1 = new PartyOne(channel_server, otSender, circuit);
 		// run Party one
-		if (i==0)
-			all = scapi_now();
 		p1->run(ungarbledInput);
 	}
-	print_elapsed_ms(all, "********************* PartyOne: 900 iterations ALL");
+	auto end = std::chrono::system_clock::now();
+	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
+	cout << "********************* PartyOne: Running " << number_of_iterations <<
+		" iterations too: " << elapsed_ms << " milliseconds" << endl;
+	cout << "Average time per iteration: " << elapsed_ms / (float) number_of_iterations << " milliseconds" << endl;
 	delete p1;
+	io_service.stop();
+	t.join();
 }
 
 void execute_party_two() {
@@ -92,13 +96,17 @@ void execute_party_two() {
 	auto all = scapi_now();
 	for (int i = 0; i < number_of_iterations ; i++) {
 		// init the P1 yao protocol and run party two of Yao protocol.
-		if (i == 0)
-			all = scapi_now();
 		p2 = new PartyTwo(server, otReceiver, circuit);
 		p2->run(ungarbledInput, inputSize);
 	}
-	print_elapsed_ms(all, "********************* PartyTwo: 900 iterations ALL");
+	auto end = std::chrono::system_clock::now();
+	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
+	cout << "********************* PartyTwo: Running " << number_of_iterations <<
+		" iterations too: " << elapsed_ms << " milliseconds" << endl;
+	cout << "Average time per iteration: " << elapsed_ms / (float) number_of_iterations << " milliseconds" << endl;
 	delete p2;
+	io_service.stop();
+	t.join();
 }
 
 void Usage(char * argv0) {
@@ -112,7 +120,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	string partyNum(argv[1]);
-	if (partyNum == "1")
+	if (partyNum == "1") 
 		execute_party_one();
 	else if (partyNum == "2")
 		execute_party_two();
