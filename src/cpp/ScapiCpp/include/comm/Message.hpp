@@ -7,8 +7,8 @@
 class Message
 {
 public:
-	enum { header_length = 6 };
-	enum { max_body_length = 1000000};
+	enum { header_length = 8 };
+	enum { max_body_length = 3000000};
 
 	Message()
 		: body_length_(0), data_(header_length + max_body_length)

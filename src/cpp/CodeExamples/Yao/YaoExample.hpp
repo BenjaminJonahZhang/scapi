@@ -9,6 +9,7 @@
 #include "../../ScapiCpp/include/interactive_mid_protocols/OTSemiHonestExtension.hpp"
 #undef AES_KEY
 #include <thread>
+#include "../../ScapiCpp/include/infra/Scanner.hpp"
 
 
 
@@ -90,7 +91,7 @@ public:
 	* Runs the protocol.
 	* @param ungarbledInput The input for the circuit, each p1's input wire gets 0 or 1.
 	*/
-	void run(byte * ungarbledInput, int inputSize);
+	void run(byte * ungarbledInput, int inputSize, bool print_output=false);
 	/**
 	* Receive the circuit's garbled tables and translation table.
 	*/

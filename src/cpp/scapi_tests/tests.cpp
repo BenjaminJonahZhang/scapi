@@ -386,6 +386,7 @@ TEST_CASE("PRF", "[AES, PRF]")
 	SECTION("OpenSSL PRP")
 	{
 		test_prp<OpenSSLAES>("2b7e151628aed2a6abf7158809cf4f3c", "6bc1bee22e409f96e93d7e117393172a", "3ad77bb40d7a3660a89ecaf32466ef97");
+		test_prp<OpenSSLAES>("2b7e151628aed2a6abf7158809cf4f3c", "6bc1bee22e409f96e93d7e1173000000", "3ad77bb40d7a3660a89ecaf32466ef97");
 	}
 	SECTION("TRIPLE DES")
 	{
@@ -516,12 +517,6 @@ TEST_CASE("Comm basics", "[Communication]") {
 		REQUIRE(spd1 <= spd2);
 		REQUIRE(spd1 != spd2);
 		REQUIRE(!(spd1 == spd2));
-	}
-	SECTION("string", "[]") {
-		auto x = (long)1 << 32;
-		cout << "x= " << x << endl;
-		cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
-
 	}
 }
 

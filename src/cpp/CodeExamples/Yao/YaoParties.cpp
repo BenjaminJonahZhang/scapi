@@ -4,19 +4,21 @@
 /*********************************/
 void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 	byte* allInputs = values.getAllInputWireValues();
-	//get the size of party one inputs
+	// get the size of party one inputs
 	int numberOfp1Inputs = 0;
 	numberOfp1Inputs = circuit->getNumberOfInputs(1);
 	int inputsSize = numberOfp1Inputs*SIZE_OF_BLOCK;
 	byte* p1Inputs = new byte[inputsSize];
-	//Create an array with the keys corresponding the given input.
+
+	// create an array with the keys corresponding the given input.
 	int inputStartIndex;
 	for (int i = 0; i < numberOfp1Inputs; i++) {
-		inputStartIndex = (2 * i + ungarbledInput[i])*SIZE_OF_BLOCK;
+		inputStartIndex = (2 * i + ((int) ungarbledInput[i]))*SIZE_OF_BLOCK;
 		memcpy(p1Inputs + i*SIZE_OF_BLOCK, allInputs + inputStartIndex, SIZE_OF_BLOCK);
 	}
-	//Send the keys to p2.
+	// send the keys to p2.
 	channel->write_fast(p1Inputs, inputsSize);
+	delete p1Inputs;
 }
 
 void PartyOne::run(byte * ungarbledInput) {
@@ -41,6 +43,8 @@ void PartyOne::runOTProtocol() {
 	p2InputSize = circuit->getNumberOfInputs(2);
 	auto x0Arr = new vector<byte>();
 	x0Arr->reserve(p2InputSize * SIZE_OF_BLOCK);
+	//int arrSize = p2InputSize * SIZE_OF_BLOCK;
+	//byte * x0Arr = new byte[arrSize];
 	auto x1Arr = new vector<byte>();
 	x1Arr->reserve(p2InputSize * SIZE_OF_BLOCK);
 	int beginIndex0, beginIndex1;
@@ -48,14 +52,14 @@ void PartyOne::runOTProtocol() {
 		beginIndex0 = p1InputSize * 2 * SIZE_OF_BLOCK + 2 * i*SIZE_OF_BLOCK;
 		beginIndex1 = p1InputSize * 2 * SIZE_OF_BLOCK + (2 * i + 1)*SIZE_OF_BLOCK;
 		x0Arr->insert(x0Arr->end(), &allInputWireValues[beginIndex0], &allInputWireValues[beginIndex0 + SIZE_OF_BLOCK]);
+		//memcpy(x0Arr, &allInputWireValues[beginIndex0], SIZE_OF_BLOCK);
 		x1Arr->insert(x1Arr->end(), &allInputWireValues[beginIndex1], &allInputWireValues[beginIndex1 + SIZE_OF_BLOCK]);
 	}
 	// create an OT input object with the keys arrays.
 	OTBatchSInput * input = new OTExtensionGeneralSInput(&(x0Arr->at(0)), x0Arr->size(), &(x1Arr->at(0)), x1Arr->size(), p2InputSize);
 	// run the OT's transfer phase.
-	auto start = chrono::system_clock::now();
 	otSender->transfer(input);
-	//print_elapsed_ms(start, "PartyOne: transfer part of OT");
+	delete x0Arr, x1Arr;
 }
 
 /*********************************/
@@ -79,13 +83,13 @@ byte* PartyTwo::computeCircuit(OTBatchROutput * otOutput) {
 	// compute the circuit.
 	byte* garbledOutput;
 	garbledOutput = circuit->compute();
-	
+
 	// translate the result from compute.
 	byte* circuitOutput = circuit->translate(garbledOutput);
 	return circuitOutput;
 }
 
-void PartyTwo::run(byte * ungarbledInput, int inputSize) {
+void PartyTwo::run(byte * ungarbledInput, int inputSize, bool print_output) {
 	// receive tables and inputs
 	receiveCircuit();
 	receiveP1Inputs();
@@ -96,19 +100,24 @@ void PartyTwo::run(byte * ungarbledInput, int inputSize) {
 	// Compute the circuit.
 	byte* circuitOutput = computeCircuit(output);
 
-	//// we're done print the output
-	//int outputSize = circuit->getNumberOfParties();
-	//cout << "PartyTwo: printing outputSize: " << outputSize << endl;
-	//for (int i = 0; i<outputSize; i++)
-	//	cout << circuitOutput[i];
+	// we're done print the output
+	if (print_output)
+	{
+		int outputSize = circuit->getNumberOfOutputs();
+		cout << "PartyTwo: printing outputSize: " << outputSize << endl;
+		for (int i = 0; i < outputSize; i++)
+			cout << (int)circuitOutput[i];
+		cout << endl;
+	}
 }
 
 void PartyTwo::receiveCircuit() {
 	// receive garbled tables.
 	auto msg = channel->read_one();
 	GarbledTablesHolder * garbledTables = new JustGarbledGarbledTablesHolder(&(msg->at(0)), msg->size());
-	msg = channel->read_one();
+	
 	// receive translation table.
+	msg = channel->read_one();
 	byte* translationTable = &(msg->at(0));
 	// set garbled tables and translation table to the circuit.
 	circuit->setGarbledTables(garbledTables);
@@ -119,4 +128,4 @@ void PartyTwo::receiveP1Inputs() {
 	auto msg = channel->read_one();
 	p1Inputs = &(msg->at(0));
 	p1InputsSize = msg->size();
-};
+}

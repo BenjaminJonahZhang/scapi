@@ -1,12 +1,25 @@
 #include "YaoExample.hpp"
 
+
+// Config:
 int number_of_iterations = 1000;
+bool print_output = false;
 #ifdef __linux__ 
 auto circuit_file = R"(../../../java/edu/biu/SCProtocols/YaoProtocol/NigelAes.txt)";
 #else
-auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\YaoProtocol\NigelAes.txt)";
+//auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\YaoProtocol\NigelAes.txt)";
+//auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\AES\NigelAes.txt)";
+//auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA1\NigelSHA1.txt)";
+auto circuit_file = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA256\NigelSHA256.txt)";
 #endif
-auto localhost_ip = IpAdress::from_string("127.0.0.1");
+auto party_1_ip = IpAdress::from_string("127.0.0.1");
+auto party_2_ip = IpAdress::from_string("127.0.0.1");
+//input_file_2 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\AES\AESPartyOneInputs.txt)";
+//auto input_file_1 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA1\SHA1PartyOneInputs.txt)";
+auto input_file_1 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA256\SHA256PartyOneInputs.txt)";
+//input_file_2 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\AES\AESPartyTwoInputs.txt)";
+//auto input_file_2 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA1\SHA1PartyTwoInputs.txt)";
+auto input_file_2 = R"(C:\code\scapi\src\java\edu\biu\SCProtocols\MaliciousYao\assets\circuits\SHA256\SHA256PartyTwoInputs.txt)";
 
 void connect(ChannelServer * channel_server) {
 	cout << "PartyOne: Connecting to Receiver..." << endl;
@@ -21,15 +34,22 @@ void connect(ChannelServer * channel_server) {
 	cout << "Sender Connected!" << endl;
 }
 
-byte * readInputsAsArray() {
-	return new byte[128];
+vector<byte> * readInputAsVector(int party) {
+	string input_file = (party == 1) ? input_file_1 : input_file_2;
+	cout << "reading from file " << input_file << endl;;
+	auto sc = scannerpp::Scanner(new scannerpp::File(input_file));
+	int inputsNumber = sc.nextInt();
+	auto inputVector = new vector<byte>(inputsNumber);
+	for (int i = 0; i < inputsNumber; i++)
+		(*inputVector)[i] = (byte)sc.nextInt();
+	return inputVector;
 }
 
 void execute_party_one() {
 	auto start = chrono::system_clock::now();
 	boost::asio::io_service io_service;
-	SocketPartyData me(localhost_ip, 1213);
-	SocketPartyData other(localhost_ip, 1212);
+	SocketPartyData me(party_1_ip, 1213);
+	SocketPartyData other(party_2_ip, 1212);
 	ChannelServer * channel_server = new ChannelServer(io_service, me, other);
 	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 	print_elapsed_ms(start, "PartyOne: Init");
@@ -40,29 +60,31 @@ void execute_party_one() {
 	print_elapsed_ms(start, "PartyOne: Creating FastGarbledBooleanCircuit");
 	
 	// create the semi honest OT extension sender
-	SocketPartyData senderParty(localhost_ip, 7766);
+	SocketPartyData senderParty(party_2_ip, 7766);
 	OTBatchSender * otSender = new OTSemiHonestExtensionSender(senderParty, 163, 1);
 
 	// connect to party two
 	connect(channel_server);
 	
 	// get the inputs of P1 
-	byte* ungarbledInput = readInputsAsArray();
-	
+	vector<byte>* ungarbledInput = readInputAsVector(1);
+
 	PartyOne * p1;
 	auto all = scapi_now();
+	// create Party one with the previous created objects.
+	p1 = new PartyOne(channel_server, otSender, circuit);
 	for (int i = 0; i < number_of_iterations ; i++) {
-		// create Party one with the previous created objects.
-		p1 = new PartyOne(channel_server, otSender, circuit);
 		// run Party one
-		p1->run(ungarbledInput);
+		p1->run(&(ungarbledInput->at(0)));
 	}
 	auto end = std::chrono::system_clock::now();
 	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
 	cout << "********************* PartyOne: Running " << number_of_iterations <<
 		" iterations too: " << elapsed_ms << " milliseconds" << endl;
 	cout << "Average time per iteration: " << elapsed_ms / (float) number_of_iterations << " milliseconds" << endl;
-	delete p1;
+	
+	// exit cleanly
+	delete p1, channel_server, circuit, otSender, ungarbledInput;
 	io_service.stop();
 	t.join();
 }
@@ -71,9 +93,9 @@ void execute_party_two() {
 	// init
 	auto start = scapi_now();
 	boost::asio::io_service io_service;
-	SocketPartyData me(localhost_ip, 1212);
-	SocketPartyData other(localhost_ip, 1213);
-	SocketPartyData receiverParty(localhost_ip, 7766);
+	SocketPartyData me(party_2_ip, 1212);
+	SocketPartyData other(party_1_ip, 1213);
+	SocketPartyData receiverParty(party_1_ip, 7766);
 	ChannelServer * server = new ChannelServer(io_service, me, other);
 	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 	print_elapsed_ms(start, "PartyTwo: Init");
@@ -89,22 +111,21 @@ void execute_party_two() {
 	print_elapsed_ms(start, "PartyTwo: creating OTSemiHonestExtensionReceiver");
 
 	// create Party two with the previous created objec ts			
-	int inputSize = 128;
-	byte* ungarbledInput = new byte[inputSize];
+	vector<byte> * ungarbledInput = readInputAsVector(2);
 
 	PartyTwo * p2;
 	auto all = scapi_now();
+	p2 = new PartyTwo(server, otReceiver, circuit);
 	for (int i = 0; i < number_of_iterations ; i++) {
 		// init the P1 yao protocol and run party two of Yao protocol.
-		p2 = new PartyTwo(server, otReceiver, circuit);
-		p2->run(ungarbledInput, inputSize);
+		p2->run(&(ungarbledInput->at(0)), ungarbledInput->size(), print_output);
 	}
 	auto end = std::chrono::system_clock::now();
 	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
 	cout << "********************* PartyTwo: Running " << number_of_iterations <<
 		" iterations too: " << elapsed_ms << " milliseconds" << endl;
 	cout << "Average time per iteration: " << elapsed_ms / (float) number_of_iterations << " milliseconds" << endl;
-	delete p2;
+	delete p2, server, circuit, otReceiver, ungarbledInput;
 	io_service.stop();
 	t.join();
 }

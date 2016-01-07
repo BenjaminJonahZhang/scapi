@@ -253,6 +253,8 @@ public:
 	* @throws NoSuchPartyException In case the given party number is not valid.
 	*/
 	virtual int getNumberOfInputs(int partyNumber) = 0;
+
+	virtual int getNumberOfOutputs() = 0;
 	/**
 	* Returns the number of parties using this circuit.
 	*
@@ -408,6 +410,7 @@ public:
 	int* getInputWireIndices(int partyNumber) override;
 	int* getOutputWireIndices() override{ return garbledCircuitPtr->getOutputIndices(); };
 	int getNumberOfInputs(int partyNumber) override{ return garbledCircuitPtr->getNumOfInputsForEachParty()[partyNumber - 1]; };
+	int getNumberOfOutputs() { return garbledCircuitPtr->getNumberOfOutputs(); };
 	int getNumberOfParties() override { return garbledCircuitPtr->getNumberOfParties(); };
 	bool verifyTranslationTable(byte* allOutputWireValues) override;
 	int* getInputWireIndices() override { return garbledCircuitPtr->getInputIndices(); };

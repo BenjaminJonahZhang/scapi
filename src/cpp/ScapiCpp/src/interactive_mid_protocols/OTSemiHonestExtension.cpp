@@ -203,8 +203,6 @@ void OTSemiHonestExtensionSender::runOtAsSender(byte *x1, byte * x2, byte * delt
 	}
 
 	//make sure to release the memory created in c++. The JVM will not release it automatically.
-	delete x1;
-	delete x2;
 	X1.delCBitVector();
 	X2.delCBitVector();
 	delta.delCBitVector();
@@ -347,11 +345,9 @@ OTBatchROutput* OTSemiHonestExtensionReceiver::transfer(OTBatchRInput* input) {
 
 	int outbytesLength = numOfOts*elementSize / 8;
 	byte* outputBytes = new byte[outbytesLength];
-
-	//Run the protocol using the native code in the dll.
-	auto start = scapi_now();
+	
+	// run the protocol using the native code in the dll.
 	runOtAsReceiver(sigmaArr, numOfOts, elementSize, outputBytes, version);
-	//print_elapsed_ms(start, "PartyTwo: runOtAsReceiver");
 	return new OTOnByteArrayROutput(outputBytes, outbytesLength);
 }
 
