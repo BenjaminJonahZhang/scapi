@@ -102,6 +102,9 @@
     <ClCompile Include="src\circuits\FastGarbledBooleanCircuit.cpp">
       <Filter>Source Files\Circuits</Filter>
     </ClCompile>
+    <ClCompile Include="src\infra\ConfigFile.cpp">
+      <Filter>Source Files\infra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -126,9 +129,6 @@
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
     <ClInclude Include="include\primitives\Key.hpp">
-      <Filter>Header Files\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="include\primitives\mac.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
     <ClInclude Include="include\primitives\Prf.hpp">
@@ -187,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="include\circuits\FastGarbledBooleanCircuit.hpp">
       <Filter>Header Files\Circuits</Filter>
+    </ClInclude>
+    <ClInclude Include="include\primitives\mac.hpp">
+      <Filter>Header Files\Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="include\infra\ConfigFile.hpp">
+      <Filter>Header Files\infra</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

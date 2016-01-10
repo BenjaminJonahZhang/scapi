@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
 #include "../ScapiCpp/include/infra/Common.hpp"
+#include "../ScapiCpp/include/infra/ConfigFile.hpp"
 #include "catch.hpp"
 #include "../ScapiCpp/include/primitives/Dlog.hpp"
 #include "../ScapiCpp/include/primitives/DlogCryptopp.hpp"
@@ -110,6 +111,26 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 	SECTION("convert hex to string") {
 		string hex = "64";
 		REQUIRE(convert_hex_to_biginteger(hex)==biginteger(100));
+	}
+
+	SECTION("Config file") {
+		// clean and create the config file
+		remove("config_for_test.txt");
+		std::ofstream outfile("config_for_test.txt");
+		string textforfoo = "text_for_foo";
+		string textforwater = "text_for_water";
+		string nosecarg = "text_for_no_section_arg";
+		outfile << "no_section_arg=" << nosecarg << "\n[section_1]\nfoo=" 
+			<< textforfoo << "\n[section_2]\nwater=" << textforwater << std::endl;
+		outfile.close();
+	
+		// read the file as config file
+		ConfigFile cf("config_for_test.txt");
+		std::string nosec = cf.Value("", "no_section_arg");
+		std::string foo = cf.Value("section_1", "foo");
+		std::string water = cf.Value("section_2", "water");
+		REQUIRE(foo == textforfoo);
+		REQUIRE(water == textforwater);
 	}
 }
 
@@ -386,7 +407,6 @@ TEST_CASE("PRF", "[AES, PRF]")
 	SECTION("OpenSSL PRP")
 	{
 		test_prp<OpenSSLAES>("2b7e151628aed2a6abf7158809cf4f3c", "6bc1bee22e409f96e93d7e117393172a", "3ad77bb40d7a3660a89ecaf32466ef97");
-		test_prp<OpenSSLAES>("2b7e151628aed2a6abf7158809cf4f3c", "6bc1bee22e409f96e93d7e1173000000", "3ad77bb40d7a3660a89ecaf32466ef97");
 	}
 	SECTION("TRIPLE DES")
 	{

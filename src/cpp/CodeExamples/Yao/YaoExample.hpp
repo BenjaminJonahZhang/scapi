@@ -10,6 +10,7 @@
 #undef AES_KEY
 #include <thread>
 #include "../../ScapiCpp/include/infra/Scanner.hpp"
+#include "../../ScapiCpp/include/infra/ConfigFile.hpp"
 
 
 

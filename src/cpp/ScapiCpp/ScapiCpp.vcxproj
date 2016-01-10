@@ -118,6 +118,7 @@
     <ClCompile Include="src\infra\Common.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4319</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="src\infra\ConfigFile.cpp" />
     <ClCompile Include="src\infra\MathAlgorithms.cpp" />
     <ClCompile Include="src\infra\Scanner.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\OTSemiHonestExtension.cpp">
@@ -148,6 +149,7 @@
     <ClInclude Include="include\comm\Socket.hpp" />
     <ClInclude Include="include\comm\TwoPartyComm.hpp" />
     <ClInclude Include="include\infra\Common.hpp" />
+    <ClInclude Include="include\infra\ConfigFile.hpp" />
     <ClInclude Include="include\infra\File.hpp" />
     <ClInclude Include="include\infra\Log.hpp" />
     <ClInclude Include="include\infra\MathAlgorithms.hpp" />
