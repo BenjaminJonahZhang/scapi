@@ -3,13 +3,14 @@
 struct YaoConfig {
 	int number_of_iterations;
 	bool print_output;
+	string circuit_type;
 	string circuit_file;
 	string input_file_1;
 	string input_file_2;
 	IpAdress sender_ip;
 	IpAdress receiver_ip;
 	YaoConfig(int n_iterations, bool print, string c_file, string input_file_1,
-		string input_file_2, string sender_ip_str, string rec_ip_str) {
+		string input_file_2, string sender_ip_str, string rec_ip_str, string circuit_type) {
 		number_of_iterations = n_iterations;
 		print_output = print;
 		circuit_file = c_file;
@@ -17,6 +18,7 @@ struct YaoConfig {
 		this->input_file_2 = input_file_2;
 		sender_ip = IpAdress::from_string(sender_ip_str);
 		receiver_ip = IpAdress::from_string(rec_ip_str);
+		this->circuit_type = circuit_type;
 	};
 };
 
@@ -43,6 +45,16 @@ vector<byte> * readInputAsVector(string input_file) {
 	return inputVector;
 }
 
+FastGarbledBooleanCircuit * create_circuit(YaoConfig yao_config) {
+	if (yao_config.circuit_type == "FixedKey")
+		return new ScNativeGarbledBooleanCircuit(yao_config.circuit_file, 
+			ScNativeGarbledBooleanCircuit::CircuitType::FREE_XOR_HALF_GATES, false);
+	else if (yao_config.circuit_type == "NoFixedKey")
+		return new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
+	else
+		throw invalid_argument("circuit_type should either be FixedKey or NoFixedKey");
+}
+
 void execute_party_one(YaoConfig yao_config) {
 	auto start = chrono::system_clock::now();
 	boost::asio::io_service io_service;
@@ -54,9 +66,9 @@ void execute_party_one(YaoConfig yao_config) {
 	
 	// create the garbled circuit
 	start = chrono::system_clock::now();
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
+	FastGarbledBooleanCircuit * circuit = create_circuit(yao_config);
 	print_elapsed_ms(start, "PartyOne: Creating FastGarbledBooleanCircuit");
-	
+
 	// create the semi honest OT extension sender
 	SocketPartyData senderParty(yao_config.sender_ip, 7766);
 	OTBatchSender * otSender = new OTSemiHonestExtensionSender(senderParty, 163, 1);
@@ -77,9 +89,9 @@ void execute_party_one(YaoConfig yao_config) {
 	}
 	auto end = std::chrono::system_clock::now();
 	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
-	cout << "********************* PartyOne: Running " << yao_config.number_of_iterations <<
-		" iterations too: " << elapsed_ms << " milliseconds" << endl;
-	cout << "Average time per iteration: " << elapsed_ms / (float)yao_config.number_of_iterations << " milliseconds" << endl;
+	cout << "********************* PartyOne ********\nRunning " << yao_config.number_of_iterations <<
+		" iterations took: " << elapsed_ms << " milliseconds" << endl 
+		<< "Average time per iteration: " << elapsed_ms / (float)yao_config.number_of_iterations << " milliseconds" << endl;
 	
 	// exit cleanly
 	delete p1, channel_server, circuit, otSender, ungarbledInput;
@@ -120,8 +132,8 @@ void execute_party_two(YaoConfig yao_config) {
 	}
 	auto end = std::chrono::system_clock::now();
 	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - all).count();
-	cout << "********************* PartyTwo: Running " << yao_config.number_of_iterations <<
-		" iterations too: " << elapsed_ms << " milliseconds" << endl;
+	cout << "********************* PartyTwo ********\nRunning " << yao_config.number_of_iterations <<
+		" iterations took: " << elapsed_ms << " milliseconds" << endl;
 	cout << "Average time per iteration: " << elapsed_ms / (float)yao_config.number_of_iterations 
 		<< " milliseconds" << endl;
 	delete p2, server, circuit, otReceiver, ungarbledInput;
@@ -136,15 +148,17 @@ YaoConfig read_yao_config(string config_file) {
 	bool print_output;
 	istringstream(str_print_output) >> std::boolalpha >> print_output;
 	cout << "\nprintoutput:" << print_output << endl;
-	string circuit_file = cf.Value("", "circuit_file");
-	string input_file_1 = cf.Value("", "input_file_party_1");
-	string input_file_2 = cf.Value("", "input_file_party_2");
+	string input_section = cf.Value("", "input_section");
+	string circuit_file = cf.Value(input_section, "circuit_file");
+	string input_file_1 = cf.Value(input_section, "input_file_party_1");
+	string input_file_2 = cf.Value(input_section, "input_file_party_2");
 	string sender_ip_str = cf.Value("", "sender_ip");
 	string receiver_ip_str = cf.Value("", "receiver_ip");
 	auto sender_ip = IpAdress::from_string(sender_ip_str);
 	auto receiver_ip = IpAdress::from_string(receiver_ip_str);
+	string circuit_type = cf.Value("", "circuit_type");
 	return YaoConfig(number_of_iterations, print_output, circuit_file, input_file_1,
-		input_file_2, sender_ip_str, receiver_ip_str);
+		input_file_2, sender_ip_str, receiver_ip_str, circuit_type);
 }
 
 void Usage(char * argv0) {

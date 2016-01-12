@@ -2,6 +2,11 @@
 #include <ScGarbledCircuitNoFixedKey/GarbledBooleanCircuit.h>
 #include <ScGarbledCircuitNoFixedKey/FastGarblingFourToTwoNoAssumptions.h>
 #include <ScGarbledCircuitNoFixedKey/FastGarblingFreeXorHalfGatesFixedKeyAssumptions.h>
+#include <ScGarbledCircuit/RowReductionGarbledBooleanCircuit.h>
+#include <ScGarbledCircuit/StandardGarbledBooleanCircuit.h>
+#include <ScGarbledCircuit/FreeXorGarbledBooleanCircuit.h>
+#include <ScGarbledCircuit/HalfGatesGarbledBooleanCircuit.h>
+
 #include "../infra/Common.hpp"
 #include "BooleanCircuits.hpp"
 #include <openssl/rand.h>
@@ -267,6 +272,35 @@ public:
 	virtual int getKeySize()=0;
 };
 
+class NativeGarbledBooleanCircuitImpl : public FastGarbledBooleanCircuit {
+public:
+	FastCircuitCreationValues garble() override;
+	FastCircuitCreationValues garble(byte * seed) override;
+	bool verify(byte* allInputWireValues) override;
+	byte* getGarbledInputFromUngarbledInput(byte* ungarbledInputBits, byte* allInputWireValues, int partyNumber) override;
+	void setInputs(vector<byte>& garbledInputs) override { this->garbledInputs = garbledInputs; };
+	byte* verifiedTranslate(byte* garbledOutput, byte * allOutputWireValues) override { return NULL; }
+	int* getInputWireIndices(int partyNumber) override;
+	byte* getTranslationTable() override { return garbledCircuitPtr->getTranslationTable(); };
+	int getTranslationTableSize() override { return garbledCircuitPtr->getNumberOfOutputs(); };
+	void setTranslationTable(byte* translationTable) override {
+		garbledCircuitPtr->setTranslationTable(translationTable);
+	};
+	int* getOutputWireIndices() override { return garbledCircuitPtr->getOutputIndices(); };
+	int getNumberOfInputs(int partyNumber) override { return garbledCircuitPtr->getNumOfInputsForEachParty()[partyNumber - 1]; };
+	int getNumberOfOutputs() { return garbledCircuitPtr->getNumberOfOutputs(); };
+	int getNumberOfParties() override { return garbledCircuitPtr->getNumberOfParties(); };
+	int* getInputWireIndices() override { return garbledCircuitPtr->getInputIndices(); };
+	int getKeySize() override { return SCAPI_NATIVE_KEY_SIZE; };
+	byte* translate(byte * garbledOutput) override;
+	bool verifyTranslationTable(byte* allOutputWireValues) override;
+	~NativeGarbledBooleanCircuitImpl() { delete garbledCircuitPtr; };
+
+protected:
+	static const int SCAPI_NATIVE_KEY_SIZE = 16; // the number of bytes in each just garbled key 
+	GarbledBooleanCircuit * garbledCircuitPtr = NULL; // pointer to the native garbledCircuit object
+	vector<byte> garbledInputs;
+};
 /**
 * A concrete implementation of FastGarbledBooleanCircuit that is a wrapper for a code of SCAPI written in c++y.<p>
 * The circuit can be used as a regular circuit in java and the actual calculations are done in the c++ jni dll
@@ -277,147 +311,37 @@ public:
 * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
 *
 */
-class ScNativeGarbledBooleanCircuitNoFixedKey : public FastGarbledBooleanCircuit {
-private:
-	static const int SCAPI_NATIVE_KEY_SIZE = 16;//The number of bytes in each just garbled key 
-	GarbledBooleanCircuit * garbledCircuitPtr = NULL; //Pointer to the native garbledCircuit object
-	vector<byte> garbledInputs;
-
+class ScNativeGarbledBooleanCircuitNoFixedKey : public NativeGarbledBooleanCircuitImpl {
 public:
-	/**
-	* A constructor that passes the file to the native code in order to create a circuit object. The pointer of the
-	* garbled circuit object is saved in this java class in order to refer to in when calling native functions.
-	* The constructor also initializes information stored in java as well as in the c++ code.
-	*
-	* @param fileName the name of the circuit file.
-	* @param isFreeXor a flag indicating the use of the optimization of FreeXor
+	/*
+	* fileName the name of the circuit file.
+	* isFreeXor a flag indicating the use of the optimization of FreeXor
 	*/
 	ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor);
-	/**
-	* Not used in this implementation since we require a seed for optimization concerns
-	*/
-	FastCircuitCreationValues garble() override;
-	/**
-	* This method generates all the needed keys of the circuit.
-	* It then creates the garbled table according to those values.<p>
-	* @param seed Used as the aes key that generates the wire keys.
-	* @return FastCircuitCreationValues Contains both keys for each input and output wire and the translation table.
-	* @throws InvalidKeyException In case the seed is an invalid key for the given PRG.
-	*/
-	FastCircuitCreationValues garble(byte * seed) override;
-	/**
-	* This method takes an array containing the <b> non garbled</b> values, both keys for all input wires and the party number which the inputs belong to. <p>
-	* This method then performs the lookup on the allInputWireValues according to the party number and returns the keys
-	* of the corresponding input bits.
-	* @param ungarbledInputBits An array containing the <b> non garbled</b> value for each input wire of the given party number.
-	* @param allInputWireValues The array containing both garbled values (keys) for each input wire.
-	* @param partyNumber The number of party which the inputs belong to.
-	* @return an array containing a single key of each input wire of the given party in a single dimension array. The keys
-	*  	   are of the same size which is known in advance.
-	*/
-	byte* getGarbledInputFromUngarbledInput(byte* ungarbledInputBits, byte* allInputWireValues, int partyNumber) override;
-	void setInputs(vector<byte>& garbledInputs) override { this->garbledInputs = garbledInputs; };
-	/**
-	* Computes the circuit using the given inputs. <p>
-	* It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
-	* @param garbledInput A single key for each input wire.
-	* @return returns an array containing the garbled value of each output wire.
-	* @throws NotAllInputsSetException if the given inputs array is not the same size of the inputs for this circuit.
-	*/
 	byte* compute() override;
-	/**
-	* The verify method is used in the case of malicious adversaries.<p>
-	* For example, Alice constructs n circuits and Bob can verify n-1 of them (of his choice) to confirm that they are indeed garbling of the
-	* agreed upon non garbled circuit. In order to verify, Alice has to give Bob both keys for each of the input wires.
-	* @param allInputWireValues An array containing both keys for each input wire, the keys for each wire are given one after the other.
-	* @return {@code true} if this {@code FastGarbledBooleanCircuit} is a garbling the given keys, {@code false} if it is not.
-	*/
-	bool verify(byte* allInputWireValues) override; 
-	/**
-	* This function behaves exactly as the verify(byte[] allInputWireValues) method except the last part.
-	* The verify function verifies that the translation table matches the resulted output garbled values, while this function does not check it
-	* but return the resulted output garbled values.
-	* @param allInputWireValues An array containing both keys for each input wire.
-	* @param allOutputWireValues An array containing both keys for each output wire.
-	* When calling the function this array should be empty and will be filled during the process of the function.
-	* @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling the given keys, {@code false} if it is not.
-	*/
 	bool internalVerify(byte * allInputWireValues, byte* allOutputWireValues) override;
-	/**
-	* Translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
-	* This is done in the native code and gets back the result.
-	* @param garbledOutput An array contains the garbled output.
-	* @return an array contains the output bit for each output wire.
-	*/
-	byte* translate(byte * garbledOutput) override;
 	byte* verifyTranslate(byte* garbledOutput, byte* bothOutputKeys);
-	/**
-	* Verifies that the given garbledOutput is valid values according to the given all OutputWireValues. <p>
-	* Meaning, for each output wire, checks that the garbled wire is one of the two possibilities.
-	* Then, translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
-	* @param garbledOutput An array contains the garbled output.
-	* @param allOutputWireValues both values for each output wire.
-	* @return an array contains the output bit for each output wire.
-	* @throws CheatAttemptException if there is a garbledOutput values that is not one of the two possibilities.
-	*/
-	byte* verifiedTranslate(byte* garbledOutput, byte * allOutputWireValues) override { return NULL;}
-	/**
-	* The garbled tables are stored in the native code circuit for all the gates. This method returns the garbled tables. <p>
-	* This function is useful if we would like to pass many garbled circuits built on the same boolean circuit. <p>
-	* This is a compact way to define a circuit, that is, two garbled circuit with the same encryption scheme and the same
-	* basic boolean circuit only differ in the garbled tables and the translation table. <p>
-	* Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the translation tables if
-	* necessary). The advantage is that the size of the tables only is much smaller that all the information stored in the circuit
-	* (gates and other member variables). The size becomes important when sending large circuits.
-	*
-	*/
 	GarbledTablesHolder * getGarbledTables() override;
-	/**
-	* Sets the garbled tables of this circuit in the native code where it is actually stored.
-	* This function is useful if we would like to pass many garbled circuits built on the same boolean circuit. <p>
-	* This is a compact way to define a circuit, that is, two garbled circuit with the same multi encryption scheme and the same
-	* basic boolean circuit only differ in the garbled tables and the translation table. <p>
-	* Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the translation tables if necessary).
-	* The advantage is that the size of the tables only is much smaller that all the information stored in the circuit (gates and other
-	* member variables). The size becomes important when sending large circuits.<p>
-	* The receiver of the circuits will set the garbled tables for the relevant circuit.
-	*/
 	void setGarbledTables(GarbledTablesHolder * garbledTables) override;
-	/**
-	* Returns the translation table of the circuit calculated and stored in the native code. <P>
-	* This is necessary since the constructor of the circuit may want to pass the translation table to a different party. <p>
-	* Usually, this will be used when the other party (not the constructor of the circuit) creates a circuit, sets the garbled tables
-	* and needs the translation table as well to complete the construction of the circuit.
-	* @return the translation table of the circuit.
-	*/
-	byte* getTranslationTable() override { return garbledCircuitPtr->getTranslationTable(); };
-	int getTranslationTableSize() override { return garbledCircuitPtr->getNumberOfOutputs(); };
-	/**
-	* Sets the translation table of the circuit stored in the native code. <p>
-	* This is necessary when the garbled tables where set and we would like to compute the circuit later on.
-	* @param translationTable This value should match the garbled tables of the circuit.
-	*/
-	void setTranslationTable(byte* translationTable) override {
-		garbledCircuitPtr->setTranslationTable(translationTable);
-	};
-	/**
-	* Returns the input wires' indices of the given party.
-	* We only have the number of inputs for each party and thus we copy the relevant indices from the inputIndices for all the parties.
-	* @param partyNumber The number of the party which we need his input wire indices.
-	* @return an array contains the indices of the input wires of the given party number.
-	* @throws NoSuchPartyException In case the given party number is not valid.
-	*/
-	int* getInputWireIndices(int partyNumber) override;
-	int* getOutputWireIndices() override{ return garbledCircuitPtr->getOutputIndices(); };
-	int getNumberOfInputs(int partyNumber) override{ return garbledCircuitPtr->getNumOfInputsForEachParty()[partyNumber - 1]; };
-	int getNumberOfOutputs() { return garbledCircuitPtr->getNumberOfOutputs(); };
-	int getNumberOfParties() override { return garbledCircuitPtr->getNumberOfParties(); };
-	bool verifyTranslationTable(byte* allOutputWireValues) override;
-	int* getInputWireIndices() override { return garbledCircuitPtr->getInputIndices(); };
-	int getKeySize() override { return SCAPI_NATIVE_KEY_SIZE; };
-	~ScNativeGarbledBooleanCircuitNoFixedKey() { delete garbledCircuitPtr; };
 };
 
+class ScNativeGarbledBooleanCircuit : public NativeGarbledBooleanCircuitImpl {
+public:
+	static enum CircuitType {
+		FREE_XOR_HALF_GATES,
+		FREE_XOR_ROW_REDUCTION,
+		FREE_XOR_STANDARD,
+		STANDARD
+	};
+	ScNativeGarbledBooleanCircuit(string fileName, CircuitType type, bool isNonXorOutputsRequired);
+	byte* compute() override;
+	bool internalVerify(byte * allInputWireValues, byte* allOutputWireValues) override;
+	GarbledTablesHolder * getGarbledTables() override;
+	void setGarbledTables(GarbledTablesHolder * garbledTables) override;
+private:
+	bool isNonXorOutputsRequired;
+	int getGarbledTableSize();
+};
 
 inline void* aligned_malloc(size_t size, size_t align) {
 	void *result;
@@ -427,7 +351,7 @@ inline void* aligned_malloc(size_t size, size_t align) {
 	if (posix_memalign(&result, align, size)) result = 0;
 #endif
 	return result;
-}
+};
 
 inline void aligned_free(void *ptr) {
 #ifdef _MSC_VER 
@@ -436,4 +360,4 @@ inline void aligned_free(void *ptr) {
 	free(ptr);
 #endif
 
-}
+};
