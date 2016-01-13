@@ -1,7 +1,7 @@
 #pragma once
-#include <ScGarbledCircuitNoFixedKey/GarbledBooleanCircuit.h>
-#include <ScGarbledCircuitNoFixedKey/FastGarblingFourToTwoNoAssumptions.h>
-#include <ScGarbledCircuitNoFixedKey/FastGarblingFreeXorHalfGatesFixedKeyAssumptions.h>
+//#include <ScGarbledCircuitNoFixedKey/GarbledBooleanCircuit.h>
+//#include <ScGarbledCircuitNoFixedKey/FastGarblingFourToTwoNoAssumptions.h>
+//#include <ScGarbledCircuitNoFixedKey/FastGarblingFreeXorHalfGatesFixedKeyAssumptions.h>
 #include <ScGarbledCircuit/RowReductionGarbledBooleanCircuit.h>
 #include <ScGarbledCircuit/StandardGarbledBooleanCircuit.h>
 #include <ScGarbledCircuit/FreeXorGarbledBooleanCircuit.h>
@@ -311,19 +311,19 @@ protected:
 * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
 *
 */
-class ScNativeGarbledBooleanCircuitNoFixedKey : public NativeGarbledBooleanCircuitImpl {
-public:
-	/*
-	* fileName the name of the circuit file.
-	* isFreeXor a flag indicating the use of the optimization of FreeXor
-	*/
-	ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor);
-	byte* compute() override;
-	bool internalVerify(byte * allInputWireValues, byte* allOutputWireValues) override;
-	byte* verifyTranslate(byte* garbledOutput, byte* bothOutputKeys);
-	GarbledTablesHolder * getGarbledTables() override;
-	void setGarbledTables(GarbledTablesHolder * garbledTables) override;
-};
+//class ScNativeGarbledBooleanCircuitNoFixedKey : public NativeGarbledBooleanCircuitImpl {
+//public:
+//	/*
+//	* fileName the name of the circuit file.
+//	* isFreeXor a flag indicating the use of the optimization of FreeXor
+//	*/
+//	ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor);
+//	byte* compute() override;
+//	bool internalVerify(byte * allInputWireValues, byte* allOutputWireValues) override;
+//	byte* verifyTranslate(byte* garbledOutput, byte* bothOutputKeys);
+//	GarbledTablesHolder * getGarbledTables() override;
+//	void setGarbledTables(GarbledTablesHolder * garbledTables) override;
+//};
 
 class ScNativeGarbledBooleanCircuit : public NativeGarbledBooleanCircuitImpl {
 public:

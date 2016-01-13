@@ -71,97 +71,97 @@ byte* NativeGarbledBooleanCircuitImpl::translate(byte * garbledOutput) {
 bool NativeGarbledBooleanCircuitImpl::verifyTranslationTable(byte* allOutputWireValues) {
 	return garbledCircuitPtr->verifyTranslationTable((block *)allOutputWireValues);
 }
-/*******************************************/
-/* ScNativeGarbledBooleanCircuitNoFixedKey */
-/*******************************************/
-ScNativeGarbledBooleanCircuitNoFixedKey::ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor) {
-	//create the relevant garbled circuit
-	if (isFreeXor) 
-		garbledCircuitPtr = new FastGarblingFreeXorHalfGatesFixedKeyAssumptions(fileName.c_str());
-	else 
-		//the best implementation for non free xor is the 4 to 2 
-		garbledCircuitPtr = new FastGarblingFourToTwoNoAssumptions(fileName.c_str());
-}
-
-byte* ScNativeGarbledBooleanCircuitNoFixedKey::compute() {
-	if (garbledInputs.size() / 16 != garbledCircuitPtr->getNumberOfInputs())
-		throw NotAllInputsSetException("missing inputs");
-	
-	block *outputs = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
-	// call the native function compute of the garbled circuit
-	garbledCircuitPtr->compute((block*)&garbledInputs[0], outputs);
-	return (byte *) outputs;
-}
-
-bool ScNativeGarbledBooleanCircuitNoFixedKey::internalVerify(byte * allInputWireValues, byte* allOutputWireValues) {
-	//allocate memory for the input keys and the output keys that will be filled
-	block *inputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
-	block *outputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfOutputs(), 16);
-	//copy the bothInputKeys to the the aligned inputs
-	memcpy(inputs, allInputWireValues, garbledCircuitPtr->getNumberOfInputs() * 2 * 16);
-	//call the internal verify of the native circuit
-	bool isVerified = garbledCircuitPtr->internalVerify(inputs, outputs);
-	//set the output from the native internal verify to the empty array of outputs received as argument
-	memcpy(allOutputWireValues, outputs, 2 * garbledCircuitPtr->getNumberOfOutputs()*SIZE_OF_BLOCK);
-	aligned_free(inputs);
-	aligned_free(outputs);
-
-	return isVerified;
-}
-
-byte* ScNativeGarbledBooleanCircuitNoFixedKey::verifyTranslate(byte* garbledOutput, byte* bothOutputKeys) {
-	bool flagSuccess = true;
-	byte* answer = new byte[garbledCircuitPtr->getNumberOfOutputs()];
-	//allocate memory for the input keys and the output keys that will be filled
-	block *singleOutputResultsBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
-	block *bothOutputKeysBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
-	//copy the outputKeys to the the aligned singleOutputResultsBlocks
-	memcpy(singleOutputResultsBlocks, garbledOutput, garbledCircuitPtr->getNumberOfOutputs() * 16);
-	//copy the bothOutputKeys to the the aligned bothOutputKeysBlocks
-	memcpy(bothOutputKeysBlocks, bothOutputKeys, garbledCircuitPtr->getNumberOfOutputs() * 2 * 16);
-	int numOfOutputs = garbledCircuitPtr->getNumberOfOutputs();
-	//check that the provided output keys are in fact one of 2 keys that we have
-	for (int i = 0; i<numOfOutputs; i++)
-	{
-		if (!(garbledCircuitPtr->equalBlocks(singleOutputResultsBlocks[i], bothOutputKeysBlocks[2 * i]) || 
-			garbledCircuitPtr->equalBlocks(singleOutputResultsBlocks[i], bothOutputKeysBlocks[2 * i + 1]))) {
-			flagSuccess = false;
-			break;
-		}
-	}
-
-	if (flagSuccess) {
-		garbledCircuitPtr->translate(singleOutputResultsBlocks, answer);
-	}
-	else { //if the  check is false set the answer to null
-		delete[] answer;
-		answer = NULL;
-	}
-	return answer;
-}
-
-GarbledTablesHolder * ScNativeGarbledBooleanCircuitNoFixedKey::getGarbledTables() {
-	int size = 0;
-	if (garbledCircuitPtr->getIsFreeXor()) {
-		size = (garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 2 * 16;
-	}
-	else {
-		size = (((garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 33) / 16
-			+ 1 + garbledCircuitPtr->getNumOfXorGates()) * 16;
-	}
-	byte * garbledTables = (byte*)garbledCircuitPtr->getGarbledTables();
-	return new JustGarbledGarbledTablesHolder(garbledTables, size);
-}
-
-void ScNativeGarbledBooleanCircuitNoFixedKey::setGarbledTables(GarbledTablesHolder * garbledTables) {
-	int size = 0;
-	if (garbledCircuitPtr->getIsFreeXor())
-		size = (garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 2 * 16;
-	else 
-		size = (((garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 33) / 16 + 1 + garbledCircuitPtr->getNumOfXorGates()) * 16;
-	// copy the garbled table to the native circuit
-	memcpy(garbledCircuitPtr->getGarbledTables(), garbledTables->toDoubleByteArray()[0], size);
-}
+///*******************************************/
+///* ScNativeGarbledBooleanCircuitNoFixedKey */
+///*******************************************/
+//ScNativeGarbledBooleanCircuitNoFixedKey::ScNativeGarbledBooleanCircuitNoFixedKey(string fileName, bool isFreeXor) {
+//	//create the relevant garbled circuit
+//	if (isFreeXor) 
+//		garbledCircuitPtr = new FastGarblingFreeXorHalfGatesFixedKeyAssumptions(fileName.c_str());
+//	else 
+//		//the best implementation for non free xor is the 4 to 2 
+//		garbledCircuitPtr = new FastGarblingFourToTwoNoAssumptions(fileName.c_str());
+//}
+//
+//byte* ScNativeGarbledBooleanCircuitNoFixedKey::compute() {
+//	if (garbledInputs.size() / 16 != garbledCircuitPtr->getNumberOfInputs())
+//		throw NotAllInputsSetException("missing inputs");
+//	
+//	block *outputs = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
+//	// call the native function compute of the garbled circuit
+//	garbledCircuitPtr->compute((block*)&garbledInputs[0], outputs);
+//	return (byte *) outputs;
+//}
+//
+//bool ScNativeGarbledBooleanCircuitNoFixedKey::internalVerify(byte * allInputWireValues, byte* allOutputWireValues) {
+//	//allocate memory for the input keys and the output keys that will be filled
+//	block *inputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfInputs(), 16);
+//	block *outputs = (block *)aligned_malloc(sizeof(block) * 2 * garbledCircuitPtr->getNumberOfOutputs(), 16);
+//	//copy the bothInputKeys to the the aligned inputs
+//	memcpy(inputs, allInputWireValues, garbledCircuitPtr->getNumberOfInputs() * 2 * 16);
+//	//call the internal verify of the native circuit
+//	bool isVerified = garbledCircuitPtr->internalVerify(inputs, outputs);
+//	//set the output from the native internal verify to the empty array of outputs received as argument
+//	memcpy(allOutputWireValues, outputs, 2 * garbledCircuitPtr->getNumberOfOutputs()*SIZE_OF_BLOCK);
+//	aligned_free(inputs);
+//	aligned_free(outputs);
+//
+//	return isVerified;
+//}
+//
+//byte* ScNativeGarbledBooleanCircuitNoFixedKey::verifyTranslate(byte* garbledOutput, byte* bothOutputKeys) {
+//	bool flagSuccess = true;
+//	byte* answer = new byte[garbledCircuitPtr->getNumberOfOutputs()];
+//	//allocate memory for the input keys and the output keys that will be filled
+//	block *singleOutputResultsBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs(), 16);
+//	block *bothOutputKeysBlocks = (block *)aligned_malloc(sizeof(block)  * garbledCircuitPtr->getNumberOfOutputs() * 2, 16);
+//	//copy the outputKeys to the the aligned singleOutputResultsBlocks
+//	memcpy(singleOutputResultsBlocks, garbledOutput, garbledCircuitPtr->getNumberOfOutputs() * 16);
+//	//copy the bothOutputKeys to the the aligned bothOutputKeysBlocks
+//	memcpy(bothOutputKeysBlocks, bothOutputKeys, garbledCircuitPtr->getNumberOfOutputs() * 2 * 16);
+//	int numOfOutputs = garbledCircuitPtr->getNumberOfOutputs();
+//	//check that the provided output keys are in fact one of 2 keys that we have
+//	for (int i = 0; i<numOfOutputs; i++)
+//	{
+//		if (!(garbledCircuitPtr->equalBlocks(singleOutputResultsBlocks[i], bothOutputKeysBlocks[2 * i]) || 
+//			garbledCircuitPtr->equalBlocks(singleOutputResultsBlocks[i], bothOutputKeysBlocks[2 * i + 1]))) {
+//			flagSuccess = false;
+//			break;
+//		}
+//	}
+//
+//	if (flagSuccess) {
+//		garbledCircuitPtr->translate(singleOutputResultsBlocks, answer);
+//	}
+//	else { //if the  check is false set the answer to null
+//		delete[] answer;
+//		answer = NULL;
+//	}
+//	return answer;
+//}
+//
+//GarbledTablesHolder * ScNativeGarbledBooleanCircuitNoFixedKey::getGarbledTables() {
+//	int size = 0;
+//	if (garbledCircuitPtr->getIsFreeXor()) {
+//		size = (garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 2 * 16;
+//	}
+//	else {
+//		size = (((garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 33) / 16
+//			+ 1 + garbledCircuitPtr->getNumOfXorGates()) * 16;
+//	}
+//	byte * garbledTables = (byte*)garbledCircuitPtr->getGarbledTables();
+//	return new JustGarbledGarbledTablesHolder(garbledTables, size);
+//}
+//
+//void ScNativeGarbledBooleanCircuitNoFixedKey::setGarbledTables(GarbledTablesHolder * garbledTables) {
+//	int size = 0;
+//	if (garbledCircuitPtr->getIsFreeXor())
+//		size = (garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 2 * 16;
+//	else 
+//		size = (((garbledCircuitPtr->getNumberOfGates() - garbledCircuitPtr->getNumOfXorGates() - garbledCircuitPtr->getNumOfNotGates()) * 33) / 16 + 1 + garbledCircuitPtr->getNumOfXorGates()) * 16;
+//	// copy the garbled table to the native circuit
+//	memcpy(garbledCircuitPtr->getGarbledTables(), garbledTables->toDoubleByteArray()[0], size);
+//}
 
 /*******************************************/
 /* ScNativeGarbledBooleanCircuit           */
@@ -229,12 +229,12 @@ int ScNativeGarbledBooleanCircuit::getGarbledTableSize() {
 }
 
 GarbledTablesHolder * ScNativeGarbledBooleanCircuit::getGarbledTables() {
-	int size = getGatbledTableSoze();
+	int size = getGarbledTableSize();
 	byte * garbledTables = (byte*)garbledCircuitPtr->getGarbledTables();
 	return new JustGarbledGarbledTablesHolder(garbledTables, size);
 }
 
 void ScNativeGarbledBooleanCircuit::setGarbledTables(GarbledTablesHolder * garbledTables) {
-	int size = getGatbledTableSoze();
+	int size = getGarbledTableSize();
 	memcpy(garbledCircuitPtr->getGarbledTables(), garbledTables->toDoubleByteArray()[0], size);
 }

@@ -46,13 +46,16 @@ vector<byte> * readInputAsVector(string input_file) {
 }
 
 FastGarbledBooleanCircuit * create_circuit(YaoConfig yao_config) {
-	if (yao_config.circuit_type == "FixedKey")
-		return new ScNativeGarbledBooleanCircuit(yao_config.circuit_file, 
-			ScNativeGarbledBooleanCircuit::CircuitType::FREE_XOR_HALF_GATES, false);
-	else if (yao_config.circuit_type == "NoFixedKey")
-		return new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
-	else
-		throw invalid_argument("circuit_type should either be FixedKey or NoFixedKey");
+	//return new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
+	return new ScNativeGarbledBooleanCircuit(yao_config.circuit_file, 
+		ScNativeGarbledBooleanCircuit::CircuitType::FREE_XOR_HALF_GATES, false);
+	//if (yao_config.circuit_type == "FixedKey")
+	//	return new ScNativeGarbledBooleanCircuit(yao_config.circuit_file, 
+	//		ScNativeGarbledBooleanCircuit::CircuitType::FREE_XOR_HALF_GATES, false);
+	//else if (yao_config.circuit_type == "NoFixedKey")
+		//return new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
+	//else
+	//	throw invalid_argument("circuit_type should either be FixedKey or NoFixedKey");
 }
 
 void execute_party_one(YaoConfig yao_config) {
@@ -112,7 +115,7 @@ void execute_party_two(YaoConfig yao_config) {
 
 	// create the garbled circuit
 	start = scapi_now();
-	FastGarbledBooleanCircuit * circuit = new ScNativeGarbledBooleanCircuitNoFixedKey(yao_config.circuit_file, true);
+	FastGarbledBooleanCircuit * circuit = create_circuit(yao_config);
 	print_elapsed_ms(start, "PartyTwo: creating FastGarbledBooleanCircuit");
 
 	// create the OT receiver.
