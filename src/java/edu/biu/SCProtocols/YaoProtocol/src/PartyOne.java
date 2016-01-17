@@ -1,3 +1,5 @@
+package edu.biu.SCProtocols.YaoProtocol.src;
+
 import java.io.IOException;
 import java.util.Date;
 
@@ -48,47 +50,38 @@ public class PartyOne {
 	 * @throws InvalidDlogGroupException
 	 * @throws NotAllInputsSetException 
 	 */
-	public void run(byte[] ungarbledInput) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException, NotAllInputsSetException{
+	public void run(byte[] ungarbledInput, boolean print_output) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException, NotAllInputsSetException{
 		Date startProtocol = new Date();
 		
 		
 		//Garble the circuit. 
 		Date start = new Date();
 		values = circuit.garble();
-		Date end = new Date();
-		long time = (end.getTime() - start.getTime());
-		System.out.println("Garble the circuit took " +time + " milis");
+		if(print_output)
+			System.out.println("Garble the circuit took " + (new Date().getTime() - start.getTime()) + " milis");
 			
 		start = new Date();
 		//Send garbled tables and the translation table to p2.
 		channel.send(circuit.getGarbledTables());
 		channel.send(circuit.getTranslationTable());
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("Send garbled tables and translation tables took " +time + " milis");
+		if(print_output)
+			System.out.println("Send garbled tables and translation tables took " + 
+				(new Date().getTime() - start.getTime()) + " milis");
 
+		// send p1 input keys to p2.
 		start = new Date();
-		//Send p1 input keys to p2.
 		sendP1Inputs(ungarbledInput);
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("send inputs took " +time + " milis");
+		if (print_output)
+			System.out.println("send inputs took " + (new Date().getTime() - start.getTime()) + " milis");
 		
 		
-		//Run OT protocol in order to send p2 the necessary keys without revealing any information.
+		// run OT protocol in order to send p2 the necessary keys without revealing any information.
 		start = new Date();
-		runOTProtocol();
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("run OT took " +time + " milis");
-				
-		
-		Date yaoEnd = new Date();
-		long yaoTime = (yaoEnd.getTime() - startProtocol.getTime());
-		System.out.println("run party one protocol took " +yaoTime + " milis");
-		
-		
-		
+		runOTProtocol(print_output);
+		if (print_output) {
+			System.out.println("run OT took " + (new Date().getTime() - start.getTime()) + " milis");
+			System.out.println("run party one protocol took " + (new Date().getTime() - startProtocol.getTime()) + " milis");
+		}
 	}
 
 	/**
@@ -134,7 +127,7 @@ public class PartyOne {
 	 * @throws CheatAttemptException
 	 * @throws InvalidDlogGroupException
 	 */
-	public void runOTProtocol() throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException {
+	public void runOTProtocol(boolean print_output) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException {
 		//Get the indices of p2 input wires.
 		int p1InputSize = 0;
 		int p2InputSize = 0;		
@@ -165,7 +158,8 @@ public class PartyOne {
 		OTBatchSInput input = new OTExtensionGeneralSInput(x0Arr, x1Arr, p2InputSize);
 		Date end = new Date();
 		long time = (end.getTime() - start.getTime());
-		System.out.println("create the ot object " +time + " milis");
+		if (print_output)
+			System.out.println("create the ot object " +time + " milis");
 		
 	
 		//Run the OT's transfer phase.
@@ -173,7 +167,8 @@ public class PartyOne {
 		otSender.transfer(null, input);
 		end = new Date();
 		time = (end.getTime() - start.getTime());
-		System.out.println("run ot transfer phase " +time + " milis");
+		if (print_output)
+			System.out.println("run ot transfer phase " +time + " milis");
 		
 	}
 

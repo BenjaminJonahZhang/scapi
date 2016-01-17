@@ -1,3 +1,5 @@
+package edu.biu.SCProtocols.YaoProtocol.src;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
@@ -49,50 +51,49 @@ public class PartyTwo {
 	 * @throws CheatAttemptException
 	 * @throws InvalidDlogGroupException
 	 */
-	public void run(byte[] ungarbledInput) throws CheatAttemptException, ClassNotFoundException, IOException, InvalidDlogGroupException {
+	public void run(byte[] ungarbledInput, boolean print_output) throws CheatAttemptException, ClassNotFoundException, IOException, InvalidDlogGroupException {
 		Date startProtocol = new Date();//the starting time of the protocol
 		
-		//Receive the garbled circuit and translation table.
+		// receive the garbled circuit and translation table.
 		Date start = new Date();
 		receiveCircuit();
-		Date end = new Date();
-		long time = (end.getTime() - start.getTime());
-		System.out.println("Receive garbled tables and translation tables and p1 inpustfrom p1 took " +time + " milis");
+		if (print_output)
+			System.out.println("Receive garbled tables and translation tables and p1 inpustfrom p1 took " + 
+					(new Date().getTime() - start.getTime()) + " milis");
 		
-		//receive the input keys of party one.
+		// receive the input keys of party one.
 		start = new Date();
 		receiveP1Inputs();
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("Receive P1 input keys" +time + " milis");
+		if (print_output)
+			System.out.println("Receive P1 input keys" + 
+					(new Date().getTime() - start.getTime())+ " milis");
 		
 		
-		//Run OT protocol in order to get the necessary keys without revealing any information.
+		// run OT protocol in order to get the necessary keys without revealing any information.
 		start = new Date();
 		OTBatchROutput output = runOTProtocol(ungarbledInput);
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("run OT took " +time + " milis");
+		if (print_output)
+			System.out.println("run OT took " + 
+					(new Date().getTime() - start.getTime()) + " milis");
 		
-		//Compute the circuit.
+		// compute the circuit.
 		start = new Date();
 		byte[] circuitOutput = computeCircuit(output);
-		end = new Date();
-		time = (end.getTime() - start.getTime());
-		System.out.println("compute the circuit took " +time + " milis");
+		if (print_output)
+			System.out.println("compute the circuit took " +
+					(new Date().getTime() - start.getTime()) + " milis");
 		
-		Date yaoEnd = new Date();
-		long yaoTime = (yaoEnd.getTime() - startProtocol.getTime());
-		System.out.println("run one protocol took " +yaoTime + " milis");
+		if (print_output)
+			System.out.println("run one protocol took " +
+					(new Date().getTime() - startProtocol.getTime()) + " milis");		
 		
-		//Just for printing, can be removed in case no printing is needed.
-		int outputSize = circuit.getOutputWireIndices().length;
-		
-		for (int i=0; i<outputSize;i++){
-			System.out.print(circuitOutput[i]);
+		// Just for printing, can be removed in case no printing is needed.
+		if (print_output) {
+			int outputSize = circuit.getOutputWireIndices().length;
+			for (int i=0; i<outputSize;i++)
+				System.out.print(circuitOutput[i]);
+			System.out.println();
 		}
-		System.out.println();
-		
 	}
 
 	/**
