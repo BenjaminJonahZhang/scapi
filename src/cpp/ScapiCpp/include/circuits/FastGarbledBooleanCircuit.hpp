@@ -327,7 +327,7 @@ protected:
 
 class ScNativeGarbledBooleanCircuit : public NativeGarbledBooleanCircuitImpl {
 public:
-	static enum CircuitType {
+	enum CircuitType {
 		FREE_XOR_HALF_GATES,
 		FREE_XOR_ROW_REDUCTION,
 		FREE_XOR_STANDARD,
