@@ -53,6 +53,10 @@ In order to install scapi: ::
   $ sudo make prefix=/usr
   $ sudo make install prefix=/usr
   
+In case you want to install the latest java build as well and not use the pre-compiled header: ::
+
+  $ sudo make compile-scapi
+  
 .. note::
 
   Seems that JDK 1.8 introduced a change of behavior regarding JNI include file locations.
