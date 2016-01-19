@@ -42,7 +42,13 @@ class DlogBasedSigma {};
 * This interface is a marker interface for Sigma protocol message, where there is an implementing class
 * for each concrete Sigma message, like GroupElement message or BigInteger message.
 */
-class SigmaProtocolMsg {};
+class SigmaProtocolMsg {
+public:
+	virtual void init_from_byte_array(byte * arr, int size) = 0;
+	virtual byte * toByteArray() = 0;
+	virtual int size() = 0;
+};
+
 /**
 * General interface for Sigma Protocol prover. Every class that implements it is signed as Sigma Protocol prover.<p>
 *
@@ -109,7 +115,7 @@ class SigmaSimulator {
 	/**
 	* Computes the simulator computation.
 	*/
-	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input, byte* challenge, int challenge_size);
+	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input, byte* challenge, int challenge_size)  =0;
 
 	/**
 	* Chooses random challenge and computes the simulator computation.
@@ -181,7 +187,7 @@ public:
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	*/
-	virtual SigmaSimulator * getSimulator();
+	virtual SigmaSimulator * getSimulator() = 0;
 };
 
 /**
@@ -209,12 +215,12 @@ public:
 	* Sets the given challenge.
 	* @param challenge
 	*/
-	virtual void setChallenge(byte * challenge, int challenge_size);
+	virtual void setChallenge(byte * challenge, int challenge_size) = 0;
 	/**
 	* Fills result param with the sampled challenge.
 	* @return the challenge size.
 	*/
-	virtual int getChallenge(byte * result);
+	virtual int getChallenge(byte * result) = 0;
 };
 
 /**
@@ -240,15 +246,9 @@ public:
 	* Constructor that sets the given channel and sigmaProverComputation.
 	*/
 	SigmaProver(ChannelServer * channel, SigmaProverComputation * proverComputation) {
-		//Sets the parameters.
 		this->channel = channel;
 		this->proverComputation = proverComputation;
 	}
-	/**
-	* Runs the proof of this protocol. <p>
-	* This function executes the proof at once by calling the following functions one by one.<p>
-	* This function can be called when a user does not want to save time by doing operations in parallel.<p>
-	*/
 	void prove(SigmaProverInput * input) override{
 		processFirstMsg(input); // step one of the protocol.
 		processSecondMsg(); // step two of the protocol.
@@ -278,13 +278,7 @@ private:
 	/**
 	* Sends the given message to the verifier.
 	*/
-	void sendMsgToVerifier(SigmaProtocolMsg * message);
-	/**
-	* Waits and receives the challenge from the verifier.
-	* challenge is written to the 'result' paramater
-	* @return the size challenge
-	*/
-	int receiveChallenge(byte * result);
+	void sendMsgToVerifier(SigmaProtocolMsg * message) { channel->write_fast(message->toByteArray(), message->size()); };
 };
 
 
@@ -308,9 +302,12 @@ public:
 	/**
 	* Constructor that sets the given channel and random.
 	*/
-	SigmaVerifier(ChannelServer * channel, SigmaVerifierComputation * verifierComputation) {
+	SigmaVerifier(ChannelServer * channel, SigmaVerifierComputation * verifierComputation, 
+		SigmaProtocolMsg * emptyFirstMessage, SigmaProtocolMsg * emptySecondMessage) {
 		this->channel = channel;
 		this->verifierComputation = verifierComputation;
+		this->a = emptyFirstMessage;
+		this->z = emptySecondMessage;
 	}
 	bool verify(SigmaCommonInput * input) override;
 	void sampleChallenge() override {
@@ -319,11 +316,11 @@ public:
 	}
 	void setChallenge(byte * challenge, int challenge_size) override{
 		// Delegates to the underlying verifierComputation object.
-		verifierComputation->setChallenge(challenge);
+		verifierComputation->setChallenge(challenge, challenge_size);
 	}
 	int getChallenge(byte * result) override {
-		//Delegates to the underlying verifierComputation object.
-		return verifierComputation->getChallenge();
+		// delegates to the underlying verifierComputation object.
+		return verifierComputation->getChallenge(result);
 	}
 	void sendChallenge() override;
 	bool processVerify(SigmaCommonInput * input) override;
@@ -331,13 +328,14 @@ public:
 private:
 	ChannelServer * channel;
 	SigmaVerifierComputation * verifierComputation;
-	SigmaProtocolMsg * a;	//First message from the prover.
+	SigmaProtocolMsg * a;	// First message from the prover.
+	SigmaProtocolMsg * z;	// Second message from the prover.
 	bool doneChallenge;
 	/**
 	* Waits for message from receiver and returns it.
-	* @return the received message. MUST be an instance of SigmaProtocolMsg.
+	* Fills an instance of SigmaProtocolMsg with body from the received message
 	*/
-	SigmaProtocolMsg receiveMsgFromProver();
+	void receiveMsgFromProver(SigmaProtocolMsg * msg);
 	/**
 	* Sends the challenge to the prover.
 	*/
