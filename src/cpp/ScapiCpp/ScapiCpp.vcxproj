@@ -155,6 +155,7 @@
     <ClInclude Include="include\infra\MathAlgorithms.hpp" />
     <ClInclude Include="include\infra\Scanner.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\OTSemiHonestExtension.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\SigmaProtocol.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />
