@@ -108,6 +108,9 @@
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocol.cpp">
       <Filter>Source Files\InteractiveMidProtocols</Filter>
     </ClCompile>
+    <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolAnd.cpp">
+      <Filter>Source Files\InteractiveMidProtocols</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -198,6 +201,9 @@
       <Filter>Header Files\infra</Filter>
     </ClInclude>
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocol.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolAnd.hpp">
       <Filter>Header Files\InteractiveMidProtocols</Filter>
     </ClInclude>
   </ItemGroup>

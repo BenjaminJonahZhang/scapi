@@ -125,6 +125,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocol.cpp" />
+    <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolAnd.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogCryptopp.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4297</DisableSpecificWarnings>
@@ -157,6 +158,7 @@
     <ClInclude Include="include\infra\Scanner.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\OTSemiHonestExtension.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocol.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolAnd.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />

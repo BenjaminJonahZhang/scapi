@@ -2,6 +2,14 @@
 #include "../infra/Common.hpp"
 #include "../comm/TwoPartyComm.hpp"
 
+
+class CheatAttemptException : public logic_error
+{
+public:
+	CheatAttemptException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "cheat attempt"; }
+};
+
 /**
 * Marker interface. Each concrete ZK prover's input class should implement this interface.
 */
@@ -92,10 +100,16 @@ public:
 	virtual SigmaProtocolMsg * getA()=0;
 
 	/**
-	* All SigmaSimulators contains first message, challenge and second message. Returns the challenge size
-	* Rills 'result' with the challenge
+	* All SigmaSimulators contains first message, challenge and second message. 
+	* Returns the challenge 
 	*/
-	virtual int getE(byte* result) = 0 ;
+	virtual byte* getE() = 0 ;
+
+	/**
+	* All SigmaSimulators contains first message, challenge and second message.
+	* Returns the challenge size
+	*/
+	virtual int getESize() = 0;
 
 	/**
 	* All SigmaSimulators contains first message, challenge and second message. Returns the second message.
@@ -111,7 +125,7 @@ public:
 * between the honest prover and verifier on common input x.
 */
 class SigmaSimulator {
-
+public:
 	/**
 	* Computes the simulator computation.
 	*/
@@ -120,7 +134,7 @@ class SigmaSimulator {
 	/**
 	* Chooses random challenge and computes the simulator computation.
 	*/
-	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput input) = 0;
+	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input) = 0;
 	/**
 	* Returns the soundness parameter for this Sigma simulator.
 	*/
@@ -160,9 +174,13 @@ class SigmaProtocolVerifier {
 	*/
 	virtual void setChallenge(byte * challenge, int challenge_size)=0;
 	/**
-	* Fills the sampled challenge in 'result' and return its size.
+	* Return the challenge byte array
 	*/
-	virtual int getChallenge(byte * result)=0;
+	virtual byte * getChallenge()=0;
+	/*
+	* Returns the ChallengeSize
+	*/
+	virtual int getChallengeSize() = 0;
 };
 
 /**
@@ -217,10 +235,11 @@ public:
 	*/
 	virtual void setChallenge(byte * challenge, int challenge_size) = 0;
 	/**
-	* Fills result param with the sampled challenge.
-	* @return the challenge size.
+	* @return the challenge.
 	*/
-	virtual int getChallenge(byte * result) = 0;
+	virtual byte * getChallenge() = 0;
+
+	virtual int getChallengeSize() = 0;
 };
 
 /**
@@ -318,9 +337,12 @@ public:
 		// Delegates to the underlying verifierComputation object.
 		verifierComputation->setChallenge(challenge, challenge_size);
 	}
-	int getChallenge(byte * result) override {
+	byte* getChallenge() override {
 		// delegates to the underlying verifierComputation object.
-		return verifierComputation->getChallenge(result);
+		return verifierComputation->getChallenge();
+	}
+	int getChallengeSize() override {
+		return verifierComputation->getChallengeSize();
 	}
 	void sendChallenge() override;
 	bool processVerify(SigmaCommonInput * input) override;
@@ -342,6 +364,18 @@ private:
 	void sendChallengeToProver(byte* challenge, int challenge_size);
 };
 
+/**
+* Concrete implementation of SigmaProtocol message. <p>
+* This message contains array of SigmaProtocolMsg and used, for example, when the SigmaANDProver sends the messages to the verifier.<p>
+*/
+class SigmaMultipleMsg : public SigmaProtocolMsg {
+public:
+	SigmaMultipleMsg(vector<SigmaProtocolMsg *> messages) { this->messages = messages; };
+	vector<SigmaProtocolMsg*> getMessages() { return messages; };
+	void init_from_byte_array(byte * arr, int size) override;
+	byte * toByteArray() override;
+	int size() override;
 
-
-
+private:
+	vector<SigmaProtocolMsg *> messages;
+};

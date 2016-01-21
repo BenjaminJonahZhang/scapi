@@ -48,8 +48,8 @@ void SigmaVerifier::sendChallenge() {
 	receiveMsgFromProver(a);
 
 	// get the challenge from the verifierComputation.
-	byte * challenge;
-	int challenge_size = verifierComputation->getChallenge(challenge);
+	byte * challenge = verifierComputation->getChallenge();
+	int challenge_size = verifierComputation->getChallengeSize();
 	if (challenge_size == 0)
 		throw IllegalStateException("sampleChallenge function should be called before sendChallenge");
 
