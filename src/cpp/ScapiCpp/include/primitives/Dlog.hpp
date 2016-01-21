@@ -12,7 +12,12 @@
 */
 class GroupElementSendableData {
 public:
+	virtual byte * toByteArray() = 0;
+	virtual int getSerializedSize() { return serialized_size; };
+	virtual void init_from_byte_array(byte* arr, int size) = 0;
 	virtual ~GroupElementSendableData() = 0; // making this an abstract class
+protected:
+	int serialized_size;
 };
 
 inline GroupElementSendableData::~GroupElementSendableData() {}; // must provide implemeantion to allow destruction of base classes
@@ -563,16 +568,21 @@ public:
 };
 
 class ZpElementSendableData : public GroupElementSendableData {
-
-private:
-	static const long serialVersionUID = -4297988366522382659L;
-
 protected:
-	biginteger x;
+	biginteger x=0;
 
 public:
 	ZpElementSendableData(biginteger x_): GroupElementSendableData(){ x = x_; }
 	biginteger getX() { return x; }
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
+	byte * toByteArray() override {
+		byte * result;
+		serialized_size = allocateAndEncodeBigInteger(x, result);
+		return result;
+	};
+	void init_from_byte_array(byte* arr, int size) {
+		serialized_size = size;
+		x = decodeBigInteger(arr, size);
+	};
 
 };

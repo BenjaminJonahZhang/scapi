@@ -1,6 +1,7 @@
 #pragma once
 #include "../infra/Common.hpp"
 #include "../comm/TwoPartyComm.hpp"
+#include <openssl/rand.h>
 
 
 class CheatAttemptException : public logic_error
@@ -8,6 +9,13 @@ class CheatAttemptException : public logic_error
 public:
 	CheatAttemptException(const string & msg) : logic_error(msg) {};
 	virtual char const * what() const throw() { return "cheat attempt"; }
+};
+
+class InvalidDlogGroupException : public logic_error
+{
+public:
+	InvalidDlogGroupException(const string & msg) : logic_error(msg) {};
+	virtual char const * what() const throw() { return "invalid dlog"; }
 };
 
 /**
@@ -378,4 +386,20 @@ public:
 
 private:
 	vector<SigmaProtocolMsg *> messages;
+};
+
+/**
+* Concrete implementation of SigmaProtocol message. <p>
+* This message contains one BigInteger value and used when the prover sends a message to the verifier.
+*/
+class SigmaBIMsg : public SigmaProtocolMsg {
+private:
+	biginteger z;
+public:
+	SigmaBIMsg(biginteger z) { this->z = z; };
+	biginteger getMsg() { return z; };
+	void init_from_byte_array(byte * arr, int size) override;
+	byte * toByteArray() override;
+	int size() override;
+
 };

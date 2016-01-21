@@ -16,6 +16,9 @@
     <Filter Include="Source Files\YaoSemiHonest">
       <UniqueIdentifier>{a9dba6ec-313c-480c-ab38-51fb2ffd846d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\SigmaProtocols">
+      <UniqueIdentifier>{5dfb209e-d577-4e73-bcf0-68d86bc4b977}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -37,10 +40,16 @@
     <ClCompile Include="Yao\YaoParties.cpp">
       <Filter>Source Files\YaoSemiHonest</Filter>
     </ClCompile>
+    <ClCompile Include="SigmaProtocols\SigmaProtocolExample.cpp">
+      <Filter>Source Files\SigmaProtocols</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Yao\YaoExample.hpp">
       <Filter>Source Files\YaoSemiHonest</Filter>
+    </ClInclude>
+    <ClInclude Include="SigmaProtocols\SigmaProtocolExample.hpp">
+      <Filter>Source Files\SigmaProtocols</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

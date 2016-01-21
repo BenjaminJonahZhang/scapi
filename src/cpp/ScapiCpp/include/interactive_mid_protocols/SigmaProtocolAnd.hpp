@@ -1,6 +1,5 @@
 #pragma once
 #include "SigmaProtocol.hpp"
-#include <openssl/rand.h>
 
 /**
 * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolAND verifier and simulator.<p>

@@ -90,11 +90,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_WIN32_WINNT=0x06030000;_SCL_SECURE_NO_WARNINGS;_DBOOST_SYSTEM_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\local\boost_1_60_0;C:\OpenSSL-Win64\include;C:\code\scapi\lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\code\scapi\lib\CryptoPP;C:\local\boost_1_60_0;C:\OpenSSL-Win64\include;C:\code\scapi\lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\code\scapi\lib\ScGarbledCircuit\ScGarbledCircuitWin64\x64\Release\ScGarbledCircuitWin64.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Release\ScapiCpp.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\lib\OTExtensionCompilation\x64\Release\OTExtension1.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\MiraclWin64.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\big.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\code\scapi\lib\ScGarbledCircuit\ScGarbledCircuitWin64\x64\Release\ScGarbledCircuitWin64.lib;C:\code\scapi\src\cpp\ScapiCpp\x64\Release\ScapiCpp.lib;C:\OpenSSL-Win64\lib\libeay32.lib;C:\code\scapi\lib\OTExtensionCompilation\x64\Release\OTExtension1.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\MiraclWin64.lib;C:\code\scapi\lib\MiraclCompilation\MiraclWin64\x64\Release\big.obj;C:\code\Builds\CryptoPP\Output\Release\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="comm_example.cpp" />
+    <ClCompile Include="SigmaProtocols\SigmaProtocolExample.cpp" />
     <ClCompile Include="simple_dlog.cpp" />
     <ClCompile Include="simple_sha1.cpp" />
     <ClCompile Include="Yao\App1.cpp">
@@ -113,6 +114,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SigmaProtocols\SigmaProtocolExample.hpp" />
     <ClInclude Include="Yao\YaoExample.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

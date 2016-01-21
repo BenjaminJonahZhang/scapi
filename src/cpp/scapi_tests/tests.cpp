@@ -591,4 +591,3 @@ TEST_CASE("Gates and Wires", "") {
 		REQUIRE(bc_res_map[7].getValue() == 1);
 	}
 }
-
