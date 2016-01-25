@@ -4,6 +4,7 @@ bool check_soundness(int t, DlogGroup* dlog) {
 	// if soundness parameter does not satisfy 2^t<q, return false.
 	biginteger soundness = mp::pow(biginteger(2), t);
 	biginteger q = dlog->getOrder();
+	cout << "t= " << t << " soundness= " << soundness << " q=" << q << endl;
 	return (soundness < q);
 }
 
@@ -72,11 +73,13 @@ SigmaProtocolMsg* SigmaDlogProverComputation::computeFirstMsg(SigmaProverInput* 
 	// sample random r in Zq
 	boost::random::uniform_int_distribution<biginteger> ui(0, qMinusOne);
 	r = ui(random);
-
 	// compute a = g^r.
 	GroupElement* a = dlog->exponentiate(dlog->getGenerator(), r);
+	auto x = a->generateSendableData();
+	cout << "computed first message: " << ((ZpElementSendableData*)x)->toString() << endl;
 	// create and return SigmaGroupElementMsg with a.
-	return new SigmaGroupElementMsg(a->generateSendableData());
+	return new SigmaGroupElementMsg(x);
+
 }
 
 SigmaProtocolMsg* SigmaDlogProverComputation::computeSecondMsg(byte* challenge, int challenge_size) {
@@ -116,7 +119,7 @@ SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog, int 
 
 void SigmaDlogVerifierComputation::sampleChallenge() {
 	eSize = t / 8;
-	byte* e = new byte[eSize]; // create a new byte array of size t/8, to get the required byte size.
+	e = new byte[eSize]; // create a new byte array of size t/8, to get the required byte size.
 	if (!RAND_bytes(e, eSize)) // fill the byte array with random values.
 		throw runtime_error("key generation failed");
 }

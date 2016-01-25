@@ -20,7 +20,7 @@ CryptoPP::Integer biginteger_to_cryptoppint(biginteger bi)
 
 CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg)
 {
-	mt19937 prime_gen(clock()); // prg for prime checking
+	mt19937 prime_gen = get_seeded_random(); // prg for prime checking
 	this->random_element_gen = prg;
 	biginteger p = groupParams->getP();
 	biginteger q = groupParams->getQ();
@@ -41,20 +41,20 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt
 	// set the inner parameters
 	this->groupParams = groupParams;
 
-	//Create CryptoPP Dlog group with p, ,q , g.
-	//The validity of g will be checked after the creation of the group because the check need the pointer to the group
+	// create CryptoPP Dlog group with p, ,q , g.
+	// the validity of g will be checked after the creation of the group because the check need the pointer to the group
 	pointerToGroup = new CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime();
 	pointerToGroup->Initialize(biginteger_to_cryptoppint(p), biginteger_to_cryptoppint(q), biginteger_to_cryptoppint(g));
 
-	//If the generator is not valid, delete the allocated memory and throw exception 
+	// if the generator is not valid, delete the allocated memory and throw exception 
 	if (!pointerToGroup->ValidateElement(3, biginteger_to_cryptoppint(g), 0)){
 		delete pointerToGroup;
 		throw invalid_argument("generator value is not valid");
 	}
-	//Create the GroupElement - generator with the pointer that return from the native function
+	// create the GroupElement - generator with the pointer that return from the native function
 	generator = new ZpSafePrimeElementCryptoPp(g, p, false);
 
-	//Now that we have p, we can calculate k which is the maximum length of a string to be converted to a Group Element of this group.
+	// now that we have p, we can calculate k which is the maximum length of a string to be converted to a Group Element of this group.
 	k = calcK(p);
 }
 

@@ -183,8 +183,10 @@ void ChannelServer::write(byte* data, int size) {
 }
 
 void ChannelServer::write_fast(byte * data, int size) {
+	cout << "in write fast. sending data with size: " << size << endl;
 	msg.body_length(size);
 	memcpy(msg.body(), &data[0], msg.body_length());
 	msg.encode_header();
+	cout << "writing: size: " << size << endl;
 	channel->write_fast(msg);
 }

@@ -7,6 +7,7 @@
 void SigmaProver::processFirstMsg(SigmaProverInput * input) {
 	// compute the first message by the underlying proverComputation.
 	SigmaProtocolMsg * a = proverComputation->computeFirstMsg(input);
+	cout << "sending first message with size: " << a->size();
 	//Send the first message.
 	sendMsgToVerifier(a);
 	//save the state of this protocol.

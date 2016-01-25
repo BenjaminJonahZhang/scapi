@@ -300,12 +300,17 @@ public:
 
 private:
 	ChannelServer * channel;
-	SigmaProverComputation * proverComputation;	//Underlying sigma computation.
+	SigmaProverComputation * proverComputation;	// underlying sigma computation.
 	bool doneFirstMsg;
 	/**
 	* Sends the given message to the verifier.
 	*/
-	void sendMsgToVerifier(SigmaProtocolMsg * message) { channel->write_fast(message->toByteArray(), message->size()); };
+	void sendMsgToVerifier(SigmaProtocolMsg * message) { 
+		byte* raw_message = message->toByteArray();
+		int message_size = message->size();
+		cout << "sending message to verifier. Size(2): " << message_size << endl;
+		channel->write_fast(raw_message, message_size);
+	};
 };
 
 
@@ -338,11 +343,11 @@ public:
 	}
 	bool verify(SigmaCommonInput * input) override;
 	void sampleChallenge() override {
-		// Delegates to the underlying verifierComputation object.
+		// delegates to the underlying verifierComputation object.
 		verifierComputation->sampleChallenge();
 	}
 	void setChallenge(byte * challenge, int challenge_size) override{
-		// Delegates to the underlying verifierComputation object.
+		// delegates to the underlying verifierComputation object.
 		verifierComputation->setChallenge(challenge, challenge_size);
 	}
 	byte* getChallenge() override {
@@ -358,8 +363,8 @@ public:
 private:
 	ChannelServer * channel;
 	SigmaVerifierComputation * verifierComputation;
-	SigmaProtocolMsg * a;	// First message from the prover.
-	SigmaProtocolMsg * z;	// Second message from the prover.
+	SigmaProtocolMsg * a;	// first message from the prover.
+	SigmaProtocolMsg * z;	// second message from the prover.
 	bool doneChallenge;
 	/**
 	* Waits for message from receiver and returns it.
@@ -369,7 +374,9 @@ private:
 	/**
 	* Sends the challenge to the prover.
 	*/
-	void sendChallengeToProver(byte* challenge, int challenge_size);
+	void sendChallengeToProver(byte* challenge, int challenge_size) {
+		channel->write_fast(challenge, challenge_size);
+	}
 };
 
 /**
@@ -395,11 +402,19 @@ private:
 class SigmaBIMsg : public SigmaProtocolMsg {
 private:
 	biginteger z;
+	int size_;
 public:
+	SigmaBIMsg() { this->z = -100; };
 	SigmaBIMsg(biginteger z) { this->z = z; };
 	biginteger getMsg() { return z; };
-	void init_from_byte_array(byte * arr, int size) override;
-	byte * toByteArray() override;
-	int size() override;
-
+	void init_from_byte_array(byte * arr, int size) override { 
+		z = decodeBigInteger(arr, size); 
+		size_ = size;
+	};
+	byte * toByteArray() override {
+		byte* res;
+		size_ = allocateAndEncodeBigInteger(this->z, res);
+		return res;
+	}
+	int size() override { return size_; };
 };

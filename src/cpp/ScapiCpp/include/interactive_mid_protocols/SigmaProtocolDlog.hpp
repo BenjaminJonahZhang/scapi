@@ -13,8 +13,14 @@ public:
 	void init_from_byte_array(byte * arr, int size) {
 		element->init_from_byte_array(arr, size);
 	};
-	byte * toByteArray() override{ return element->toByteArray();  };
-	int size() override { return element->getSerializedSize(); };
+	byte * toByteArray() override{
+		cout << "to byte array in SigmaGroupElemet" << endl;
+		return element->toByteArray();  };
+	int size() override { 
+		auto x = element->getSerializedSize(); 
+		cout << "size in SigmaGroupElementMsg: " << x << endl;
+		return x;
+	};
 private:
 	GroupElementSendableData* element=NULL;
 };

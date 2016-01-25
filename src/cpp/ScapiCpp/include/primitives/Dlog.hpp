@@ -483,9 +483,8 @@ class DlogZp : public DlogGroup {};
 /**
 * This class holds the parameters of a Dlog group over Zp*.
 */
-class ZpGroupParams : public GroupParams{ //TODO serializable ! - XXX
+class ZpGroupParams : public GroupParams{
 private:
-	static const long serialVersionUID = 1458597565512141731L;
 	biginteger p; //modulus
 	biginteger xG; //generator value
 
@@ -576,8 +575,10 @@ public:
 	biginteger getX() { return x; }
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
 	byte * toByteArray() override {
+		cout << "to byte array in ZpElementSendableData " << endl;
 		byte * result;
 		serialized_size = allocateAndEncodeBigInteger(x, result);
+		cout << "converting x= " << x << " got byte array with size: " << serialized_size;
 		return result;
 	};
 	void init_from_byte_array(byte* arr, int size) {
