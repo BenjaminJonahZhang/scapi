@@ -16,7 +16,7 @@ SigmaDlogSimulator::SigmaDlogSimulator(DlogGroup* dlog, int t, std::mt19937 rand
 	this->dlog = dlog;
 	this->t = t;
 	if (!checkSoundnessParam()) // check the soundness validity.
-		throw invalid_argument("soundness parameter t does not satisfy 2^t<q");
+		throw invalid_argument("soundness parameter t does not satisfy 2^t<q. q=" + (string)dlog->getOrder() + " t=" + to_string(t) + "\n");
 	this->random = random;
 	qMinusOne = dlog->getOrder() - 1;
 }
@@ -130,7 +130,7 @@ bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocol
 	SigmaGroupElementMsg* firstMsg = (SigmaGroupElementMsg*)a;
 	SigmaBIMsg* exponent = (SigmaBIMsg*)z;
 
-	GroupElement* aElement = dlog->reconstructElement(true, firstMsg->getElement());
+	GroupElement* aElement = dlog->reconstructElement(false, firstMsg->getElement());
 
 	// get the h from the input and verify that it is in the Dlog Group.
 	GroupElement* h = cInput->getH();

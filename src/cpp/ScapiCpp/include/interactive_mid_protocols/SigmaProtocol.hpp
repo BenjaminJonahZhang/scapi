@@ -277,8 +277,11 @@ public:
 		this->proverComputation = proverComputation;
 	}
 	void prove(SigmaProverInput * input) override{
+		cout << "first message starting " << endl;
 		processFirstMsg(input); // step one of the protocol.
+		cout << "second message starting " << endl;
 		processSecondMsg(); // step two of the protocol.
+		cout << "seocond message done" << endl;
 	};
 	/**
 	* Processes the first step of the sigma protocol.<p>
@@ -308,7 +311,7 @@ private:
 	void sendMsgToVerifier(SigmaProtocolMsg * message) { 
 		byte* raw_message = message->toByteArray();
 		int message_size = message->size();
-		cout << "sending message to verifier. Size(2): " << message_size << endl;
+		cout << "sending message to verifier. Size(2): " << message_size << "message adress: " << raw_message << endl;
 		channel->write_fast(raw_message, message_size);
 	};
 };
@@ -412,8 +415,9 @@ public:
 		size_ = size;
 	};
 	byte * toByteArray() override {
-		byte* res;
-		size_ = allocateAndEncodeBigInteger(this->z, res);
+		size_ = bytesCount(this->z);
+		byte* res = new byte[size_];
+		encodeBigInteger(this->z, res, size_);
 		return res;
 	}
 	int size() override { return size_; };

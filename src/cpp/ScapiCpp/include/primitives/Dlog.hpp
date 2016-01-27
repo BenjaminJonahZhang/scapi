@@ -571,14 +571,17 @@ protected:
 	biginteger x=0;
 
 public:
-	ZpElementSendableData(biginteger x_): GroupElementSendableData(){ x = x_; }
+	ZpElementSendableData(biginteger x_): GroupElementSendableData(){ 
+		x = x_; 
+		serialized_size = bytesCount(x_);
+	};
 	biginteger getX() { return x; }
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
 	byte * toByteArray() override {
 		cout << "to byte array in ZpElementSendableData " << endl;
 		byte * result;
 		serialized_size = allocateAndEncodeBigInteger(x, result);
-		cout << "converting x= " << x << " got byte array with size: " << serialized_size;
+		cout << "converting x= " << x << " got byte array with size: " << serialized_size << endl;
 		return result;
 	};
 	void init_from_byte_array(byte* arr, int size) {

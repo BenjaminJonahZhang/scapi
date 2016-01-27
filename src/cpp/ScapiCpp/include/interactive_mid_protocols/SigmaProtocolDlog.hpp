@@ -8,7 +8,9 @@
 */
 class SigmaGroupElementMsg : public SigmaProtocolMsg {
 public:
-	SigmaGroupElementMsg(GroupElementSendableData* el) { this->element = el; };
+	SigmaGroupElementMsg(GroupElementSendableData* el) { 
+		this->element = el; 
+	};
 	GroupElementSendableData* getElement() { return element; };
 	void init_from_byte_array(byte * arr, int size) {
 		element->init_from_byte_array(arr, size);

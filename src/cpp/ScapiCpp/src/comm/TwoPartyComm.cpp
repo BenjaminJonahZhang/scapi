@@ -152,6 +152,7 @@ void NativeChannel::handle_read_body(const boost::system::error_code& error)
 
 void NativeChannel::handle_msg(const Message& msg) {
 	int m_len = read_msg_.body_length();
+	cout << "got message " << m_len << endl;
 	auto v = new vector<byte>(m_len);
 	memcpy(&(v->at(0)), read_msg_.body(), m_len);
 	std::unique_lock<std::mutex> lk(m);

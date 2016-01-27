@@ -21,21 +21,18 @@ class IllegalStateException : public logic_error
 {
 public:
 	IllegalStateException(const string & msg) : logic_error(msg) {};
-	virtual char const * what() const throw(){ return "unacceptable state"; }
 };
 
 class NotImplementedException : public logic_error
 {
 public:
 	NotImplementedException(const string & msg) : logic_error(msg) {};
-	virtual char const * what() const throw() { return "Function not yet implemented."; }
 };
 
 class InvalidKeyException : public logic_error
 {
 public:
 	InvalidKeyException(const string & msg) : logic_error(msg) {};
-	virtual char const * what() const throw() { return "Invalid key"; }
 };
 
 // Using boost::multiprecision:mpz_int - Arbitrary precision integer type.
