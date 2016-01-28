@@ -67,9 +67,11 @@ public:
 	* @param q the order of the group
 	* @param g the generator of the group
 	* @param p the prime of the group
-	* @throws NoSuchAlgorithmException
 	*/
-	CryptoPpDlogZpSafePrime(string q, string g, string p, string randNumGenAlg) { throw invalid_argument("not implemented"); };
+	CryptoPpDlogZpSafePrime(string q, string g, string p, string randNumGenAlg) { 
+		throw NotImplementedException(
+			"CryptoPpDlogZpSafePrime((string q, string g, string p, string randNumGenAlg) is not implemented"
+	); };
 
 	/**
 	* Initializes the CryptoPP implementation of Dlog over Zp* with random elements
@@ -81,7 +83,8 @@ public:
 	CryptoPpDlogZpSafePrime(string numBits) : CryptoPpDlogZpSafePrime(stoi(numBits)) {};
 
 	CryptoPpDlogZpSafePrime(string numBits, string randNumGenAlg) {
-		// TODO: NOT IMPLEMENTED 
+		throw NotImplementedException(
+			"CryptoPpDlogZpSafePrime(string numBits, string randNumGenAlg) is not implemented");
 	}
 
 	string getGroupType() { return "Zp*"; }
@@ -89,8 +92,8 @@ public:
 		return new ZpSafePrimeElementCryptoPp(1, ((ZpGroupParams *)groupParams)->getP(), false);
 	}
 	GroupElement * createRandomElement() override {
-		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
-		//It calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.
+		// this function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
+		// it calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.
 		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams *)groupParams)->getP(), random_element_gen);
 	}
 

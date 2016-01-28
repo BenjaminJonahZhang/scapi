@@ -8,21 +8,12 @@
 */
 class SigmaGroupElementMsg : public SigmaProtocolMsg {
 public:
-	SigmaGroupElementMsg(GroupElementSendableData* el) { 
-		this->element = el; 
-	};
+	SigmaGroupElementMsg(GroupElementSendableData* el) {  this->element = el;  };
 	GroupElementSendableData* getElement() { return element; };
-	void init_from_byte_array(byte * arr, int size) {
-		element->init_from_byte_array(arr, size);
-	};
-	byte * toByteArray() override{
-		cout << "to byte array in SigmaGroupElemet" << endl;
-		return element->toByteArray();  };
-	int size() override { 
-		auto x = element->getSerializedSize(); 
-		cout << "size in SigmaGroupElementMsg: " << x << endl;
-		return x;
-	};
+	void init_from_byte_array(byte * arr, int size) { element->init_from_byte_array(arr, size); };
+	byte * toByteArray() override{ return element->toByteArray();  };
+	int size() override { return element->getSerializedSize(); };
+
 private:
 	GroupElementSendableData* element=NULL;
 };
@@ -33,13 +24,7 @@ private:
 */
 class SigmaDlogCommonInput : public SigmaCommonInput {
 public:
-	/**
-	* Sets the given h element.
-	*/
 	SigmaDlogCommonInput(GroupElement* h) { this->h = h; };
-	/**
-	* Returns h element.
-	*/
 	GroupElement * getH() { return h; };
 private:
 	GroupElement* h;
@@ -96,9 +81,10 @@ private:
 	/**
 	* Checks if the given challenge length is equal to the soundness parameter.
 	*/
-	bool checkChallengeLength(int challenge_size) {
-		//If the challenge's length is equal to t, return true. else, return false.
-		return (challenge_size == (t / 8));
+	bool checkChallengeLength(byte* challenge, int challenge_size) {
+		// if the challenge's length is equal to t, return true. else, return false.
+		biginteger e = decodeBigInteger(challenge, challenge_size);
+		return (e >= 0) && (e < mp::pow(biginteger(2), t));
 	}
 	/**
 	* Checks the validity of the given soundness parameter.
@@ -182,7 +168,11 @@ private:
 	/**
 	* Checks if the given challenge length is equal to the soundness parameter.
 	*/
-	bool checkChallengeLength(int challenge_size) { return (challenge_size == (t / 8)); };
+	bool checkChallengeLength(byte* challenge, int challenge_size) {
+		biginteger e = decodeBigInteger(challenge, challenge_size);
+		cout << "got challenge: " << e << endl;
+		return (e >= 0) && (e < mp::pow(biginteger(2), t)); // 0 <= e < 2^t
+	};
 	/**
 	* Checks the validity of the given soundness parameter.
 	* @return true if the soundness parameter is valid; false, otherwise.

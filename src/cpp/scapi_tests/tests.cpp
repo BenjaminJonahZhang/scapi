@@ -106,6 +106,9 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 		REQUIRE(bi_res == birsa100);
 		bi_res = endcode_decode(-birsa100);
 		REQUIRE(bi_res == -birsa100);
+		bi_res = endcode_decode(197);
+		REQUIRE(bi_res == 197);
+
 	}
 
 	SECTION("convert hex to string") {

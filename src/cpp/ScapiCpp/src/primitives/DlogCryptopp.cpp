@@ -49,9 +49,9 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(ZpGroupParams * groupParams, mt
 	// if the generator is not valid, delete the allocated memory and throw exception 
 	if (!pointerToGroup->ValidateElement(3, biginteger_to_cryptoppint(g), 0)){
 		delete pointerToGroup;
-		throw invalid_argument("generator value is not valid");
+		throw invalid_argument("generator value is not valid. q=" + (string)q + " g=" + (string) g);
 	}
-	// create the GroupElement - generator with the pointer that return from the native function
+	// create the GroupElement - generator
 	generator = new ZpSafePrimeElementCryptoPp(g, p, false);
 
 	// now that we have p, we can calculate k which is the maximum length of a string to be converted to a Group Element of this group.
@@ -63,7 +63,7 @@ CryptoPpDlogZpSafePrime::CryptoPpDlogZpSafePrime(int numBits, mt19937 prg) {
 	this->random_element_gen = prg;
 
 	// create random Zp dlog group and initialise it with the size and generator
-	CryptoPP::AutoSeededRandomPool rng; //Random Number Generator
+	CryptoPP::AutoSeededRandomPool rng; // Random Number Generator
 	pointerToGroup = new CryptoPP::DL_GroupParameters_GFP_DefaultSafePrime();
 	pointerToGroup->Initialize(rng, numBits);
 

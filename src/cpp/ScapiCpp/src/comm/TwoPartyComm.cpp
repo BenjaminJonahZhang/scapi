@@ -25,27 +25,39 @@ void NativeChannel::start_listening()
 	serverSocket.set_option(option);
 }
 
-void NativeChannel::connect() {
-	Logger::log("Channel (" + me.to_log_string() + ") - connecting to peer (" + other.to_log_string() + ")");
+void NativeChannel::connect(bool bSynced) {
+	Logger::log("Channel (" + me.to_log_string() + ") - connecting to peer ("
+		+ other.to_log_string() + ")");
 	tcp::resolver resolver(io_service_client_);
 	tcp::resolver::query query(other.getIpAddress().to_string(), to_string(other.getPort()));
 	tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-	boost::asio::async_connect(clientSocket, endpoint_iterator,
-		boost::bind(&NativeChannel::handle_connect, this,
-			boost::asio::placeholders::error));
-	boost::asio::ip::tcp::no_delay option(true);
-	clientSocket.set_option(option);
+	if (bSynced)
+	{// blocking!
+		boost::asio::connect(clientSocket, endpoint_iterator);
+		m_IsConnected = true;
+		boost::asio::ip::tcp::no_delay option(true);
+		clientSocket.set_option(option);
+	}
+	else
+		boost::asio::async_connect(clientSocket, endpoint_iterator,
+			boost::bind(&NativeChannel::handle_connect, this,
+				boost::asio::placeholders::error));
+	
 }
 
 void NativeChannel::handle_connect(const boost::system::error_code& error)
 {
 	if (!error)
 	{
-		Logger::log("Channel (" + me.to_log_string() + ") - succesfully connected to peer (" + other.to_log_string() + ")");
+		Logger::log("Channel (" + me.to_log_string() + ") - succesfully connected to peer ("
+			+ other.to_log_string() + ")");
 		m_IsConnected = true;
+		boost::asio::ip::tcp::no_delay option(true);
+		clientSocket.set_option(option);
 	}
 	else
-		Logger::log("Channel (" + me.to_log_string() + ") - failed to connect to peer (" + other.to_log_string() + ")!!");
+		Logger::log("Channel (" + me.to_log_string() + ") - failed to connect to peer ("
+			+ other.to_log_string() + ")!!");
 }
 
 void NativeChannel::write(const Message& msg)
@@ -109,7 +121,8 @@ void NativeChannel::handle_write(const boost::system::error_code& error)
 	}
 	else
 	{
-		Logger::log("Channel( " + me.to_log_string() + "error when writing message: " + error.message());
+		Logger::log("Channel( " + me.to_log_string() + "error when writing message: "
+			+ error.message());
 		m_IsConnected = false;
 		do_close();
 	}
@@ -126,7 +139,8 @@ void NativeChannel::handle_read_header(const boost::system::error_code& error)
 	}
 	else
 	{
-		Logger::log("Channel( " + me.to_log_string() + "error when reading message header: " + error.message());
+		Logger::log("Channel( " + me.to_log_string() + "error when reading message header: "
+			+ error.message());
 		m_IsConnected = false;
 		do_close();
 	}
@@ -144,7 +158,8 @@ void NativeChannel::handle_read_body(const boost::system::error_code& error)
 	}
 	else
 	{
-		Logger::log("Channel( " + me.to_log_string() + "error when reading message body: " + error.message());
+		Logger::log("Channel( " + me.to_log_string() + "error when reading message body: "
+			+ error.message());
 		m_IsConnected = false;
 		do_close();
 	}
@@ -152,9 +167,9 @@ void NativeChannel::handle_read_body(const boost::system::error_code& error)
 
 void NativeChannel::handle_msg(const Message& msg) {
 	int m_len = read_msg_.body_length();
-	cout << "got message " << m_len << endl;
 	auto v = new vector<byte>(m_len);
-	memcpy(&(v->at(0)), read_msg_.body(), m_len);
+	if (m_len>0)
+		memcpy(&(v->at(0)), read_msg_.body(), m_len);
 	std::unique_lock<std::mutex> lk(m);
 	read_msgs_.push_back(v);
 	lk.unlock();
@@ -184,10 +199,8 @@ void ChannelServer::write(byte* data, int size) {
 }
 
 void ChannelServer::write_fast(byte * data, int size) {
-	cout << "in write fast. sending data with size: " << size << endl;
 	msg.body_length(size);
 	memcpy(msg.body(), &data[0], msg.body_length());
 	msg.encode_header();
-	cout << "writing: size: " << size << endl;
 	channel->write_fast(msg);
 }

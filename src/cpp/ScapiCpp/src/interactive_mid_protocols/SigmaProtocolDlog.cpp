@@ -4,7 +4,6 @@ bool check_soundness(int t, DlogGroup* dlog) {
 	// if soundness parameter does not satisfy 2^t<q, return false.
 	biginteger soundness = mp::pow(biginteger(2), t);
 	biginteger q = dlog->getOrder();
-	cout << "t= " << t << " soundness= " << soundness << " q=" << q << endl;
 	return (soundness < q);
 }
 
@@ -23,8 +22,8 @@ SigmaDlogSimulator::SigmaDlogSimulator(DlogGroup* dlog, int t, std::mt19937 rand
 
 SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input, byte* challenge, int challenge_size) {
 	//check the challenge validity.
-	if (!checkChallengeLength(challenge_size))
-		throw CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
+	if (!checkChallengeLength(challenge, challenge_size))
+		throw CheatAttemptException("the length of the given challenge is different from the soundness parameter");
 	SigmaDlogCommonInput* dlogInput = (SigmaDlogCommonInput*)input;
 
 	// SAMPLE a random z <- Zq
@@ -76,25 +75,22 @@ SigmaProtocolMsg* SigmaDlogProverComputation::computeFirstMsg(SigmaProverInput* 
 	// compute a = g^r.
 	GroupElement* a = dlog->exponentiate(dlog->getGenerator(), r);
 	auto x = a->generateSendableData();
-	cout << "computed first message: " << ((ZpElementSendableData*)x)->toString() << endl;
 	// create and return SigmaGroupElementMsg with a.
 	return new SigmaGroupElementMsg(x);
 
 }
 
 SigmaProtocolMsg* SigmaDlogProverComputation::computeSecondMsg(byte* challenge, int challenge_size) {
-	if (!checkChallengeLength(challenge_size)) // check the challenge validity.
-		throw CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
+	if (!checkChallengeLength(challenge, challenge_size)) // check the challenge validity.
+		throw CheatAttemptException("the length of the given challenge is different from the soundness parameter");
 
 	// compute z = (r+ew) mod q
 	biginteger q = dlog->getOrder();
 	biginteger e = decodeBigInteger(challenge, challenge_size);
 	biginteger ew = (e * input->getW()) % q;
 	biginteger z = (r + ew) % q;
-
-	// delete the random value r
-	r = 0;
-	// create and return SigmaBIMsg with z.
+	
+	// create and return SigmaBIMsg with z
 	return new SigmaBIMsg(z);
 }
 
@@ -118,10 +114,12 @@ SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog, int 
 }
 
 void SigmaDlogVerifierComputation::sampleChallenge() {
-	eSize = t / 8;
+	boost::random::uniform_int_distribution<biginteger> ui(0, mp::pow(biginteger(2), t)-1);
+	biginteger e_number = ui(random);
+	cout << "sampled challenge between 0 and: " << mp::pow(biginteger(2), t)-1 << " got: " << e_number << endl;
+	eSize = bytesCount(e_number);
 	e = new byte[eSize]; // create a new byte array of size t/8, to get the required byte size.
-	if (!RAND_bytes(e, eSize)) // fill the byte array with random values.
-		throw runtime_error("key generation failed");
+	encodeBigInteger(e_number, e, eSize);
 }
 
 bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocolMsg* a, SigmaProtocolMsg* z) {
@@ -130,11 +128,10 @@ bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocol
 	SigmaGroupElementMsg* firstMsg = (SigmaGroupElementMsg*)a;
 	SigmaBIMsg* exponent = (SigmaBIMsg*)z;
 
-	GroupElement* aElement = dlog->reconstructElement(false, firstMsg->getElement());
+	GroupElement* aElement = dlog->reconstructElement(true, firstMsg->getElement());
 
 	// get the h from the input and verify that it is in the Dlog Group.
 	GroupElement* h = cInput->getH();
-
 	// if h is not member in the group, set verified to false.
 	verified = verified && dlog->isMember(h);
 
@@ -144,11 +141,12 @@ bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocol
 	// compute a*h^e (right side of the verify equation).
 	biginteger eBI = decodeBigInteger(e, eSize); 	// convert e to biginteger.
 	GroupElement* hToe = dlog->exponentiate(h, eBI); // calculate h^e.
+
 	// calculate a*h^e.
 	GroupElement* right = dlog->multiplyGroupElements(aElement, hToe);
 
 	// if left and right sides of the equation are not equal, set verified to false.
-	verified = verified && (left==right);
+	verified = verified && (*left==*right);
 
 	delete e;
 	eSize = 0;

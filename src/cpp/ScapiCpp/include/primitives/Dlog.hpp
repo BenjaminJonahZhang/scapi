@@ -578,10 +578,9 @@ public:
 	biginteger getX() { return x; }
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
 	byte * toByteArray() override {
-		cout << "to byte array in ZpElementSendableData " << endl;
-		byte * result;
-		serialized_size = allocateAndEncodeBigInteger(x, result);
-		cout << "converting x= " << x << " got byte array with size: " << serialized_size << endl;
+		serialized_size = bytesCount(x);
+		byte * result = new byte[serialized_size];
+		encodeBigInteger(x, result, serialized_size);
 		return result;
 	};
 	void init_from_byte_array(byte* arr, int size) {

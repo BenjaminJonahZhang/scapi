@@ -69,7 +69,7 @@ public:
 			other.getIpAddress().to_string() + " Peer's port: " + to_string(other.getPort()));
 	};
 	tcp::socket& getServerSocket() { return serverSocket; };
-	void connect();
+	void connect(bool bSynced);
 	void start_listening();
 	void write(const Message& msg);
 	void close();
@@ -118,7 +118,27 @@ public:
 		acceptor_.async_accept(channel->getServerSocket(), boost::bind(&ChannelServer::handle_accept, 
 			this, channel, boost::asio::placeholders::error));
 	};
-	void connect() { channel->connect(); };
+	void connect(bool bSynced=false) { channel->connect(bSynced); };
+	void try_connecting(int sleep_between_attempts, int timeout) {
+		int total_sleep = 0;
+		while (!channel->is_connected())
+		{
+			try {
+				channel->connect(true);
+			}
+			catch (const boost::system::system_error& ex)
+			{
+				cout << "Failed to connect. sleeping for " << sleep_between_attempts << " milliseconds" << endl;
+				this_thread::sleep_for(chrono::milliseconds(sleep_between_attempts));
+				total_sleep += sleep_between_attempts;
+				if (total_sleep > timeout)
+				{
+					cerr << "Failed to connect after timeout, aboting!";
+					throw ex;
+				}
+			}
+		}
+	}
 	bool is_connected() { return channel->is_connected(); };
 	void write(byte* data, int size);
 	vector<byte>* read_one() { return channel->read_one(); };

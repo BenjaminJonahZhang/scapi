@@ -106,7 +106,7 @@ SigmaANDSimulator::SigmaANDSimulator(vector<SigmaSimulator *> simulators, int t,
 
 SigmaSimulatorOutput* SigmaANDSimulator::simulate(SigmaCommonInput *input, byte* challenge, int challenge_size) {
 	if (!checkChallengeLength(challenge_size)) 
-		throw CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
+		throw CheatAttemptException("the length of the given challenge is different from the soundness parameter");
 	
 	SigmaANDCommonInput *andInput = (SigmaANDCommonInput *)input;
 

@@ -7,98 +7,102 @@ struct SigmaDlogParams {
 	biginteger q;
 	biginteger g;
 	int t;
+	IpAdress proverIp;
+	IpAdress verifierIp;
+	int proverPort;
+	int verifierPort;
 
-	SigmaDlogParams(biginteger w, biginteger p, biginteger q, biginteger g, int t) {
-		this->w = w;
-		this->p = p;
-		this->q = q;
-		this->g = g;
-		this->t = t;
+	SigmaDlogParams(biginteger w, biginteger p, biginteger q, biginteger g, int t,
+		IpAdress proverIp, IpAdress verifierIp, int proverPort, int verifierPort) {
+		this->w = w; // witness
+		this->p = p; // group order - must be prime
+		this->q = q; // sub group order - prime such that p=2q+1
+		this->g = g; // generator of Zd
+		this->t = t; // soundness param must be: 2^t<q
+		this->proverIp = proverIp;
+		this->verifierIp = verifierIp;
+		this->proverPort = proverPort;
+		this->verifierPort = verifierPort;
 	};
 };
 
-SigmaDlogParams getParams() {
-	biginteger q = 3;
-	biginteger p = q * 2 + 1; // p=7
-	biginteger g = 2;
-	int t = 1;
-	return SigmaDlogParams(2, p, q, g, t);
+SigmaDlogParams readSigmaConfig(string config_file) {
+	ConfigFile cf(config_file);
+	string input_section = cf.Value("", "input_section");
+	biginteger p  = biginteger(cf.Value(input_section, "p"));
+	biginteger q = biginteger(cf.Value(input_section, "q"));
+	biginteger g = biginteger(cf.Value(input_section, "g"));
+	biginteger w = biginteger(cf.Value(input_section, "w"));
+	int t = stoi(cf.Value(input_section, "t"));
+	string proverIpStr = cf.Value("", "proverIp");
+	string verifierIpStr = cf.Value("", "verifierIp");
+	int proverPort = stoi(cf.Value("", "proverPort"));
+	int verifierPort = stoi(cf.Value("", "verifierPort"));
+	auto proverIp = IpAdress::from_string(proverIpStr);
+	auto verifierIp = IpAdress::from_string(verifierIpStr);
+	return SigmaDlogParams(w, p, q, g, t, proverIp, verifierIp, proverPort, verifierPort);
 }
 
-
-void SigmaProtocolExample(char * argv0) {
-	std::cerr << "Usage: " << argv0 << " 1(=prover)|2(=verifier)" << std::endl;
+void SigmaProtocolExampleUsage(char * argv0) {
+	std::cerr << "Usage: " << argv0 << " <1(=prover)|2(=verifier)> config_file_path" << std::endl;
 }
 
+void run_prover(ChannelServer * server, SigmaDlogParams sdp) {
+	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), 
+		get_seeded_random());
 
-void connect_(ChannelServer * channel_server) {
-	cout << "PartyOne: Connecting to Receiver..." << endl;
-	int sleep_time = 50;
-	this_thread::sleep_for(chrono::milliseconds(sleep_time));
-	channel_server->connect();
-	while (!channel_server->is_connected())
-	{
-		cout << "Failed to connect. sleeping for " << sleep_time << " milliseconds" << endl;
-		this_thread::sleep_for(chrono::milliseconds(sleep_time));
-	}
-	cout << "Sender Connected!" << endl;
-}
-
-
-void run_prover(ChannelServer * server) {
-	int i;
-	cout << "please click 0 when ready" << endl;
-	cin >> i;
-	connect_(server);
-
-	SigmaDlogParams sdp = getParams();
-	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), get_seeded_random());
+	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
 	GroupElement * g = dg->getGenerator();
 	GroupElement * h = dg->exponentiate(g, sdp.w);
-	SigmaProverComputation* proverComputation = new SigmaDlogProverComputation(dg, sdp.t, get_seeded_random());
+	SigmaProverComputation* proverComputation = new SigmaDlogProverComputation(dg, sdp.t, 
+		get_seeded_random());
 	SigmaProver* sp = new SigmaProver(server, proverComputation);
 	auto proverinput = new SigmaDlogProverInput(h, sdp.w);
 	sp->prove(proverinput);
 }
 
-void run_verifier(ChannelServer* server) {
-	SigmaDlogParams sdp = getParams();
-	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), get_seeded_random());
+void run_verifier(ChannelServer* server, SigmaDlogParams sdp) {
+	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), 
+		get_seeded_random());
 
-	connect_(server);
-
+	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
 	GroupElement * g = dg->getGenerator();
 	GroupElement * h = dg->exponentiate(g, sdp.w);
 	SigmaCommonInput* commonInput = new SigmaDlogCommonInput(h);
-	SigmaVerifierComputation* verifierComputation = new SigmaDlogVerifierComputation(dg, sdp.t, get_seeded_random());
+	SigmaVerifierComputation* verifierComputation = new SigmaDlogVerifierComputation(dg, sdp.t,
+		get_seeded_random());
 	SigmaGroupElementMsg* msg1 = new SigmaGroupElementMsg(h->generateSendableData());
 	SigmaBIMsg* msg2 = new SigmaBIMsg();
 	SigmaVerifier* v = new SigmaVerifier(server, verifierComputation, msg1, msg2);
-	v->verify(commonInput);
+	bool verificationPassed = v->verify(commonInput);
+	cout << "Verifer output: " << (verificationPassed? "Success" : "Failure") << endl;
 }
 
 int main(int argc, char* argv[]) {
-	if (argc != 2) {
-		SigmaProtocolExample(argv[0]);
+	if (argc != 3) {
+		SigmaProtocolExampleUsage(argv[0]);
 		return 1;
 	}
+	SigmaDlogParams sdp = readSigmaConfig(argv[2]);
 	string side(argv[1]);
 
 	Logger::configure_logging();
 	boost::asio::io_service io_service;
-	SocketPartyData me(IpAdress::from_string("127.0.0.1"), 1212);
-	SocketPartyData other(IpAdress::from_string("127.0.0.1"), 1213);
-	ChannelServer * server = (side == "1")? new ChannelServer(io_service, me, other) : new ChannelServer(io_service, other, me);
+	SocketPartyData proverParty(sdp.proverIp, sdp.proverPort);
+	SocketPartyData verifierParty(sdp.verifierIp, sdp.verifierPort);
+	ChannelServer * server = (side == "1")? 
+		new ChannelServer(io_service, proverParty, verifierParty) : 
+		new ChannelServer(io_service, verifierParty, proverParty);
 	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 	try {
 		if (side == "1") {
-			run_prover(server);
+			run_prover(server, sdp);
 		}
 		else if (side == "2") {
-			run_verifier(server);
+			run_verifier(server, sdp);
 		}
 		else {
-			SigmaProtocolExample(argv[0]);
+			SigmaProtocolExampleUsage(argv[0]);
 			return 1;
 		}
 	}

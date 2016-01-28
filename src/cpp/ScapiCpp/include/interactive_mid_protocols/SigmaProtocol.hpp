@@ -8,14 +8,12 @@ class CheatAttemptException : public logic_error
 {
 public:
 	CheatAttemptException(const string & msg) : logic_error(msg) {};
-	virtual char const * what() const throw() { return "cheat attempt"; }
 };
 
 class InvalidDlogGroupException : public logic_error
 {
 public:
 	InvalidDlogGroupException(const string & msg) : logic_error(msg) {};
-	virtual char const * what() const throw() { return "invalid dlog"; }
 };
 
 /**
@@ -277,11 +275,8 @@ public:
 		this->proverComputation = proverComputation;
 	}
 	void prove(SigmaProverInput * input) override{
-		cout << "first message starting " << endl;
 		processFirstMsg(input); // step one of the protocol.
-		cout << "second message starting " << endl;
 		processSecondMsg(); // step two of the protocol.
-		cout << "seocond message done" << endl;
 	};
 	/**
 	* Processes the first step of the sigma protocol.<p>
@@ -311,7 +306,6 @@ private:
 	void sendMsgToVerifier(SigmaProtocolMsg * message) { 
 		byte* raw_message = message->toByteArray();
 		int message_size = message->size();
-		cout << "sending message to verifier. Size(2): " << message_size << "message adress: " << raw_message << endl;
 		channel->write_fast(raw_message, message_size);
 	};
 };
