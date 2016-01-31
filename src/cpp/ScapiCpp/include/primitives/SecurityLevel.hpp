@@ -1,5 +1,4 @@
-#ifndef SECURITY_LEVEL_H
-#define SECURITY_LEVEL_H
+#pragma once
 
 /**
 * Many cryptographic primitives and schemes have different security levels.
@@ -68,4 +67,12 @@ class UnlimitedTimes : public OneTime {};
 */
 class ProtocolSecLevel : public SecurityLevel {};
 
-#endif
+class CommitSecLevel : public SecurityLevel {};
+class SecureCommit : public CommitSecLevel {};
+class StatisticallyHidingCmt : public SecureCommit {};
+/**
+* Any commitment scheme that is perfectly hiding should implement this interface.
+*/
+class PerfectlyHidingCmt : public StatisticallyHidingCmt {};
+
+

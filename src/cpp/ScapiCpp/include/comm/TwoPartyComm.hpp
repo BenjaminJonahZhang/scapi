@@ -94,7 +94,6 @@ private:
 	void do_write(const Message & msg);
 	void do_write_fast(byte * data, int len);
 	void handle_write(const boost::system::error_code& error);
-	void handle_write_fast(const boost::system::error_code& error);
 	void do_close() { clientSocket.close(); };
 	void handle_msg(const Message& msg);
 	void handle_read_body(const boost::system::error_code& error);

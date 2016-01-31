@@ -62,7 +62,8 @@ public:
 	* @param challenge
 	* @return the output of the computation - (a, e, eSize, z).
 	*/
-	SigmaSimulatorOutput* simulate(SigmaCommonInput* input, byte* challenge, int challenge_size) override;
+	SigmaSimulatorOutput* simulate(SigmaCommonInput* input, byte* challenge,
+		int challenge_size) override;
 	/**
 	* Computes the simulator computation, using random challenge.<p>
 	* "SAMPLE a random z <- Zq<p>

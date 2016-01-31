@@ -59,7 +59,7 @@ FastGarbledBooleanCircuit * create_circuit(YaoConfig yao_config) {
 }
 
 void execute_party_one(YaoConfig yao_config) {
-	auto start = chrono::system_clock::now();
+	auto start = scapi_now();
 	boost::asio::io_service io_service;
 	SocketPartyData me(yao_config.sender_ip, 1213);
 	SocketPartyData other(yao_config.receiver_ip, 1212);

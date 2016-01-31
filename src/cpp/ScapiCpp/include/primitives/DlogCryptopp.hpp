@@ -25,7 +25,8 @@ CryptoPP::Integer biginteger_to_cryptoppint(biginteger bi);
 */
 class ZpSafePrimeElementCryptoPp : public ZpSafePrimeElement {
 public:
-	ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, bool bCheckMembership) : ZpSafePrimeElement(x, p, bCheckMembership) {};
+	ZpSafePrimeElementCryptoPp(biginteger x, biginteger p, 
+		bool bCheckMembership) : ZpSafePrimeElement(x, p, bCheckMembership) {};
 	ZpSafePrimeElementCryptoPp(biginteger p, mt19937 prg) : ZpSafePrimeElement(p, prg) {};
 	ZpSafePrimeElementCryptoPp(biginteger elementValue) : ZpSafePrimeElement(elementValue) {};
 	virtual string toString() {
@@ -60,7 +61,8 @@ public:
 	* @param g the generator of the group
 	* @param p the prime of the group
 	*/
-	CryptoPpDlogZpSafePrime(string q, string g, string p) : CryptoPpDlogZpSafePrime(new ZpGroupParams(biginteger(q), biginteger(g), biginteger(p))) {};
+	CryptoPpDlogZpSafePrime(string q, string g, string p) : 
+		CryptoPpDlogZpSafePrime(new ZpGroupParams(biginteger(q), biginteger(g), biginteger(p))) {};
 
 	/**
 	* Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams

@@ -21,20 +21,22 @@ public:
 */
 class ZKProverInput {};
 /**
-* This interface is a marker interface for Zero Knowledge input, where there is an implementing class
+* This interface is a marker interface for Zero Knowledge input, 
+* where there is an implementing class
 * for each concrete Zero Knowledge protocol.
 */
 class ZKCommonInput {};
 /**
 * Marker interface for common input of Sigma Protocols.<p>
-* Each Sigma Protocol has a common input for the prover and the verifier, such input should implement this interface.
+* Each Sigma Protocol has a common input for the prover and the verifier, 
+* such input should implement this interface.
 */
 class SigmaCommonInput : public ZKCommonInput {};
 /**
 * Every Sigma protocol prover needs inputs during the protocol execution, but every concrete
 * prover needs different inputs.<p>
-* This interface is a marker interface for Sigma protocol input, where there is an implementing class
-* for each concrete Sigma protocol.
+* This interface is a marker interface for Sigma protocol input, 
+* where there is an implementing class for each concrete Sigma protocol.
 */
 class SigmaProverInput : public ZKProverInput {
 public:
@@ -44,17 +46,20 @@ public:
 	virtual SigmaCommonInput * getCommonParams()=0;
 };
 /**
-* Marker interface. Every Sigma prover or verifier that consists of DamgardJurik should implement this interface.
+* Marker interface. Every Sigma prover or verifier that consists of 
+* DamgardJurik should implement this interface.
 */
 class DJBasedSigma {};
 /**
-* Marker interface. Every Sigma prover or verifier that consists of DlogGroup should implement this interface.
+* Marker interface. Every Sigma prover or verifier that consists of DlogGroup
+* should implement this interface.
 */
 class DlogBasedSigma {};
 /**
 * Every Sigma protocol prover/receiver needs to send messages during the protocol execution.<p>
-* This interface is a marker interface for Sigma protocol message, where there is an implementing class
-* for each concrete Sigma message, like GroupElement message or BigInteger message.
+* This interface is a marker interface for Sigma protocol message, where there
+* is an implementing class for each concrete Sigma message, 
+* like GroupElement message or BigInteger message.
 */
 class SigmaProtocolMsg {
 public:
@@ -64,11 +69,14 @@ public:
 };
 
 /**
-* General interface for Sigma Protocol prover. Every class that implements it is signed as Sigma Protocol prover.<p>
+* General interface for Sigma Protocol prover. Every class that implements it is signed as 
+* Sigma Protocol prover.<p>
 *
-* Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. <p>
-* A sigma protocol is a 3-round proof, comprised of a first message from the prover to the verifier,
-* a random challenge from the verifier and a second message from the prover. <p>
+* Sigma protocols are a basic building block for zero-knowledge, 
+* zero-knowledge proofs of knowledge and more. <p>
+* A sigma protocol is a 3-round proof, comprised of a first message from
+* the prover to the verifier, a random challenge from the verifier and a second message 
+* from the prover. <p>
 * See Hazay-Lindell (chapter 6) for more information.
 */
 class SigmaProtocolProver {
@@ -76,7 +84,8 @@ public:
 	/**
 	* Runs the proof of this protocol. <p>
 	* This function executes the proof at once by calling the following functions one by one. <p>
-	* This function can be called when a user does not want to save time by doing operations in parallel. <p>
+	* This function can be called when a user does not want to save time by 
+	* doing operations in parallel. <p>
 	*/
 	virtual void prove(SigmaProverInput * input) = 0;
 	/**
@@ -86,21 +95,25 @@ public:
 	virtual void processFirstMsg(SigmaProverInput * input)=0;
 	/**
 	* Processes the second step of the sigma protocol. <p>
-	* It receives the challenge from the verifier, computes the second message and then sends it to the verifier. <p>
+	* It receives the challenge from the verifier, computes the second message and then 
+	* sends it to the verifier. <p>
 	* This is a blocking function!
 	*/
 	virtual void processSecondMsg() =0;
 };
 
 /**
- * Every sigma simulator outputs the result in the end of it's compute function, but each one can outputs different values. <p>
- * This interface is a marker interface for Sigma simulator output, where there is an implementing class
+ * Every sigma simulator outputs the result in the end of it's compute function, but each 
+ * one can outputs different values. <p>
+ * This interface is a marker interface for Sigma simulator output, where there is an 
+ * implementing class
  * for each concrete Sigma protocol.
  */
 class SigmaSimulatorOutput {
 public:
 	/**
-	* All SigmaSimulators contains first message, challenge and second message. Returns the first message.
+	* All SigmaSimulators contains first message, challenge and second message. 
+	* Returns the first message.
 	* @return a - first message
 	*/
 	virtual SigmaProtocolMsg * getA()=0;
@@ -118,7 +131,8 @@ public:
 	virtual int getESize() = 0;
 
 	/**
-	* All SigmaSimulators contains first message, challenge and second message. Returns the second message.
+	* All SigmaSimulators contains first message, challenge and second message. 
+	* Returns the second message.
 	* @return z - second message
 	*/
 	virtual SigmaProtocolMsg * getZ() = 0;
@@ -126,7 +140,8 @@ public:
 
 /**
 * General interface for Sigma Protocol Simulator. <p>
-* The simulator is a probabilistic polynomial-time function, that on input x and challenge e outputs
+* The simulator is a probabilistic polynomial-time function, that on input x and 
+* challenge e outputs
 * a transcript of the form (a, e, z) with the same probability distribution as transcripts
 * between the honest prover and verifier on common input x.
 */
@@ -135,7 +150,8 @@ public:
 	/**
 	* Computes the simulator computation.
 	*/
-	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input, byte* challenge, int challenge_size)  =0;
+	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input, 
+		byte* challenge, int challenge_size)  =0;
 
 	/**
 	* Chooses random challenge and computes the simulator computation.
@@ -148,17 +164,22 @@ public:
 };
 
 /**
-* General interface for Sigma Protocol verifier. Every class that implements it is signed as Sigma Protocol verifier.<p>
-* Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. <p>
-* A sigma protocol is a 3-round proof, comprised of a first message from the prover to the verifier,
+* General interface for Sigma Protocol verifier. Every class that implements it is
+* signed as Sigma Protocol verifier.<p>
+* Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs
+* of knowledge and more. <p>
+* A sigma protocol is a 3-round proof, comprised of a first message from the prover to
+* the verifier,
 * a random challenge from the verifier and a second message from the prover. <p>
 * See Hazay-Lindell (chapter 6) for more information.
 */
 class SigmaProtocolVerifier {
 	/**
 	* Runs the verification of this protocol. <p>
-	* This function executes the verification protocol at once by calling the following functions one by one.<p>
-	* This function can be called when a user does not want to save time by doing operations in parallel.
+	* This function executes the verification protocol at once by calling the following.
+	* functions one by one.<p>
+	* This function can be called when a user does not want to save time by doing operations
+	* in parallel.
 	*/
 	virtual bool verify(SigmaCommonInput * input) = 0;
 	/**

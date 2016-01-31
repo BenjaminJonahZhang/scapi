@@ -15,15 +15,18 @@ SigmaDlogSimulator::SigmaDlogSimulator(DlogGroup* dlog, int t, std::mt19937 rand
 	this->dlog = dlog;
 	this->t = t;
 	if (!checkSoundnessParam()) // check the soundness validity.
-		throw invalid_argument("soundness parameter t does not satisfy 2^t<q. q=" + (string)dlog->getOrder() + " t=" + to_string(t) + "\n");
+		throw invalid_argument("soundness parameter t does not satisfy 2^t<q. q=" +
+			(string)dlog->getOrder() + " t=" + to_string(t) + "\n");
 	this->random = random;
 	qMinusOne = dlog->getOrder() - 1;
 }
 
-SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input, byte* challenge, int challenge_size) {
+SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input, 
+	byte* challenge, int challenge_size) {
 	//check the challenge validity.
 	if (!checkChallengeLength(challenge, challenge_size))
-		throw CheatAttemptException("the length of the given challenge is different from the soundness parameter");
+		throw CheatAttemptException(
+			"the length of the given challenge is different from the soundness parameter");
 	SigmaDlogCommonInput* dlogInput = (SigmaDlogCommonInput*)input;
 
 	// SAMPLE a random z <- Zq
@@ -38,7 +41,8 @@ SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input, byte
 	GroupElement* a = dlog->multiplyGroupElements(gToZ, hToE);
 
 	// OUTPUT (a,e,eSize,z).
-	return new SigmaDlogSimulatorOutput(new SigmaGroupElementMsg(a->generateSendableData()), challenge, challenge_size, new SigmaBIMsg(z));
+	return new SigmaDlogSimulatorOutput(new SigmaGroupElementMsg(a->generateSendableData()),
+		challenge, challenge_size, new SigmaBIMsg(z));
 }
 
 SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input) {
@@ -58,7 +62,8 @@ bool SigmaDlogSimulator::checkSoundnessParam() {
 /*   SigmaDlogProverComputation        */
 /***************************************/
 
-SigmaDlogProverComputation::SigmaDlogProverComputation(DlogGroup* dlog, int t, std::mt19937 random) {
+SigmaDlogProverComputation::SigmaDlogProverComputation(DlogGroup* dlog,
+	int t, std::mt19937 random) {
 	this->dlog = dlog;
 	this->t = t;
 	if (!checkSoundnessParam()) // check the soundness validity.
@@ -80,9 +85,11 @@ SigmaProtocolMsg* SigmaDlogProverComputation::computeFirstMsg(SigmaProverInput* 
 
 }
 
-SigmaProtocolMsg* SigmaDlogProverComputation::computeSecondMsg(byte* challenge, int challenge_size) {
+SigmaProtocolMsg* SigmaDlogProverComputation::computeSecondMsg(byte* challenge,
+	int challenge_size) {
 	if (!checkChallengeLength(challenge, challenge_size)) // check the challenge validity.
-		throw CheatAttemptException("the length of the given challenge is different from the soundness parameter");
+		throw CheatAttemptException(
+			"the length of the given challenge is different from the soundness parameter");
 
 	// compute z = (r+ew) mod q
 	biginteger q = dlog->getOrder();
@@ -102,7 +109,8 @@ bool SigmaDlogProverComputation::checkSoundnessParam() {
 /*   SigmaDlogVerifierComputation      */
 /***************************************/
 
-SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog, int t, std::mt19937 random) {
+SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog, 
+	int t, std::mt19937 random) {
 	if (!dlog->validateGroup())
 		throw InvalidDlogGroupException("invalid dlog");
 
@@ -116,13 +124,15 @@ SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog, int 
 void SigmaDlogVerifierComputation::sampleChallenge() {
 	boost::random::uniform_int_distribution<biginteger> ui(0, mp::pow(biginteger(2), t)-1);
 	biginteger e_number = ui(random);
-	cout << "sampled challenge between 0 and: " << mp::pow(biginteger(2), t)-1 << " got: " << e_number << endl;
+	cout << "sampled challenge between 0 and: " << mp::pow(biginteger(2), t)-1 << 
+		" got: " << e_number << endl;
 	eSize = bytesCount(e_number);
 	e = new byte[eSize]; // create a new byte array of size t/8, to get the required byte size.
 	encodeBigInteger(e_number, e, eSize);
 }
 
-bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocolMsg* a, SigmaProtocolMsg* z) {
+bool SigmaDlogVerifierComputation::verify(SigmaCommonInput* input, SigmaProtocolMsg* a,
+	SigmaProtocolMsg* z) {
 	SigmaDlogCommonInput* cInput = (SigmaDlogCommonInput*)input;
 	bool verified = true;
 	SigmaGroupElementMsg* firstMsg = (SigmaGroupElementMsg*)a;

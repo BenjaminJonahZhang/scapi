@@ -17,7 +17,7 @@ struct SigmaDlogParams {
 		this->w = w; // witness
 		this->p = p; // group order - must be prime
 		this->q = q; // sub group order - prime such that p=2q+1
-		this->g = g; // generator of Zd
+		this->g = g; // generator of Zq
 		this->t = t; // soundness param must be: 2^t<q
 		this->proverIp = proverIp;
 		this->verifierIp = verifierIp;

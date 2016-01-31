@@ -101,10 +101,6 @@ void NativeChannel::do_write_fast(byte * data, int len)
 		boost::asio::transfer_all(), ignored_error);
 }
 
-void NativeChannel::handle_write_fast(const boost::system::error_code& error) {
-
-}
-
 void NativeChannel::handle_write(const boost::system::error_code& error)
 {
 	if (!error)

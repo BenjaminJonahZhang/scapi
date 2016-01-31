@@ -58,10 +58,7 @@ public:
 class GroupParams
 {
 private:
-	static const long serialVersionUID = -2073134974201958294L;
-
-protected:
-	biginteger q; //the group order
+	biginteger q; // the group order
 
 public:
 	/*

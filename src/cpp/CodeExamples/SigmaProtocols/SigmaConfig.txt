@@ -1,4 +1,4 @@
-input_section = LARGER
+input_section = VERY_VERY_LARGE
 proverIp      = 127.0.0.1
 verifierIp    = 127.0.0.1
 proverPort    = 1222

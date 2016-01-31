@@ -52,7 +52,7 @@ void SigmaVerifier::sendChallenge() {
 	int challenge_size = verifierComputation->getChallengeSize();
 	if (challenge_size == 0)
 		throw IllegalStateException("challenge_size=0. Make sure that sampleChallenge function is called before sendChallenge");
-
+	
 	// send the challenge.
 	sendChallengeToProver(challenge, challenge_size);
 
