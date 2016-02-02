@@ -121,6 +121,7 @@
     <ClCompile Include="src\infra\ConfigFile.cpp" />
     <ClCompile Include="src\infra\MathAlgorithms.cpp" />
     <ClCompile Include="src\infra\Scanner.cpp" />
+    <ClCompile Include="src\interactive_mid_protocols\CommitmentSchemePedersen.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\OTSemiHonestExtension.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
@@ -157,10 +158,16 @@
     <ClInclude Include="include\infra\Log.hpp" />
     <ClInclude Include="include\infra\MathAlgorithms.hpp" />
     <ClInclude Include="include\infra\Scanner.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\CommitmentScheme.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\CommitmentSchemePedersen.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\OTSemiHonestExtension.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\RandomValue.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocol.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolAnd.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolDlog.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\ZeroKnowledge.hpp" />
+    <ClInclude Include="include\interactive_mid_protocols\ZKPedersen.hpp" />
+    <ClInclude Include="include\mid_layer\PlainText.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogCryptopp.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />

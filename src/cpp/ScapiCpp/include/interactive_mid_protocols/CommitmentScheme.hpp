@@ -65,20 +65,21 @@ public:
 class CmtRTrapdoorCommitPhaseOutput : public CmtRBasicCommitPhaseOutput {
 private:
 	biginteger trap;
+public:
 	/**
 	* Constructor that sets the given commitment id.
 	* @param trapdoor the receiver's trapdoor for this commitment.
 	* @param commitmentId the id of the received commitment message.
 	*/
 	CmtRTrapdoorCommitPhaseOutput(biginteger trapdoor, long commitmentId) :
-		CmtRBasicCommitPhaseOutput(commitmentId) { this->trap = trapdoor; };
-public:
+		CmtRBasicCommitPhaseOutput(commitmentId) {
+		this->trap = trapdoor;
+	};
 	/**
 	* Returns the trapdoor of this commitment.
 	*/
 	biginteger getTrap() { return trap; };
 };
-
 
 /**
 * General interface for commit value.
@@ -244,7 +245,13 @@ public:
 	* @return the commitment object.
 	*/
 	virtual void* getCommitment()=0;
-};
+	/**
+	* Return byte* representation of the message
+	*/
+	virtual byte* toByteArray() = 0;
+	virtual int serializedSize() = 0;
+	virtual void init_from_byte_array(byte* arr, int size) = 0;
+};	
 
 /**
 * General interface for the decommitment message the committer sends to the receiver.
@@ -269,6 +276,7 @@ class CmtCDecommitmentMessage {
 * Receiver; and a decommitment phase in which the the Committer sends the decommitment to the Receiver.
 */
 class CmtCommitter {
+public:
 	/**
 	* Generate a commitment message using the given input and ID.<p>
 	* There are cases when the user wants to commit on the input but remain non-interactive,
@@ -531,7 +539,6 @@ public:
 	*/
 	virtual CmtCommitValue* verifyCommittedValue(long id) = 0;
 };
-
 
 /**
 * Marker interface.

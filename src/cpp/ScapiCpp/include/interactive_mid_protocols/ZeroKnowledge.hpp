@@ -27,12 +27,6 @@
 #include "CommitmentScheme.hpp"
 
 /**
-* This interface is a marker interface for Zero Knowledge input, 
-* where there is an implementing class for each concrete Zero Knowledge protocol.
-*/
-class ZKCommonInput {};
-
-/**
 * A zero-knowledge proof or zero-knowledge protocol is a method by which one party (the prover) 
 * can prove to another party (the verifier) that a given statement is true, without conveying 
 * any additional information apart from the fact that the statement is indeed true.<p>
@@ -48,6 +42,13 @@ public:
 	*/
 	virtual void prove(ZKProverInput* input) = 0;
 };
+
+/**
+* This interface is a general interface that simulates the prover side of the 
+* Zero Knowledge proof of knowledge. <p>
+* Every class that implements it is signed as ZKPOK prover.
+*/
+class ZKPOKProver : public ZKProver {};
 
 /**
 * A zero-knowledge proof or zero-knowledge protocol is a method by which one party (the prover)
@@ -67,6 +68,13 @@ public:
 	*/
 	virtual bool verify(ZKCommonInput* input) = 0;
 };
+
+/**
+* This interface is a general interface that simulates the verifier side of the 
+* Zero Knowledge proof of knowledge. <p>
+* Every class that implements it is signed as ZKPOK verifier.
+*/
+class ZKPOKVerifier : public ZKVerifier {};
 
 /**
 * Concrete implementation of Zero Knowledge prover.<p>
@@ -94,11 +102,7 @@ public:
 	* @param channel used to communicate between prover and verifier.
 	* @param sProver underlying sigma prover to use.
 	*/
-	ZKFromSigmaProver(ChannelServer* channel, SigmaProverComputation* sProver) {
-		this->sProver = sProver;
-		this->receiver = new CmtPedersenReceiver(channel);
-		this->channel = channel;
-	};
+	ZKFromSigmaProver(ChannelServer* channel, SigmaProverComputation* sProver);
 
 	/**
 	* Runs the prover side of the Zero Knowledge proof.<p>
@@ -204,12 +208,7 @@ public:
 	* @param sVerifier underlying sigma verifier to use.
 	*/
 	ZKFromSigmaVerifier(ChannelServer* channel, SigmaVerifierComputation* sVerifier,
-		std::mt19937 random) {
-		this->channel = channel; 
-		this->sVerifier = sVerifier;
-		this->committer = new CmtPedersenCommitter(channel);
-		this->random = random;
-	};
+		std::mt19937 random);
 
 	/**
 	* Runs the verifier side of the Zero Knowledge proof.<p>
@@ -267,3 +266,4 @@ private:
 		return sVerifier->verify(input, a, z);
 	};
 };
+

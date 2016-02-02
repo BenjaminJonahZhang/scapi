@@ -1,6 +1,7 @@
 #include "SigmaProtocolExample.hpp"
 
 
+
 struct SigmaDlogParams {
 	biginteger w;
 	biginteger p;

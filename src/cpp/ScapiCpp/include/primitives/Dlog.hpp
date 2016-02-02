@@ -57,7 +57,7 @@ public:
 */
 class GroupParams
 {
-private:
+protected:
 	biginteger q; // the group order
 
 public:

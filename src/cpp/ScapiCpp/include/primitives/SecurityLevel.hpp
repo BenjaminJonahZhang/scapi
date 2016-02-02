@@ -76,3 +76,8 @@ class StatisticallyHidingCmt : public SecureCommit {};
 class PerfectlyHidingCmt : public StatisticallyHidingCmt {};
 
 
+class SecurityLevelException : public logic_error
+{
+public:
+	SecurityLevelException(const string & msg) : logic_error(msg) {};
+};

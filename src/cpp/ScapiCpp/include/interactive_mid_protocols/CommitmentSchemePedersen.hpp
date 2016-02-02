@@ -1,6 +1,8 @@
 #pragma once
+
 #include "CommitmentScheme.hpp"
 #include "../comm/TwoPartyComm.hpp"
+#include "ZKPedersen.hpp"
 #include <map>
 
 
@@ -13,6 +15,7 @@ class CmtPedersenCommitmentMessage : public CmtCCommitmentMsg{
 private:
 	GroupElementSendableData* c;
 	long id; // the id of the commitment
+	int serializedSize_;
 public:
 	/**
 	* Constructor that sets the commitment and id.
@@ -26,6 +29,21 @@ public:
 
 	void* getCommitment() override { return c; };
 	long getId() override { return id; };
+	byte* toByteArray() override {
+		byte* byteGe = c->toByteArray();
+		int idSize = bytesCount(id);
+		byte* bytesId = new byte[idSize];
+		encodeBigInteger(id, bytesId, idSize);
+		int geSize = c->getSerializedSize();
+		serializedSize_ = idSize + geSize;
+		byte * result = new byte[serializedSize_];
+		copy(byteGe, byteGe + geSize, result);
+		copy(bytesId, bytesId + idSize, result + geSize);
+	}
+	virtual int serializedSize() override { return serializedSize_; };
+	void init_from_byte_array(byte* arr, int size) { //TBD
+	};
+
 };
 
 /**
@@ -42,10 +60,10 @@ public:
 	* @param x the committed value
 	* @param r the random value used for commit.
 	*/
-	CmtPedersenDecommitmentMessage(BigInteger x, BigIntegerRandomValue r) {
+	CmtPedersenDecommitmentMessage(biginteger x, BigIntegerRandomValue* r) {
 		this->x = x;
 		this->r = r;
-		this->len = byteCount(x);
+		this->len = bytesCount(x);
 	};
 	/**
 	* Returns the committed value.
@@ -62,7 +80,6 @@ public:
 /**
 * This class holds the value sent by the receiver to the committer in the pre-process
 * phase which is part of the initialization stage.
-*
 */
 class CmtPedersenPreprocessMessage{
 private:
@@ -74,7 +91,8 @@ public:
 	*/
 	CmtPedersenPreprocessMessage(GroupElementSendableData* h) { this->h = h; };
 	/**
-	* This function return the h values which is calculated by the receiver in the pre-process phase as follows:
+	* This function return the h values which is calculated by the receiver in the pre-process
+	* phase as follows:
 	* SAMPLE a random value a in  Zq
 	* COMPUTE h = g^a
 	* SEND h to Committer.
@@ -132,7 +150,6 @@ public:
 	*/
 	void* getComputedCommitment() override { return computedCommitment; };
 };
-
 
 /*
 * This abstract class performs all the core functionality of the receiver side of Pedersen commitment.
@@ -312,7 +329,6 @@ private:
 	* @param random
 	*/
 	void doConstruct(ChannelServer* channel, DlogGroup* dlog, std::mt19937 randomm);
-
 	/**
 	* Runs the preprocess phase of the commitment scheme:
 	* "WAIT for h from R
@@ -339,7 +355,6 @@ public:
 	* "SAMPLE a random value r <- Zq<P>
 	* 	COMPUTE  c = g^r * h^x<P>
 	* 	SEND c".
-	* @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
 	*/
 	void commit(CmtCommitValue* in, long id) override;
 	CmtCDecommitmentMessage* generateDecommitmentMsg(long id) override;
@@ -351,7 +366,9 @@ public:
 	void decommit(long id) override;
 	
 	void** getPreProcessValues() override;
-	void* getCommitmentPhaseValues(long id) override{ return commitmentMap.get(id); };
+	CmtCommitmentPhaseValues* getCommitmentPhaseValues(long id) override{
+		return commitmentMap[id]; 
+	};
 };
 
 /**
@@ -364,73 +381,30 @@ public:
 */
 class CmtPedersenCommitter : public CmtPedersenCommitterCore, public CmtCommitter, 
 	public PerfectlyHidingCmt, public CmtOnBigInteger {
-
+public:
 	/**
-	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
+	* Constructor that receives a connected channel (to the receiver) 
+	* and chooses default dlog and random.
 	* The receiver needs to be instantiated with the default constructor too.
 	* @param channel
-	* @throws ClassNotFoundException in case there was a problem in the serialization in the preprocess phase.
-	* @throws IOException in case there was a problem in the communication in the preprocess phase.
-	* @throws CheatAttemptException in case the committer suspects the receiver cheated in the preprocess phase.
 	*/
-	public CmtPedersenCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
-		super(channel);
-	}
-
-		/**
-		* Constructor that receives a connected channel (to the receiver), the DlogGroup agreed upon between them and a SecureRandom object.
-		* The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
-		* @param channel
-		* @param dlog
-		* @param random
-		* @throws SecurityLevelException if the given dlog is not DDH secure
-		* @throws InvalidDlogGroupException if the given dlog is not valid.
-		* @throws ClassNotFoundException if there was a problem in the serialization
-		* @throws IOException if there was a problem in the communication
-		* @throws CheatAttemptException if the receiver h is not in the DlogGroup.
-		*/
-		public CmtPedersenCommitter(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
-		super(channel, dlog, random);
-	}
-
-		@Override
-		public CmtCommitValue generateCommitValue(byte[] x) {
-		//In case that x is negative, pad the byte array with the byte '1' to make it positive.
-		//This is also solve the case that the first byte in x is zero. 
-		//In that case the conversion to BigInteger ignores the first byte and therefore 
-		//the conversion back to byte array is wrong.
-		byte[] positiveArr = new byte[x.length + 1];
-		positiveArr[0] = 1;
-		System.arraycopy(x, 0, positiveArr, 1, x.length);
-
-		return new CmtBigIntegerCommitValue(new BigInteger(positiveArr));
-	}
+	CmtPedersenCommitter(ChannelServer* channel) : CmtPedersenCommitterCore(channel) {};
 
 	/**
-	* This function converts the given commit value to a byte array.
-	* @param value
-	* @return the generated bytes.
+	* Constructor that receives a connected channel (to the receiver), 
+	* the DlogGroup agreed upon between them and a SecureRandom object.
+	* The Receiver needs to be instantiated with the same DlogGroup, 
+	* otherwise nothing will work properly.
+	* @param channel
+	* @param dlog
+	* @param random
 	*/
-	public byte[] generateBytesFromCommitValue(CmtCommitValue value) {
-		if (!(value instanceof CmtBigIntegerCommitValue))
-			throw new IllegalArgumentException("The given value must be of type CmtBigIntegerCommitValue");
-		//Remove the first byte of BigInteger in order to get the original x.
-		byte[] biBytes = ((BigInteger)value.getX()).toByteArray();
-		byte[] x = new byte[biBytes.length - 1];
-		System.arraycopy(biBytes, 1, x, 0, biBytes.length - 1);
-		return x;
-	}
-
-	/**
-	* This function samples random commit value and returns it.
-	* @return the sampled commit value
-	*/
-	public CmtCommitValue sampleRandomCommitValue() {
-		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
-		BigInteger val = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		return new CmtBigIntegerCommitValue(val);
-	}
-
+	CmtPedersenCommitter(ChannelServer* channel, DlogGroup* dlog, std::mt19937 random) :
+		CmtPedersenCommitterCore(channel, dlog, random) {};
+	
+	CmtCommitValue* generateCommitValue(byte* x, int len) override;
+	byte* generateBytesFromCommitValue(CmtCommitValue* value) override;
+	CmtCommitValue* sampleRandomCommitValue() override;
 };
 
 /**
@@ -461,7 +435,7 @@ public:
 	* @throws InvalidDlogGroupException if the given dlog is not valid.
 	* @throws IOException if there was a problem in the communication
 	*/
-	CmtPedersenReceiver(ChannelServer channel, DlogGroup* dlog, std::mt19937 random) :
+	CmtPedersenReceiver(ChannelServer* channel, DlogGroup* dlog, std::mt19937 random) :
 		CmtPedersenReceiverCore(channel, dlog, random) {};
 
 	/**
@@ -470,4 +444,178 @@ public:
 	* @return the generated bytes.
 	*/
 	byte* generateBytesFromCommitValue(CmtCommitValue* value) override;
+};
+
+/**
+* Concrete implementation of committer with proofs.
+* This implementation uses ZK based on SigmaPedersenKnowledge and SIgmaPedersenCommittedValue.
+*/
+class CmtPedersenWithProofsCommitter : public CmtPedersenCommitter, public CmtWithProofsCommitter {
+private:
+	// proves that the committer knows the committed value.
+	ZKPOKFromSigmaCmtPedersenProver* knowledgeProver;
+	// proves that the committed value is x.
+	// usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to prove committed value.
+	// in Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
+	// in order to be able to use the Pedersen scheme we need to prove committed value with ZKPOK instead.
+	ZKPOKFromSigmaCmtPedersenProver* committedValProver;
+	
+	/**
+	* Creates the ZK provers using sigma protocols that prove Pedersen's proofs.
+	* @param t
+	*/
+	void doConstruct(int t);
+
+public:
+	/**
+	* Default constructor that gets the channel and creates the ZK provers with default Dlog group.
+	* @param channel
+	*/
+	CmtPedersenWithProofsCommitter(ChannelServer* channel, int statisticalParamater) :
+		CmtPedersenCommitter(channel) { doConstruct(statisticalParamater); };
+
+	/**
+	* Constructor that gets the channel, dlog, statistical parameter and random and uses them to
+	* create the ZK provers.
+	* @param channel
+	* @param dlog
+	* @param t statistical parameter
+	* @param random
+	*/
+	CmtPedersenWithProofsCommitter(ChannelServer* channel, DlogGroup* dlog, int t, 
+		std::mt19937 random) : CmtPedersenCommitter(channel, dlog, random) { doConstruct(t); };
+	void proveKnowledge(long id) override;
+	void proveCommittedValue(long id) override;
+};
+
+/**
+* Concrete implementation of receiver with proofs.
+* This implementation uses ZK based on SigmaPedersenKnowledge and SIgmaPedersenCommittedValue.
+*/
+class CmtPedersenWithProofsReceiver : public CmtPedersenReceiver, public CmtWithProofsReceiver {
+private:
+	// Verifies that the committer knows the committed value.
+	ZKPOKFromSigmaCmtPedersenVerifier* knowledgeVerifier;
+	// Verifies that the committed value is x.
+	// Usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to verify committed value.
+	// In Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
+	// In order to be able to use the Pedersen scheme we need to verify committed value with ZKPOK instead.
+	ZKPOKFromSigmaCmtPedersenVerifier* committedValVerifier;
+	/**
+	* Creates the ZK verifiers using sigma protocols that verifies Pedersen's proofs.
+	* @param t
+	*/
+	void doConstruct(int t);
+public:
+	/**
+	* Default constructor that gets the channel and creates the ZK verifiers with default Dlog group.
+	* @param channel
+	*/
+	CmtPedersenWithProofsReceiver(ChannelServer* channel, int t) : CmtPedersenReceiver(channel) {
+		doConstruct(t);
+	};
+
+	/**
+	* Constructor that gets the channel, dlog, statistical parameter and random and uses them to create the ZK provers.
+	* @param channel
+	* @param dlog
+	* @param t statistical parameter
+	* @param random
+	*/
+	CmtPedersenWithProofsReceiver(ChannelServer* channel, DlogGroup* dlog, int t,
+		std::mt19937 random) : CmtPedersenReceiver(channel, dlog, random) { doConstruct(t); };
+
+	bool verifyKnowledge(long id) override;
+	
+	CmtBigIntegerCommitValue* verifyCommittedValue(long id) override;
+};
+
+/**
+* Concrete implementation of committer that executes the Pedersen trapdoor commitment
+* scheme in the committer's point of view.<p>
+* This commitment is also a trapdoor commitment in the sense that the receiver after
+* the commitment phase has a trapdoor value, that if known by the committer would enable
+* it to decommit to any value. <p>
+* This trapdoor is output by the receiver and can be used by a higher-level application
+* (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).<p>
+*
+* For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i>
+* by Hazay-Lindell.<p>
+*
+* The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes document 
+* at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+*/
+class CmtPedersenTrapdoorCommitter : public CmtPedersenCommitter, public CmtCommitter, 
+	public PerfectlyHidingCmt, public CmtOnBigInteger {
+
+	/**
+	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
+	* The receiver needs to be instantiated with the default constructor too.
+	* @param channel
+	*/
+	CmtPedersenTrapdoorCommitter(ChannelServer* channel) : CmtPedersenCommitter(channel) {};
+
+	/**
+	* Constructor that receives a connected channel (to the receiver), the DlogGroup agreed upon between them and a SecureRandom object.
+	* The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	* @param channel
+	* @param dlog
+	* @param random
+	*/
+	CmtPedersenTrapdoorCommitter(ChannelServer* channel, DlogGroup* dlog, std::mt19937 random) :
+		CmtPedersenCommitter(channel, dlog, random) {};
+
+	/**
+	* Validate the h value received from the receiver in the pre process phase.
+	* @param trap the trapdoor outputed from the receiver's commit phase.
+	* @return true, if valid; false, otherwise.
+	*/
+	bool validate(CmtRCommitPhaseOutput* trap);
+};
+
+/**
+* Concrete implementation of receiver that executes the Pedersen trapdoor commitment
+* scheme in the receiver's point of view.<p>
+* This commitment is also a trapdoor commitment in the sense that the receiver after
+* the commitment phase has a trapdoor value, that if known by the committer would enable
+* it to decommit to any value. <p>
+* This trapdoor is output by the receiver and can be used by a higher-level application
+* (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).<p>
+* For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i>
+* by Hazay-Lindell.<p>
+* The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes 
+* document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+*/
+class CmtPedersenTrapdoorReceiver : public CmtPedersenReceiver, public CmtReceiver, 
+	public PerfectlyHidingCmt, public CmtOnBigInteger {
+public:
+	/**
+	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
+	* The committer needs to be instantiated with the default constructor too.
+	* @param ServerChannel
+	*/
+	CmtPedersenTrapdoorReceiver(ChannelServer* channel) : CmtPedersenReceiver(channel) {};
+
+	/**
+	* Constructor that receives a connected channel (to the receiver), 
+	* the DlogGroup agreed upon between them and a SecureRandom object.
+	* The committer needs to be instantiated with the same DlogGroup, 
+	* otherwise nothing will work properly.
+	* @param channel
+	* @param dlog
+	* @param random
+	*/
+	CmtPedersenTrapdoorReceiver(ChannelServer* channel, DlogGroup* dlog, std::mt19937 random) :
+		CmtPedersenReceiver(channel, dlog, random) {};
+
+	/**
+	* Returns the receiver's trapdoor from the preprocess phase.
+	*/
+	biginteger getTrapdoor() { return trapdoor; };
+	CmtRBasicCommitPhaseOutput* receiveCommitment() override {
+		// get the output from the super.receiverCommiotment.
+		CmtRBasicCommitPhaseOutput* output = this->receiveCommitment();
+		// wrap the output with the trapdoor.
+		return new CmtRTrapdoorCommitPhaseOutput(trapdoor, output->getCommitmentId()); 
+	};
 };

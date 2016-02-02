@@ -43,6 +43,9 @@
     <Filter Include="Source Files\InteractiveMidProtocols">
       <UniqueIdentifier>{3d3b1c69-225b-48bc-b76c-866a5ded37d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MidLayer">
+      <UniqueIdentifier>{8599081e-49bd-4ae0-acf1-4c86b5c6e861}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -112,6 +115,9 @@
       <Filter>Source Files\InteractiveMidProtocols</Filter>
     </ClCompile>
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolDlog.cpp">
+      <Filter>Source Files\InteractiveMidProtocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\interactive_mid_protocols\CommitmentSchemePedersen.cpp">
       <Filter>Source Files\InteractiveMidProtocols</Filter>
     </ClCompile>
   </ItemGroup>
@@ -210,6 +216,24 @@
       <Filter>Header Files\InteractiveMidProtocols</Filter>
     </ClInclude>
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolDlog.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\ZeroKnowledge.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mid_layer\PlainText.hpp">
+      <Filter>Header Files\MidLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\RandomValue.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\CommitmentScheme.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\CommitmentSchemePedersen.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\ZKPedersen.hpp">
       <Filter>Header Files\InteractiveMidProtocols</Filter>
     </ClInclude>
   </ItemGroup>
