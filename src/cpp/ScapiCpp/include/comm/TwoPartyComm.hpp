@@ -4,6 +4,7 @@
 #include <boost/system/error_code.hpp>
 #include <boost/bind.hpp>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 #include "Message.hpp"
 #include "Comm.hpp"
