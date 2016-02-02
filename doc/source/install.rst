@@ -16,6 +16,15 @@ There are a few prerequisites you must install before being able to compile scap
 2.  Install `java`_, `junit4`_, and `ant`_
 3.  Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc. Under Ubuntu you can simply run ``sudo apt-get install build-essential``.
 
+On Ubuntu environment is should look like: ::
+
+  $ sudo apt-get update
+  $ sudo apt-get install git
+  $ sudo apt-get install default-jre
+  $ sudo apt-get install default-jdk
+  $ sudo apt-get install build-essential
+  $ sudo apt-get install ant
+
 .. _`Mac OS X`:
 
 Prerequisites on Mac OS X
