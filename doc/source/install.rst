@@ -24,6 +24,7 @@ On Ubuntu environment is should look like: ::
   $ sudo apt-get install default-jdk
   $ sudo apt-get install build-essential
   $ sudo apt-get install ant
+  $ sudo apt-get install junit4
 
 .. _`Mac OS X`:
 
