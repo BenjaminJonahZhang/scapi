@@ -30,8 +30,7 @@ void CmtPedersenReceiverCore::doConstruct(ChannelServer* channel, DlogGroup* dlo
 }
 
 void CmtPedersenReceiverCore::preProcess() {
-	boost::random::uniform_int_distribution<biginteger> ui(0, qMinusOne);
-	trapdoor = ui(random);
+	trapdoor = getRandomInRange(0, qMinusOne, random);
 	h = dlog->exponentiate(dlog->getGenerator(), trapdoor);
 	auto sendableData = h->generateSendableData();
 	byte* raw_msg = sendableData->toByteArray();

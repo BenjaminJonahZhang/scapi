@@ -157,9 +157,8 @@ TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 
 	SECTION("generating random from range")
 	{
-		boost::random::uniform_int_distribution<biginteger> ui(0, 100);
 		for (int i = 0; i < 100; ++i) {
-			biginteger randNum = ui(gen);
+			biginteger randNum = getRandomInRange(0, 100, gen);
 			REQUIRE((randNum >= 0 && randNum <= 100));
 		}
 	}

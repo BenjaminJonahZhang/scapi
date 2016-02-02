@@ -60,9 +60,9 @@ RSAElement::RSAElement(biginteger modN){
 	biginteger randNumber;
 	int numbit = NumberOfBits(modN);
 	biginteger expo = mp::pow(biginteger(2), numbit-1);
-	boost::random::uniform_int_distribution<biginteger> ui(0, expo);
 	do {
-		randNumber = ui(generator); // samples a random BigInteger with modN.bitLength()+1 bits
+		// samples a random BigInteger with modN.bitLength()+1 bits
+		randNumber = getRandomInRange(0, expo, generator); 
 	} while (randNumber > (modN - 2)); // drops the element if it's bigger than mod(N)-2
 	// gets a random biginteger between 1 to modN-1
 	randNumber += 1;

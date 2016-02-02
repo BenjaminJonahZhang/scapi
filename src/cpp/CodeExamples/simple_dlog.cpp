@@ -1,5 +1,4 @@
 #include "../ScapiCpp/include/primitives/DlogOpenSSL.hpp"
-#include <boost/random.hpp>
 #include <iostream>
 
 int main20(){
@@ -13,8 +12,7 @@ int main20(){
 
 	// create a random exponent r
 	mt19937 gen(get_seeded_random());
-	boost::random::uniform_int_distribution<biginteger> ui(0, q - 1);
-	biginteger r = ui(gen);
+	biginteger r = getRandomInRange(0, q - 1, gen);
 
 	// exponentiate g in r to receive a new group element
 	GroupElement * g1 = dlog->exponentiate(g, r);

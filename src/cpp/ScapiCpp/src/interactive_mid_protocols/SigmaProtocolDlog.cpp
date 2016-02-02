@@ -30,8 +30,7 @@ SigmaSimulatorOutput* SigmaDlogSimulator::simulate(SigmaCommonInput* input,
 	SigmaDlogCommonInput* dlogInput = (SigmaDlogCommonInput*)input;
 
 	// SAMPLE a random z <- Zq
-	boost::random::uniform_int_distribution<biginteger> ui(0, qMinusOne);
-	biginteger z = ui(random);
+	biginteger z = getRandomInRange(0, qMinusOne, random);
 
 	// COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)
 	GroupElement* gToZ = dlog->exponentiate(dlog->getGenerator(), z);
@@ -75,8 +74,7 @@ SigmaDlogProverComputation::SigmaDlogProverComputation(DlogGroup* dlog,
 SigmaProtocolMsg* SigmaDlogProverComputation::computeFirstMsg(SigmaProverInput* input) {
 	this->input = (SigmaDlogProverInput*)input;
 	// sample random r in Zq
-	boost::random::uniform_int_distribution<biginteger> ui(0, qMinusOne);
-	r = ui(random);
+	r = getRandomInRange(0, qMinusOne, random);
 	// compute a = g^r.
 	GroupElement* a = dlog->exponentiate(dlog->getGenerator(), r);
 	auto x = a->generateSendableData();
@@ -122,8 +120,7 @@ SigmaDlogVerifierComputation::SigmaDlogVerifierComputation(DlogGroup* dlog,
 }
 
 void SigmaDlogVerifierComputation::sampleChallenge() {
-	boost::random::uniform_int_distribution<biginteger> ui(0, mp::pow(biginteger(2), t)-1);
-	biginteger e_number = ui(random);
+	biginteger e_number = getRandomInRange(0, mp::pow(biginteger(2), t) - 1, random);
 	cout << "sampled challenge between 0 and: " << mp::pow(biginteger(2), t)-1 << 
 		" got: " << e_number << endl;
 	eSize = bytesCount(e_number);

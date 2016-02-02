@@ -67,3 +67,5 @@ string hexStr(vector<byte> const & data);
 void print_elapsed_ms(std::chrono::time_point<std::chrono::system_clock> start, string message);
 
 std::chrono::time_point<std::chrono::system_clock> scapi_now();
+
+biginteger getRandomInRange(biginteger min, biginteger max, std::mt19937 random);

@@ -24,9 +24,8 @@ ZpSafePrimeElement::ZpSafePrimeElement(biginteger x, biginteger p, bool bCheckMe
 ZpSafePrimeElement::ZpSafePrimeElement(biginteger p, mt19937 prg)
 {
 	// find a number in the range [1, ..., p-1]
-	boost::random::uniform_int_distribution<biginteger> ui(1, p - 1);
-	biginteger rand_in_range = ui(prg);
-	//calculate its power to get a number in the subgroup and set the power as the element. 
+	biginteger rand_in_range = getRandomInRange(1, p - 1, prg);
+	// calculate its power to get a number in the subgroup and set the power as the element. 
 	element = boost::multiprecision::powm(rand_in_range, 2, p);
 }
 
@@ -114,8 +113,8 @@ GroupElement * DlogGroupAbs::createRandomElement() {
 	// This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
 	// However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
 	// Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
-	boost::random::uniform_int_distribution<biginteger> ui(1, groupParams->getQ() - 1);
-	biginteger randNum = ui(random_element_gen);
+	biginteger randNum = getRandomInRange(1, groupParams->getQ() - 1, random_element_gen);
+
 	// compute g^x to get a new element
 	return exponentiate(generator, randNum);
 }
