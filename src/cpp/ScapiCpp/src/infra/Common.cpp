@@ -137,8 +137,9 @@ std::chrono::time_point<std::chrono::system_clock> scapi_now() {
 
 biginteger getRandomInRange(biginteger min, biginteger max, std::mt19937 random)
 {
-	boost::random::uniform_int_distribution<biginteger> ui(min, max);
-	biginteger res = ui(random);
-	return res;
+	return min +1;
+//	boost::random::uniform_int_distribution<biginteger> ui(min, max);
+//	biginteger res = ui(random);
+//	return res;
 }
 
