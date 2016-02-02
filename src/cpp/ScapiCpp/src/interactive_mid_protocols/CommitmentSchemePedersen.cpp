@@ -48,4 +48,5 @@ CmtRBasicCommitPhaseOutput* CmtPedersenReceiverCore::receiveCommitment() {
 
 	//commitmentMap.put(Long.valueOf(msg.getId()), msg);
 	//return new CmtRBasicCommitPhaseOutput(msg.getId());
+	return NULL;
 }

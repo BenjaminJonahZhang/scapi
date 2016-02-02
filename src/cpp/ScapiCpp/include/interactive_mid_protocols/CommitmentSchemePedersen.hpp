@@ -379,8 +379,8 @@ public:
 * The pseudo code of this protocol can be found in Protocol 3.1 of pseudo codes 
 * document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
 */
-class CmtPedersenCommitter : public CmtPedersenCommitterCore, public CmtCommitter, 
-	public PerfectlyHidingCmt, public CmtOnBigInteger {
+class CmtPedersenCommitter : public CmtPedersenCommitterCore, public PerfectlyHidingCmt, 
+	public CmtOnBigInteger {
 public:
 	/**
 	* Constructor that receives a connected channel (to the receiver) 
@@ -415,7 +415,7 @@ public:
 * The pseudo code of this protocol can be found in Protocol 3.1 of pseudo codes 
 * document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf} .<p>
 */
-class CmtPedersenReceiver : public CmtPedersenReceiverCore, public CmtReceiver, 
+class CmtPedersenReceiver : public CmtPedersenReceiverCore, 
 	public PerfectlyHidingCmt, public CmtOnBigInteger {
 public:
 	/**
@@ -545,8 +545,7 @@ public:
 * The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes document 
 * at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
 */
-class CmtPedersenTrapdoorCommitter : public CmtPedersenCommitter, public CmtCommitter, 
-	public PerfectlyHidingCmt, public CmtOnBigInteger {
+class CmtPedersenTrapdoorCommitter : public CmtPedersenCommitter {
 
 	/**
 	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
@@ -586,8 +585,7 @@ class CmtPedersenTrapdoorCommitter : public CmtPedersenCommitter, public CmtComm
 * The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes 
 * document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
 */
-class CmtPedersenTrapdoorReceiver : public CmtPedersenReceiver, public CmtReceiver, 
-	public PerfectlyHidingCmt, public CmtOnBigInteger {
+class CmtPedersenTrapdoorReceiver : public CmtPedersenReceiver {
 public:
 	/**
 	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.

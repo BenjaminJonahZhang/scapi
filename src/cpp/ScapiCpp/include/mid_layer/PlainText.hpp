@@ -109,7 +109,7 @@ public:
 	}
 
 	// Nested class that holds the sendable data of the outer class
-	static class GroupElementPlaintextSendableData : public PlaintextSendableData {
+	class GroupElementPlaintextSendableData : public PlaintextSendableData {
 	private:
 		GroupElementSendableData*  groupElementData;
 	public:
