@@ -17,6 +17,7 @@ but the scapi team is working these days on expending the c++ implementaion furt
 Prerequisites on Linux
 ---------------------
 There are a few prerequisites you must install before being able to compile scapi on your machine. 
+First you'll need to intall scapi for java first - see `scapi_java`_
 You'll need to install:
 
 1. Install `git`_
@@ -42,6 +43,8 @@ Installing Scapi from Source (On UNIX-based Operating Systems)
 In order to install scapi: ::
 
   $ git clone git://github.com/cryptobiu/scapi.git
+  $ git submodule init
+  $ git submodule update
   $ cd scapi/src/cpp/ScapiCpp
   $ make
   
@@ -92,3 +95,5 @@ The c++ implementation usally follows the same concept except when language spec
 .. _boost: http://www.boost.org/
 .. _cryptopp: https://www.cryptopp.com/
 .. _OpenSSL: https://www.openssl.org/
+.. _scapi_java: https://github.com/cryptobiu/scapi/edit/master/doc/source/install.rst
+
