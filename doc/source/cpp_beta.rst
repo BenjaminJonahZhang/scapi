@@ -32,8 +32,8 @@ On Ubuntu environment is should look like: ::
   $ sudo apt-get install build-essential
   $ sudo apt-get install git
   $ sudo apt-get install libboost-all-dev
-  $ sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
-  $ sudo apt-get install libssl-ocaml-dev libsslcommon2-dev
+  $ sudo apt-get install libcrypto++9v5:i386 libcrypto++9v5-dbg:i386
+  $ sudo apt-get install libssl-ocaml-dev libssl-dev
   
 .. _Source:
 
@@ -71,7 +71,7 @@ Can look at the different make file for reference. We inlcuded few sample files 
   $ ./simple_dlog.exe
   $ ./simple_sha1.exe
 
-More advenced examples can be found under Yao folder. This example require two instance running on the same machine. To compile and run: ::
+More advanced examples can be found under Yao folder. This example require two instance running on the same machine. To compile and run: ::
 
   $ cd scapi/src/cpp/CodeExamples/Yao
   $ make
@@ -86,7 +86,7 @@ and in another instance: ::
 Further Reading
 ---------------
 
-For furthre reading - refer to the extensive Java documentation. 
+For further reading - refer to the extensive Java documentation. 
 The c++ implementation usally follows the same concept except when language specific need required some change.
  
   
