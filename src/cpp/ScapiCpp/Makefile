@@ -5,7 +5,7 @@ CPP_FILES :=$(wildcard src/*/*.cpp)
 OBJ_FILES := $(patsubst src/%.cpp,obj/%.$(OBJ_EXT),$(CPP_FILES))
 OUT_DIR = obj obj/circuits obj/comm obj/infra obj/interactive_mid_protocols obj/primitives
 
-CPP_OPTIONS:= -std=c++11 -lcrypto++ -lcrypto -L/usr/lib -maes -mpclmul -DBOOST_LOG_DYN_LINK
+CPP_OPTIONS:= -std=c++11 -I../../../../boost_1_60_0  -lcrypto++ -lcrypto -L/usr/lib -maes -mpclmul -DBOOST_LOG_DYN_LINK
 CPP_LINK_OPTIONS:= -lcrypto++ -lcrypto
 
 all:: directories $(SLib)
