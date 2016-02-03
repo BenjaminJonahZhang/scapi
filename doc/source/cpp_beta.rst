@@ -32,7 +32,7 @@ On Ubuntu environment is should look like: ::
   $ sudo apt-get install build-essential
   $ sudo apt-get install git
   $ sudo apt-get install libboost-all-dev
-  $ sudo apt-get install libcrypto++9v5:i386 libcrypto++9v5-dbg:i386
+  $ sudo apt-get install libcrypto++9v5 libcrypto++9v5-dbg
   $ sudo apt-get install libssl-ocaml-dev libssl-dev
   
 .. _Source:
