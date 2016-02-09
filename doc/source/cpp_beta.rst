@@ -22,7 +22,7 @@ You'll need to install:
 
 1. Install `git`_
 2. Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc.
-3. Install `boost`_ make sure you are installing version 1_60. Follow instructions in the link. boost lib should be installed under ~/boost_1_60_0
+3. Install `boost`_ make sure you are installing version 1_60. Follow instructions in the link. boost lib should be installed under ~/boost_1_60_0. Notice - there is no need to build boost - only the src is enough
 4. Install `cryptopp`_
 5. Install `OpenSSL`_
 
