@@ -49,7 +49,7 @@ void SigmaProtocolExampleUsage(char * argv0) {
 }
 
 void run_prover(ChannelServer * server, SigmaDlogParams sdp) {
-	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), 
+	DlogGroup * dg = new OpenSSLDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p),
 		get_seeded_random());
 
 	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
@@ -63,7 +63,7 @@ void run_prover(ChannelServer * server, SigmaDlogParams sdp) {
 }
 
 void run_verifier(ChannelServer* server, SigmaDlogParams sdp) {
-	DlogGroup * dg = new CryptoPpDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p), 
+	DlogGroup * dg = new OpenSSLDlogZpSafePrime(new ZpGroupParams(sdp.q, sdp.g, sdp.p),
 		get_seeded_random());
 
 	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
