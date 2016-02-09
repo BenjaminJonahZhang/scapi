@@ -22,7 +22,7 @@ You'll need to install:
 
 1. Install `git`_
 2. Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc.
-3. Install `boost`_
+3. Install `boost`_ make sure you are installing version 1_60. Follow instructions in the link. boost lib should be installed under ~/boost_1_60_0
 4. Install `cryptopp`_
 5. Install `OpenSSL`_
 
@@ -31,9 +31,12 @@ On Ubuntu environment is should look like: ::
   $ sudo apt-get update
   $ sudo apt-get install build-essential
   $ sudo apt-get install git
-  $ sudo apt-get install libboost-all-dev
   $ sudo apt-get install libcrypto++9v5 libcrypto++9v5-dbg
-  $ sudo apt-get install libssl-ocaml-dev libssl-dev
+  $ sudo apt-get install libssl-ocaml-dev libssl-dev  
+  $ cd ~ 
+  $ wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download
+  $ tar -xvf ./download
+  
   
 .. _Source:
 
@@ -92,7 +95,7 @@ The c++ implementation usally follows the same concept except when language spec
   
 .. _git: http://git-scm.org/
 .. _gcc: http://gcc.gnu.org/
-.. _boost: http://www.boost.org/
+.. _boost: http://www.boost.org/doc/libs/1_60_0/more/getting_started/unix-variants.html
 .. _cryptopp: https://www.cryptopp.com/
 .. _OpenSSL: https://www.openssl.org/
 .. _scapi_java: https://github.com/cryptobiu/scapi/edit/master/doc/source/install.rst
