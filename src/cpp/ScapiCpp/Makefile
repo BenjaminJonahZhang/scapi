@@ -35,8 +35,6 @@ tests:: all
 
 clean::
 	@echo "cleaning .obj files"
-	@rm -f $(OUT_DIR)/*.$(OBJ_EXT)
-	@echo "cleaning executable"
-	@rm -f $(Program)
+	@rm -rf $(OUT_DIR)
 	@echo "cleaning lib"
 	@rm -f $(SLib)
