@@ -54,9 +54,6 @@
     <ClCompile Include="src\primitives\Dlog.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\primitives\DlogCryptopp.cpp">
-      <Filter>Source Files\primitives</Filter>
-    </ClCompile>
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\primitives\Dlog.hpp">
-      <Filter>Header Files\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="include\primitives\DlogCryptopp.hpp">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp">
