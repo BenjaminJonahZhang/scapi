@@ -4,7 +4,6 @@
 #include "../ScapiCpp/include/infra/ConfigFile.hpp"
 #include "catch.hpp"
 #include "../ScapiCpp/include/primitives/Dlog.hpp"
-#include "../ScapiCpp/include/primitives/DlogCryptopp.hpp"
 #include "../ScapiCpp/include/primitives/DlogOpenSSL.hpp"
 #include "../ScapiCpp/include/primitives/HashOpenSSL.hpp"
 #include "../ScapiCpp/include/primitives/PrfOpenSSL.hpp"
@@ -14,6 +13,7 @@
 #include "../ScapiCpp/include/primitives/RandomOracle.hpp"
 #include "../ScapiCpp/include/comm/TwoPartyComm.hpp"
 #include "../ScapiCpp/include/circuits/BooleanCircuits.hpp"
+#include "../ScapiCpp/include//interactive_mid_protocols/CommitmentSchemePedersen.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -188,30 +188,6 @@ TEST_CASE("boosts multiprecision", "[boost, multiprecision]") {
 		REQUIRE(mp::powm(2, 3, 3) == 2);
 		REQUIRE(mp::powm(3, 4, 17) == 13);
 	}
-
-	SECTION("conversion between CryptoPP::Integer and boost's biginteger")
-	{
-		//Test conversion between CryptoPP::Integer and boost's biginteger
-		//small Biginteger -> CryptoPP:Integer and back
-		biginteger p(123);
-		CryptoPP::Integer cp = biginteger_to_cryptoppint(p);
-		REQUIRE(cp.ConvertToLong() == 123);
-		REQUIRE(cp == 123);
-		REQUIRE(cryptoppint_to_biginteger(cp) == p);
-		// Big Biginteger -> CryptoPP:Integer and back
-		string s2 = "12345678910111212313230983204932509435098230498230948723509234098234098234098234098234098230498234098";
-		biginteger p2(s2);
-		CryptoPP::Integer cp2 = biginteger_to_cryptoppint(p2);
-		REQUIRE(!cp2.IsConvertableToLong());
-		REQUIRE(cryptoppint_to_biginteger(cp2) == p2);
-
-		// Big CryptoPP -> biginteger and back
-		CryptoPP::Integer cp3(s2.c_str());
-		biginteger p3 = cryptoppint_to_biginteger(cp3);
-		REQUIRE(!cp3.IsConvertableToLong());
-		REQUIRE(p3.str() == s2);
-		REQUIRE(biginteger_to_cryptoppint(p3) == cp3);
-	}
 }
 
 TEST_CASE("MathAlgorithm", "[crt, sqrt_mod_3_4, math]")
@@ -340,12 +316,6 @@ void test_all(DlogGroup * dg)
 
 TEST_CASE("DlogGroup", "[Dlog, DlogGroup, CryptoPpDlogZpSafePrime]")
 {
-	SECTION("testing CryptoPpDlogZpSafePrime implemenation")
-	{
-		DlogGroup * dg = new CryptoPpDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
-		test_all(dg);
-		//delete dg;
-	}
 	SECTION("test OpenSSLZpSafePrime implementation")
 	{
 		DlogGroup * dg = new OpenSSLDlogZpSafePrime(64); // testing with the default 1024 take too much time. 64 bit is good enough to test conversion with big numbers
@@ -591,5 +561,46 @@ TEST_CASE("Gates and Wires", "") {
 		bc.setInputs(presetInputWires, 1);
 		auto bc_res_map = bc.compute();
 		REQUIRE(bc_res_map[7].getValue() == 1);
+	}
+}
+
+TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
+{
+	SECTION("CmtPedersenCommitmentMessage") {
+		biginteger birsa100 = biginteger(rsa100);
+		long id = 123123123123123;
+		
+		// create serialize, and verify original values untouched
+		ZpElementSendableData es(birsa100);
+		CmtPedersenCommitmentMessage cmtMsg(&es, id);
+		byte * serialized = cmtMsg.toByteArray();
+		int serializedSize = cmtMsg.serializedSize();
+		REQUIRE(cmtMsg.getId() == id);
+		REQUIRE(((ZpElementSendableData*)cmtMsg.getCommitment())->getX() == birsa100);
+
+		// verify new one is created with empty values
+		CmtPedersenCommitmentMessage cmtMsg2;
+		REQUIRE(cmtMsg2.getId() == 0);
+		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment())->getX() == 0);
+
+		// deserialize and verify original values in the new object
+		cmtMsg2.init_from_byte_array(serialized, serializedSize);
+		REQUIRE(cmtMsg2.getId() == id);
+		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment())->getX() == birsa100);
+	}
+	SECTION("SigmaBIMsg") {
+		biginteger value = 123456789;
+		SigmaBIMsg sMsg(value);
+		byte * serialized = sMsg.toByteArray();
+		int serializedSize = sMsg.serializedSize();
+		REQUIRE(sMsg.getMsg() == value);
+
+		// verify new one is created with empty values
+		SigmaBIMsg sMsg2;
+		REQUIRE(sMsg2.getMsg() == -100);
+
+		// deserialize and verify original values in the new object
+		sMsg.init_from_byte_array(serialized, serializedSize);
+		REQUIRE(sMsg.getMsg() == value);
 	}
 }
