@@ -65,7 +65,7 @@ class SigmaProtocolMsg {
 public:
 	virtual void init_from_byte_array(byte * arr, int size) = 0;
 	virtual byte * toByteArray() = 0;
-	virtual int size() = 0;
+	virtual int serializedSize() = 0;
 };
 
 /**
@@ -326,7 +326,7 @@ private:
 	*/
 	void sendMsgToVerifier(SigmaProtocolMsg * message) { 
 		byte* raw_message = message->toByteArray();
-		int message_size = message->size();
+		int message_size = message->serializedSize();
 		channel->write_fast(raw_message, message_size);
 	};
 };
@@ -407,7 +407,7 @@ public:
 	vector<SigmaProtocolMsg*> getMessages() { return messages; };
 	void init_from_byte_array(byte * arr, int size) override;
 	byte * toByteArray() override;
-	int size() override;
+	int serializedSize() override;
 
 private:
 	vector<SigmaProtocolMsg *> messages;
@@ -435,5 +435,5 @@ public:
 		encodeBigInteger(this->z, res, size_);
 		return res;
 	}
-	int size() override { return size_; };
+	int serializedSize() override { return size_; };
 };

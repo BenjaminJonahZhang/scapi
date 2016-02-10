@@ -13,10 +13,17 @@ class CmtPedersenCommitmentMessage : public CmtCCommitmentMsg{
 	// in Pedersen schemes the commitment object is a groupElement. 
 	// in order to this class be a serializable, we get it as GroupElementSendableData.
 private:
-	GroupElementSendableData* c;
-	long id; // the id of the commitment
+	GroupElementSendableData* c=NULL;
+	long id=0; // the id of the commitment
 	int serializedSize_;
 public:
+	/**
+	* Empty constructor - used to allow initialization from byte array
+	*/
+	CmtPedersenCommitmentMessage() {
+		c = new ZpElementSendableData(0);
+	};
+
 	/**
 	* Constructor that sets the commitment and id.
 	* @param c the actual commitment object. In Pedersen schemes the commitment object is a groupElement.
@@ -29,19 +36,23 @@ public:
 
 	void* getCommitment() override { return c; };
 	long getId() override { return id; };
+	/**
+	* 
+	*/
 	byte* toByteArray() override {
 		byte* byteGe = c->toByteArray();
-		int idSize = bytesCount(id);
-		byte* bytesId = new byte[idSize];
-		encodeBigInteger(id, bytesId, idSize);
 		int geSize = c->getSerializedSize();
-		serializedSize_ = idSize + geSize;
+		serializedSize_ = sizeof(long) + geSize;
 		byte * result = new byte[serializedSize_];
-		copy(byteGe, byteGe + geSize, result);
-		copy(bytesId, bytesId + idSize, result + geSize);
+		copy(((byte*)&id), ((byte*)&id) + sizeof(long), result);
+		copy(byteGe, byteGe + geSize, result+sizeof(long));
+		delete byteGe;
+		return result;
 	}
 	virtual int serializedSize() override { return serializedSize_; };
-	void init_from_byte_array(byte* arr, int size) { //TBD
+	void init_from_byte_array(byte* arr, int size) { 
+		memcpy(&id, arr, sizeof(long));
+		c->init_from_byte_array(arr + sizeof(long), size - sizeof(long));
 	};
 
 };

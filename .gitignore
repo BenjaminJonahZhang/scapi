@@ -40,3 +40,4 @@ make.dependencies
 *.psess
 *.diagsession
 src/cpp/ScapiCpp/x64/Release/config_for_test.txt
+src/cpp/scapi_tests/config_for_test.txt

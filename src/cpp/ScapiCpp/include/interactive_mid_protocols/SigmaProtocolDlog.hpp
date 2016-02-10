@@ -12,7 +12,7 @@ public:
 	GroupElementSendableData* getElement() { return element; };
 	void init_from_byte_array(byte * arr, int size) { element->init_from_byte_array(arr, size); };
 	byte * toByteArray() override{ return element->toByteArray();  };
-	int size() override { return element->getSerializedSize(); };
+	int serializedSize() override { return element->getSerializedSize(); };
 
 private:
 	GroupElementSendableData* element=NULL;

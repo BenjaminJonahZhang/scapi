@@ -1,12 +1,12 @@
 #include "../../include/interactive_mid_protocols/CommitmentSchemePedersen.hpp"
-#include "../../include/primitives/DlogCryptopp.hpp"
+#include "../../include/primitives/DlogOpenSSL.hpp"
 
 /*********************************/
 /*   CmtPedersenReceiverCore     */
 /*********************************/
 CmtPedersenReceiverCore::CmtPedersenReceiverCore(ChannelServer* channel) {
 	auto r = get_seeded_random();
-	DlogGroup * dg = new CryptoPpDlogZpSafePrime(256, r);
+	DlogGroup * dg = new OpenSSLDlogZpSafePrime(256, r);
 	doConstruct(channel, dg, r);
 };
 
@@ -39,13 +39,12 @@ void CmtPedersenReceiverCore::preProcess() {
 }
 
 CmtRBasicCommitPhaseOutput* CmtPedersenReceiverCore::receiveCommitment() {
+	// create an empty CmtPedersenCommitmentMessage 
+	CmtPedersenCommitmentMessage* msg = new CmtPedersenCommitmentMessage();
+	// read encoded CmtPedersenCommitmentMessage from channel
 	auto v = channel->read_one();
-	// creata a sendableData object from the dlog to support polymorphism
-	GroupElementSendableData* sendableData = dlog->getGenerator()->generateSendableData();
-	sendableData->init_from_byte_array(&(v->at(0)), v->size());
-	//CmtPedersenCommitmentMessage* msg = new CmtPedersenCommitmentMessage(sendableData);
-
-	//commitmentMap.put(Long.valueOf(msg.getId()), msg);
-	//return new CmtRBasicCommitPhaseOutput(msg.getId());
-	return NULL;
+	// init the empy CmtPedersenCommitmentMessage using the encdoed data
+	msg->init_from_byte_array(&(v->at(0)), v->size());
+	commitmentMap[msg->getId()] = msg;
+	return new CmtRBasicCommitPhaseOutput(msg->getId());
 }

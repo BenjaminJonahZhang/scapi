@@ -73,7 +73,7 @@ private:
 		// compute the first message by the underlying proverComputation.
 		SigmaProtocolMsg* a = sProver->computeFirstMsg(input);
 		byte* msg = a->toByteArray();
-		int len = a->size();
+		int len = a->serializedSize();
 		// send the first message.
 		sendMsgToVerifier(msg, len);
 	}

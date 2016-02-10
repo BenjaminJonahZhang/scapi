@@ -176,7 +176,7 @@ private:
 	*/
 	void sendMsgToVerifier(SigmaProtocolMsg* message) {
 		byte* raw_message = message->toByteArray();
-		int message_size = message->size();
+		int message_size = message->serializedSize();
 		channel->write_fast(raw_message, message_size);
 	};
 };
