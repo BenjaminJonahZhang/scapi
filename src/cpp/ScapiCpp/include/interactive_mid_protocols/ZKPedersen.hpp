@@ -17,9 +17,10 @@ public:
 	* @param channel used for communication
 	* @param sProver underlying sigma prover to use.
 	*/
-	ZKPOKFromSigmaCmtPedersenProver(ChannelServer* channel, SigmaProverComputation* sProver) {
+	ZKPOKFromSigmaCmtPedersenProver(shared_ptr<ChannelServer> channel, 
+		shared_ptr<SigmaProverComputation> sProver) {
 		//this->sProver = sProver;
-		//this->receiver = new CmtPedersenTrapdoorReceiver(channel);
+		//this->receiver = make_shared<CmtPedersenTrapdoorReceiver>(channel);
 		//this->channel = channel;
 	}
 
@@ -41,7 +42,7 @@ public:
 	*
 	* @param input must be an instance of SigmaProverInput.
 	*/
-	void prove(ZKProverInput* input);
+	void prove(shared_ptr<ZKProverInput> input);
 
 	/**
 	* Processes the second message of the Zero Knowledge protocol.<p>
@@ -50,18 +51,18 @@ public:
 	*   OUTPUT nothing".<p>
 	* This is a blocking function!
 	*/
-	void processSecondMsg(byte* e, CmtRCommitPhaseOutput* trap);
+	void processSecondMsg(shared_ptr<byte> e, int eSize, shared_ptr<CmtRCommitPhaseOutput> trap);
 
 private:
-	ChannelServer* channel;
+	shared_ptr<ChannelServer> channel;
 	// underlying prover that computes the proof of the sigma protocol.
-	SigmaProverComputation* sProver;
-//	CmtPedersenTrapdoorReceiver* receiver; // underlying Commitment receiver to use.
+	shared_ptr<SigmaProverComputation> sProver;
+	//shared_ptr<CmtPedersenTrapdoorReceiver> receiver; // underlying Commitment receiver to use.
 
 	/**
 	* Runs the receiver in TRAP_COMMIT.commit with P as the receiver.
 	*/
-	CmtRCommitPhaseOutput* receiveCommit();
+	shared_ptr<CmtRCommitPhaseOutput> receiveCommit();
 
 	/**
 	* Processes the first message of the Zero Knowledge protocol:
@@ -69,10 +70,10 @@ private:
 	*	SEND a to V".
 	* @param input
 	*/
-	void processFirstMsg(SigmaProverInput*  input) {
+	void processFirstMsg(shared_ptr<SigmaProverInput>  input) {
 		// compute the first message by the underlying proverComputation.
-		SigmaProtocolMsg* a = sProver->computeFirstMsg(input);
-		byte* msg = a->toByteArray();
+		auto a = sProver->computeFirstMsg(input);
+		auto msg = a->toByteArray();
 		int len = a->serializedSize();
 		// send the first message.
 		sendMsgToVerifier(msg, len);
@@ -85,13 +86,13 @@ private:
 	* @param ctOutput
 	* @return
 	*/
-	byte* receiveDecommit(long id);
+	shared_ptr<byte> receiveDecommit(long id);
 
 	/**
 	* Sends the given message to the verifier.
 	* @param message to send to the verifier.
 	*/
-	void sendMsgToVerifier(byte* msg, int size) { channel->write_fast(msg, size); };
+	void sendMsgToVerifier(shared_ptr<byte> msg, int size) { channel->write_fast(msg, size); };
 };
 
 
@@ -105,32 +106,33 @@ private:
 */
 class ZKPOKFromSigmaCmtPedersenVerifier : public ZKPOKVerifier {
 private:
-	ChannelServer* channel;
+	shared_ptr<ChannelServer> channel;
 	// underlying verifier that computes the proof of the sigma protocol.
-	SigmaVerifierComputation* sVerifier;
+	shared_ptr<SigmaVerifierComputation> sVerifier;
 //	CmtPedersenTrapdoorCommitter* committer; // underlying Commitment committer to use.
 	std::mt19937 random;
 	/**
 	* Runs COMMIT.commit as the committer with input e.
 	*/
-	long commit(byte* e, int eSize);
+	long commit(shared_ptr<byte> e, int eSize);
 	/**
 	* Waits for a message a from the prover.
 	* @return the received message
 	*/
-	SigmaProtocolMsg* receiveMsgFromProver();
+	shared_ptr<SigmaProtocolMsg> receiveMsgFromProver();
 	/**
 	* Waits for a trapdoor a from the prover.
 	* @return the received message
 	*/
-	CmtRCommitPhaseOutput* receiveTrapFromProver();
+	shared_ptr<CmtRCommitPhaseOutput> receiveTrapFromProver();
 	/**
 	* Verifies the proof.
 	* @param input
 	* @param a first message from prover.
 	* @param z second message from prover.
 	*/
-	bool proccessVerify(SigmaCommonInput* input, SigmaProtocolMsg* a, SigmaProtocolMsg* z) {
+	bool proccessVerify(shared_ptr<SigmaCommonInput> input, 
+		shared_ptr<SigmaProtocolMsg> a, shared_ptr<SigmaProtocolMsg> z) {
 		// run transcript (a, e, z) is accepting in sigma on input x
 		return sVerifier->verify(input, a, z);
 	};
@@ -142,8 +144,8 @@ public:
 	* @param sVerifier underlying sigma verifier to use.
 	* @param random
 	*/
-	ZKPOKFromSigmaCmtPedersenVerifier(ChannelServer* channel, SigmaVerifierComputation* sVerifier,
-		std::mt19937 random) {
+	ZKPOKFromSigmaCmtPedersenVerifier(shared_ptr<ChannelServer> channel, 
+		shared_ptr<SigmaVerifierComputation> sVerifier, std::mt19937 random) {
 		//this->channel = channel;
 		//this->sVerifier = sVerifier; 
 		//this->committer = new CmtPedersenTrapdoorCommitter(channel); 
@@ -169,6 +171,6 @@ public:
 
 	* @param input must be an instance of SigmaCommonInput.
 	*/
-	bool verify(ZKCommonInput* input) override;
+	bool verify(shared_ptr<ZKCommonInput> input) override;
 
 };

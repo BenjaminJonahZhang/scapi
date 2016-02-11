@@ -93,11 +93,11 @@ void NativeChannel::do_write(const Message& msg)
 	}
 }
 
-void NativeChannel::do_write_fast(byte * data, int len)
+void NativeChannel::do_write_fast(shared_ptr<byte> data, int len)
 {
 	boost::system::error_code ignored_error;
 	boost::asio::write(clientSocket,
-		boost::asio::buffer(data, len),
+		boost::asio::buffer(data.get(), len),
 		boost::asio::transfer_all(), ignored_error);
 }
 
@@ -163,7 +163,7 @@ void NativeChannel::handle_read_body(const boost::system::error_code& error)
 
 void NativeChannel::handle_msg(const Message& msg) {
 	int m_len = read_msg_.body_length();
-	auto v = new vector<byte>(m_len);
+	auto v = make_shared<vector<byte>>(m_len);
 	if (m_len>0)
 		memcpy(&(v->at(0)), read_msg_.body(), m_len);
 	std::unique_lock<std::mutex> lk(m);
@@ -172,7 +172,7 @@ void NativeChannel::handle_msg(const Message& msg) {
 	cv.notify_one();
 }
 
-vector<byte> * NativeChannel::read_one() {
+shared_ptr<vector<byte>> NativeChannel::read_one() {
 	// Wait until main() sends data
 	std::unique_lock<std::mutex> lk(m);
 	while (read_msgs_.empty())
@@ -187,16 +187,16 @@ vector<byte> * NativeChannel::read_one() {
 /* ChannelServer						 */
 /*****************************************/
 
-void ChannelServer::write(byte* data, int size) {
+void ChannelServer::write(shared_ptr<byte> data, int size) {
 	msg.body_length(size);
-	memcpy(msg.body(), &data[0], msg.body_length());
+	memcpy(msg.body(), &(data.get()[0]), msg.body_length());
 	msg.encode_header();
 	channel->write(msg);
 }
 
-void ChannelServer::write_fast(byte * data, int size) {
+void ChannelServer::write_fast(shared_ptr<byte> data, int size) {
 	msg.body_length(size);
-	memcpy(msg.body(), &data[0], msg.body_length());
+	memcpy(msg.body(), &(data.get()[0]), msg.body_length());
 	msg.encode_header();
 	channel->write_fast(msg);
 }

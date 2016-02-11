@@ -40,7 +40,7 @@ public:
 	* Runs the prover side of the Zero Knowledge proof.
 	* @param input holds necessary values to the proof calculations.
 	*/
-	virtual void prove(ZKProverInput* input) = 0;
+	virtual void prove(shared_ptr<ZKProverInput> input) = 0;
 };
 
 /**
@@ -66,7 +66,7 @@ public:
 	* @param input holds necessary values to the varification calculations.
 	* @return true if the proof was verified; false, otherwise.
 	*/
-	virtual bool verify(ZKCommonInput* input) = 0;
+	virtual bool verify(shared_ptr<ZKCommonInput> input) = 0;
 };
 
 /**
@@ -93,8 +93,8 @@ public:
 	* @param sProver underlying sigma prover to use.
 	* @param receiver Must be an instance of PerfectlyHidingCT
 	*/
-	ZKFromSigmaProver(ChannelServer* channel, SigmaProverComputation * sProver,
-		CmtReceiver* receiver);
+	ZKFromSigmaProver(shared_ptr<ChannelServer> channel, shared_ptr<SigmaProverComputation> sProver,
+		shared_ptr<CmtReceiver> receiver);
 
 	/**
 	* Constructor that accepts the underlying channel, sigma protocol's prover and
@@ -102,7 +102,7 @@ public:
 	* @param channel used to communicate between prover and verifier.
 	* @param sProver underlying sigma prover to use.
 	*/
-	ZKFromSigmaProver(ChannelServer* channel, SigmaProverComputation* sProver);
+	ZKFromSigmaProver(shared_ptr<ChannelServer> channel, shared_ptr<SigmaProverComputation> sProver);
 
 	/**
 	* Runs the prover side of the Zero Knowledge proof.<p>
@@ -122,18 +122,18 @@ public:
 	*      		OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)<p>
 	* @param input must be an instance of SigmaProverInput.
 	*/
-	void prove(ZKProverInput* input) override;
+	void prove(shared_ptr<ZKProverInput> input) override;
 
 private:
-	ChannelServer* channel;
+	shared_ptr<ChannelServer> channel;
 	// underlying prover that computes the proof of the sigma protocol:
-	SigmaProverComputation* sProver; 
-	CmtReceiver* receiver; //Underlying Commitment receiver to use.
+	shared_ptr<SigmaProverComputation> sProver;
+	shared_ptr<CmtReceiver> receiver; //Underlying Commitment receiver to use.
 
 	/**
 	* Runs the receiver in COMMIT.commit with P as the receiver.
 	*/
-	CmtRCommitPhaseOutput* receiveCommit() { return receiver->receiveCommitment(); };
+	shared_ptr<CmtRCommitPhaseOutput> receiveCommit() { return receiver->receiveCommitment(); };
 
 	/**
 	* Processes the first message of the Zero Knowledge protocol:
@@ -141,9 +141,9 @@ private:
 	*	SEND a to V".
 	* @param input
 	*/
-	void processFirstMsg(SigmaProverInput* input) {
+	void processFirstMsg(shared_ptr<SigmaProverInput> input) {
 		// compute the first message by the underlying proverComputation.
-		SigmaProtocolMsg* a = sProver->computeFirstMsg(input);
+		auto a = sProver->computeFirstMsg(input);
 		// send the first message.
 		sendMsgToVerifier(a);
 	}
@@ -154,7 +154,7 @@ private:
 	* @param l
 	* @param ctOutput
 	*/
-	byte* receiveDecommit(long id);
+	shared_ptr<byte> receiveDecommit(long id);
 
 	/**
 	* Processes the second message of the Zero Knowledge protocol:
@@ -163,9 +163,9 @@ private:
 	*   OUTPUT nothing".
 	* This is a blocking function!
 	*/
-	void processSecondMsg(byte* e, int eSize) {
+	void processSecondMsg(shared_ptr<byte> e, int eSize) {
 		// compute the second message by the underlying proverComputation.
-		SigmaProtocolMsg* z = sProver->computeSecondMsg(e, eSize);
+		auto z = sProver->computeSecondMsg(e, eSize);
 		// send the second message.
 		sendMsgToVerifier(z);
 	}
@@ -174,8 +174,8 @@ private:
 	* Sends the given message to the verifier.
 	* @param message to send to the verifier.
 	*/
-	void sendMsgToVerifier(SigmaProtocolMsg* message) {
-		byte* raw_message = message->toByteArray();
+	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) {
+		shared_ptr<byte> raw_message = message->toByteArray();
 		int message_size = message->serializedSize();
 		channel->write_fast(raw_message, message_size);
 	};
@@ -198,8 +198,8 @@ public:
 	* @param sVerifier underlying sigma verifier to use.
 	* @param committer Must be an instance of PerfectlyHidingCT
 	*/
-	ZKFromSigmaVerifier(ChannelServer* channel, SigmaVerifierComputation* sVerifier,
-		CmtCommitter* committer, std::mt19937 random);
+	ZKFromSigmaVerifier(shared_ptr<ChannelServer> channel, shared_ptr<SigmaVerifierComputation> sVerifier,
+		shared_ptr<CmtCommitter> committer, std::mt19937 random);
 
 	/**
 	* Constructor that accepts the underlying channel, sigma protocol's verifier and
@@ -207,8 +207,8 @@ public:
 	* @param channel used to communicate between prover and verifier.
 	* @param sVerifier underlying sigma verifier to use.
 	*/
-	ZKFromSigmaVerifier(ChannelServer* channel, SigmaVerifierComputation* sVerifier,
-		std::mt19937 random);
+	ZKFromSigmaVerifier(shared_ptr<ChannelServer> channel, 
+		shared_ptr<SigmaVerifierComputation> sVerifier, std::mt19937 random);
 
 	/**
 	* Runs the verifier side of the Zero Knowledge proof.<p>
@@ -226,26 +226,26 @@ public:
 	*	 	    OUTPUT REJ<p>
 	* @param input must be an instance of SigmaCommonInput.
 	*/
-	bool verify(ZKCommonInput* input) override;
+	bool verify(shared_ptr<ZKCommonInput> input) override;
 
 private:
-	ChannelServer* channel;
+	shared_ptr<ChannelServer> channel;
 	// underlying verifier that computes the proof of the sigma protocol.
-	SigmaVerifierComputation* sVerifier;
-	CmtCommitter* committer;	// underlying Commitment committer to use.
+	shared_ptr<SigmaVerifierComputation> sVerifier;
+	shared_ptr<CmtCommitter> committer;	// underlying Commitment committer to use.
 	std::mt19937 random;
 
 	/**
 	* Runs COMMIT.commit as the committer with input e.
 	* @param e
 	*/
-	long commit(byte* e, int eSize);
+	long commit(shared_ptr<byte> e, int eSize);
 
 	/**
 	* Waits for a message a from the prover.
 	* @return the received message
 	*/
-	SigmaProtocolMsg* receiveMsgFromProver();
+	shared_ptr<SigmaProtocolMsg> receiveMsgFromProver();
 
 	/**
 	* Runs COMMIT.decommit as the decommitter.
@@ -258,11 +258,11 @@ private:
 	* @param input
 	* @param a first message from prover.
 	*/
-	bool proccessVerify(SigmaCommonInput* input, SigmaProtocolMsg* a) {
+	bool proccessVerify(shared_ptr<SigmaCommonInput> input, shared_ptr<SigmaProtocolMsg> a) {
 		// wait for a message z from P, 
 		// if transcript (a, e, z) is accepting in sigma on input x, output ACC
 		// else outupt REJ
-		SigmaProtocolMsg* z = receiveMsgFromProver();
+		shared_ptr<SigmaProtocolMsg> z = receiveMsgFromProver();
 		return sVerifier->verify(input, a, z);
 	};
 };

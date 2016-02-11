@@ -1,5 +1,4 @@
-#ifndef SCAPI_DLOG_OPENSSL_H
-#define SCAPI_DLOG_OPENSSL_H
+#pragma once
 
 #include <openssl/dh.h>
 #include <openssl/rand.h>
@@ -8,19 +7,19 @@
 /**********************/
 /**** Helpers *********/
 /**********************/
-biginteger opensslbignum_to_biginteger(BIGNUM * bint);
-BIGNUM * biginteger_to_opensslbignum(biginteger bi);
+biginteger opensslbignum_to_biginteger(BIGNUM* bint);
+BIGNUM* biginteger_to_opensslbignum(biginteger bi);
 
 class OpenSSLDlogZpAdapter {
 private:
-	DH* dlog;
-	BN_CTX* ctx;
+	shared_ptr<DH> dlog;
+	shared_ptr<BN_CTX> ctx;
 public:
-	OpenSSLDlogZpAdapter(DH* dlog, BN_CTX* ctx);
+	OpenSSLDlogZpAdapter(shared_ptr<DH> dlog, shared_ptr<BN_CTX> ctx);
 	~OpenSSLDlogZpAdapter();
-	DH* getDlog() { return dlog; };
-	BN_CTX* getCTX() { return ctx; };
-	bool validateElement(BIGNUM* element);
+	shared_ptr<DH> getDlog() { return dlog; };
+	shared_ptr<BN_CTX> getCTX() { return ctx; };
+	bool validateElement(shared_ptr<BIGNUM> element);
 };
 
 /**
@@ -28,15 +27,15 @@ public:
 * It holds a pointer to an OpenSSL's Zp element and implements all the functionality of a Zp element.
 */
 class OpenSSLZpSafePrimeElement : public ZpSafePrimeElement {
-protected:
-	~OpenSSLZpSafePrimeElement() {};
 public:
-	OpenSSLZpSafePrimeElement(biginteger x, biginteger p, bool bCheckMembership) : ZpSafePrimeElement(x, p, bCheckMembership) {};
+	OpenSSLZpSafePrimeElement(biginteger x, biginteger p, bool bCheckMembership) : 
+		ZpSafePrimeElement(x, p, bCheckMembership) {};
 	OpenSSLZpSafePrimeElement(biginteger p, mt19937 prg) : ZpSafePrimeElement(p, prg) {};
 	OpenSSLZpSafePrimeElement(biginteger elementValue) : ZpSafePrimeElement(elementValue) {};
 	virtual string toString() {
 		return "OpenSSLZpSafePrimeElement  [element value=" + string(element) + "]";
 	};
+	~OpenSSLZpSafePrimeElement() {};
 };
 
 /**
@@ -44,21 +43,20 @@ public:
 */
 class OpenSSLDlogZpSafePrime : public DlogGroupAbs, public DDH {
 private:
-	OpenSSLDlogZpAdapter* dlog; // Pointer to the native group object.
-	OpenSSLDlogZpAdapter* createOpenSSLDlogZpAdapter(biginteger p, biginteger q, biginteger g);
-	OpenSSLDlogZpAdapter * createRandomOpenSSLDlogZpAdapter(int numBits);
+	shared_ptr<OpenSSLDlogZpAdapter> dlog; // Pointer to the native group object.
+	shared_ptr<OpenSSLDlogZpAdapter> createOpenSSLDlogZpAdapter(biginteger p, biginteger q, biginteger g);
+	shared_ptr<OpenSSLDlogZpAdapter> createRandomOpenSSLDlogZpAdapter(int numBits);
 	int calcK(biginteger p);
 
-protected:
-	virtual ~OpenSSLDlogZpSafePrime();
-
 public:
+	virtual ~OpenSSLDlogZpSafePrime();
 	/**
 	* Initializes the OpenSSL implementation of Dlog over Zp* with the given groupParams.
 	*/
-	OpenSSLDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg = mt19937(clock()));
+	OpenSSLDlogZpSafePrime(std::shared_ptr<ZpGroupParams> groupParams,
+		mt19937 prg =get_seeded_random());
 	OpenSSLDlogZpSafePrime(string q, string g, string p) : OpenSSLDlogZpSafePrime(
-		new ZpGroupParams(biginteger(q), biginteger(g), biginteger(p))) {};
+		make_shared<ZpGroupParams>(biginteger(q), biginteger(g), biginteger(p))) {};
 	/**
 	* Default constructor. Initializes this object with 1024 bit size.
 	*/
@@ -67,21 +65,23 @@ public:
 	OpenSSLDlogZpSafePrime(int numBits, string randNumGenAlg) { /* TODO: implement */ };
 
 	string getGroupType() override { return "Zp*"; }
-	GroupElement * getIdentity() override;
-	GroupElement * createRandomElement() override;
-	bool isMember(GroupElement * element) override;
+	shared_ptr<GroupElement> getIdentity() override;
+	shared_ptr<GroupElement> createRandomElement() override;
+	bool isMember(shared_ptr<GroupElement> element) override;
 	bool isGenerator() override;
 	bool validateGroup() override;
-	GroupElement * getInverse(GroupElement * groupElement) override;
-	GroupElement * exponentiate(GroupElement * base, biginteger exponent) override;
-	GroupElement * exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent) override { return exponentiate(groupElement, exponent); };
-	GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) override;
-	GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) override;
-	GroupElement *generateElement(bool bCheckMembership, vector<biginteger> values) override;
-	GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) override;
-	const vector<byte> decodeGroupElementToByteArray(GroupElement * groupElement) override;
-	GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) override;
-	virtual const vector<byte>  mapAnyGroupElementToByteArray(GroupElement * groupElement) override;
+	shared_ptr<GroupElement> getInverse(shared_ptr<GroupElement> groupElement) override;
+	shared_ptr<GroupElement> exponentiate(shared_ptr<GroupElement> base, biginteger exponent) override;
+	shared_ptr<GroupElement> exponentiateWithPreComputedValues(shared_ptr<GroupElement> groupElement, 
+		biginteger exponent) override { return exponentiate(groupElement, exponent); };
+	shared_ptr<GroupElement> multiplyGroupElements(shared_ptr<GroupElement> groupElement1, 
+		shared_ptr<GroupElement> groupElement2) override;
+	shared_ptr<GroupElement> simultaneousMultipleExponentiations(vector<shared_ptr<GroupElement>> groupElements,
+		vector<biginteger> exponentiations) override;
+	shared_ptr<GroupElement> generateElement(bool bCheckMembership, vector<biginteger> values) override;
+	shared_ptr<GroupElement> reconstructElement(bool bCheckMembership, shared_ptr<GroupElementSendableData> data) override;
+	const vector<byte> decodeGroupElementToByteArray(shared_ptr<GroupElement> groupElement) override;
+	shared_ptr<GroupElement> encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) override;
+	virtual const vector<byte>  mapAnyGroupElementToByteArray(shared_ptr<GroupElement> groupElement) override;
 };
 
-#endif

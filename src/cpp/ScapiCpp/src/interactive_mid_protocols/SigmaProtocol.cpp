@@ -4,9 +4,9 @@
 /*   SigmaProver           */
 /***************************/
 
-void SigmaProver::processFirstMsg(SigmaProverInput * input) {
+void SigmaProver::processFirstMsg(shared_ptr<SigmaProverInput> input) {
 	// compute the first message by the underlying proverComputation.
-	SigmaProtocolMsg * a = proverComputation->computeFirstMsg(input);
+	auto a = proverComputation->computeFirstMsg(input);
 	// send the first message.
 	sendMsgToVerifier(a);
 	// save the state of this protocol.
@@ -20,7 +20,8 @@ void SigmaProver::processSecondMsg() {
 	auto v = channel->read_one();
 
 	// compute the second message by the underlying proverComputation.
-	SigmaProtocolMsg * z = proverComputation->computeSecondMsg(&(v->at(0)), v->size());
+	shared_ptr<byte> arr(&(v->at(0)));
+	auto z = proverComputation->computeSecondMsg(arr, v->size());
 
 	// send the second message.
 	sendMsgToVerifier(z);
@@ -33,7 +34,7 @@ void SigmaProver::processSecondMsg() {
 /***************************/
 /*   SigmaVerifier         */
 /***************************/
-bool SigmaVerifier::verify(SigmaCommonInput * input) {
+bool SigmaVerifier::verify(shared_ptr<SigmaCommonInput> input) {
 	// samples the challenge.
 	sampleChallenge();
 	// sends the challenge.
@@ -48,7 +49,7 @@ void SigmaVerifier::sendChallenge() {
 	receiveMsgFromProver(a);
 
 	// get the challenge from the verifierComputation.
-	byte * challenge = verifierComputation->getChallenge();
+	auto challenge = verifierComputation->getChallenge();
 	int challenge_size = verifierComputation->getChallengeSize();
 	if (challenge_size == 0)
 		throw IllegalStateException("challenge_size=0. Make sure that sampleChallenge function is called before sendChallenge");
@@ -60,7 +61,7 @@ void SigmaVerifier::sendChallenge() {
 	doneChallenge = true;
 }
 
-bool SigmaVerifier::processVerify(SigmaCommonInput * input) {
+bool SigmaVerifier::processVerify(shared_ptr<SigmaCommonInput> input) {
 	if (!doneChallenge)
 		throw IllegalStateException("sampleChallenge and sendChallenge should be called before processVerify");
 	// wait for second message from the prover.
@@ -72,7 +73,8 @@ bool SigmaVerifier::processVerify(SigmaCommonInput * input) {
 	return verified;
 }
 
-void SigmaVerifier::receiveMsgFromProver(SigmaProtocolMsg * msg) {
+void SigmaVerifier::receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> msg) {
 	auto v = channel->read_one();
-	msg->init_from_byte_array(&(v->at(0)), v->size());
+	shared_ptr<byte> arr(&(v->at(0)));
+	msg->init_from_byte_array(arr, v->size());
 }

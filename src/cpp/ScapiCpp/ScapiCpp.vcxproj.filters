@@ -176,9 +176,6 @@
     <ClInclude Include="include\infra\Log.hpp">
       <Filter>Header Files\infra</Filter>
     </ClInclude>
-    <ClInclude Include="include\comm\Socket.hpp">
-      <Filter>Header Files\Comm</Filter>
-    </ClInclude>
     <ClInclude Include="include\comm\Message.hpp">
       <Filter>Header Files\Comm</Filter>
     </ClInclude>

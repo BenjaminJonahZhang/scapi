@@ -1,12 +1,12 @@
 #include "../../include/primitives/DlogOpenSSL.hpp"
 
-biginteger opensslbignum_to_biginteger(BIGNUM * bint)
+biginteger opensslbignum_to_biginteger(BIGNUM* bint)
 {
 	char * s = BN_bn2dec(bint);
 	return biginteger(s);
 }
 
-BIGNUM * biginteger_to_opensslbignum(biginteger bi)
+BIGNUM* biginteger_to_opensslbignum(biginteger bi)
 {
 	BIGNUM *bn = NULL;
 	BN_dec2bn(&bn, bi.str().c_str());
@@ -17,17 +17,17 @@ BIGNUM * biginteger_to_opensslbignum(biginteger bi)
 /**** OpenSSLDlogZpAdapter ***/
 /*************************************************/
 
-OpenSSLDlogZpAdapter::OpenSSLDlogZpAdapter(DH* dh, BN_CTX* ctx) {
+OpenSSLDlogZpAdapter::OpenSSLDlogZpAdapter(shared_ptr<DH> dh, shared_ptr<BN_CTX> ctx) {
 	this->dlog = dh;
 	this->ctx = ctx;
 }
 
 OpenSSLDlogZpAdapter::~OpenSSLDlogZpAdapter() {
-	BN_CTX_free(ctx);
-	DH_free(dlog);
+	//BN_CTX_free(ctx.get());
+	//DH_free(dlog.get());
 }
 
-bool OpenSSLDlogZpAdapter::validateElement(BIGNUM* el) {
+bool OpenSSLDlogZpAdapter::validateElement(shared_ptr<BIGNUM> el) {
 	//A valid element in the grou pshould satisfy the following:
 	//	1. 0 < el < p.
 	//	2. el ^ q = 1 mod p.
@@ -37,26 +37,26 @@ bool OpenSSLDlogZpAdapter::validateElement(BIGNUM* el) {
 	//Check that the element is bigger than 0.
 	BIGNUM* zero = BN_new();
 	BN_zero(zero);
-	if (BN_cmp(el, zero) <= 0) {
+	if (BN_cmp(el.get(), zero) <= 0) {
 		result = false;
 	}
 
 	//Check that the element is smaller than p.
-	if (BN_cmp(el, p) > 0) {
+	if (BN_cmp(el.get(), p) > 0) {
 		result = false;
 	}
 
-	BIGNUM* q = dlog->q;
-	BIGNUM* exp = BN_new();
+	auto q = dlog->q;
+	auto exp = BN_new();
 
 	//Check that the element raised to q is 1 mod p.
-	int suc = BN_mod_exp(exp, el, q, p, ctx);
+	int suc = BN_mod_exp(exp, el.get(), q, p, ctx.get());
 
 	if (!BN_is_one(exp)) {
 		result = false;
 	}
 
-	//Release the allocated memory.
+	// Release the allocated memory.
 	BN_free(zero);
 	BN_free(exp);
 
@@ -66,37 +66,31 @@ bool OpenSSLDlogZpAdapter::validateElement(BIGNUM* el) {
 /*************************************************/
 /**** OpenSSLDlogZpSafePrime ***/
 /*************************************************/
-OpenSSLDlogZpAdapter * OpenSSLDlogZpSafePrime::createOpenSSLDlogZpAdapter(biginteger p, biginteger q, biginteger g)
+shared_ptr<OpenSSLDlogZpAdapter> OpenSSLDlogZpSafePrime::createOpenSSLDlogZpAdapter(biginteger p, biginteger q, biginteger g)
 {
 	// Create OpenSSL Dlog group with p, , q, g.
 	// The validity of g will be checked after the creation of the group because the check need the pointer to the group
-	DH * dh = DH_new();
+	shared_ptr<DH> dh(DH_new(), DH_free);
 
 	dh->p = biginteger_to_opensslbignum(p);
 	dh->q = biginteger_to_opensslbignum(q);
 	dh->g = biginteger_to_opensslbignum(g);
-	if ((dh->p == NULL) || (dh->q == NULL) || (dh->g == NULL)) {
-		DH_free(dh);
+	if ((dh->p == NULL) || (dh->q == NULL) || (dh->g == NULL))
 		throw runtime_error("failed to create OpenSSL Dlog group");
-	}
 
 	// Set up the BN_CTX.
-	BN_CTX *ctx;
-	if (NULL == (ctx = BN_CTX_new())) {
-		DH_free(dh);
+	shared_ptr<BN_CTX> ctx(BN_CTX_new(), BN_CTX_free);
+	if (NULL == ctx) 
 		throw runtime_error("failed to create OpenSSL Dlog group");
-	}
-	return new OpenSSLDlogZpAdapter(dh, ctx);
+	return make_shared<OpenSSLDlogZpAdapter>(dh, ctx);
 }
 
-OpenSSLDlogZpAdapter * OpenSSLDlogZpSafePrime::createRandomOpenSSLDlogZpAdapter(int numBits) {
-	DH * dh = DH_new();
+shared_ptr<OpenSSLDlogZpAdapter> OpenSSLDlogZpSafePrime::createRandomOpenSSLDlogZpAdapter(int numBits) {
+	shared_ptr<DH> dh(DH_new(), DH_free);
 	//Set up the BN_CTX.
-	BN_CTX *ctx;
-	if (NULL == (ctx = BN_CTX_new())) {
-		DH_free(dh);
+	shared_ptr<BN_CTX> ctx(BN_CTX_new(), BN_CTX_free);
+	if (NULL == ctx)
 		return NULL;
-	}
 
 	//Seed the random geneartor.
 #ifdef _WIN32
@@ -108,16 +102,12 @@ OpenSSLDlogZpAdapter * OpenSSLDlogZpSafePrime::createRandomOpenSSLDlogZpAdapter(
 	//Sample a random safe prime with the requested number of bits.
 	dh->p = BN_new();
 	if (0 == (BN_generate_prime_ex(dh->p, numBits, 1, NULL, NULL, NULL))) {
-		BN_CTX_free(ctx);
-		DH_free(dh);
 		return NULL;
 	}
 
 	//Calculates q from p, such that p = 2q + 1.
 	dh->q = BN_new();
 	if (0 == (BN_rshift1(dh->q, dh->p))) {
-		BN_CTX_free(ctx);
-		DH_free(dh);
 		return 0;
 	}
 
@@ -132,14 +122,14 @@ OpenSSLDlogZpAdapter * OpenSSLDlogZpSafePrime::createRandomOpenSSLDlogZpAdapter(
 	dh->g = BN_new();
 	while (BN_is_zero(dh->g) || BN_is_one(dh->g)) {
 		BN_rand_range(dh->g, dh->p);
-		BN_mod_sqr(dh->g, dh->g, dh->p, ctx);
+		BN_mod_sqr(dh->g, dh->g, dh->p, ctx.get());
 	}
 
 	//Create a native Dlog object with dh and ctx.
-	return new OpenSSLDlogZpAdapter(dh, ctx);
+	return make_shared<OpenSSLDlogZpAdapter>(dh, ctx);
 }
 
-OpenSSLDlogZpSafePrime::OpenSSLDlogZpSafePrime(ZpGroupParams * groupParams, mt19937 prg)
+OpenSSLDlogZpSafePrime::OpenSSLDlogZpSafePrime(shared_ptr<ZpGroupParams> groupParams, mt19937 prg)
 {
 	// TODO - unify with cryptoPP
 	mt19937 prime_gen(clock()); // prg for prime checking
@@ -162,13 +152,12 @@ OpenSSLDlogZpSafePrime::OpenSSLDlogZpSafePrime(ZpGroupParams * groupParams, mt19
 	dlog = createOpenSSLDlogZpAdapter(p, q, g);
 
 	//If the generator is not valid, delete the allocated memory and throw exception.
-	if (!dlog->validateElement(dlog->getDlog()->g)) {
-		delete dlog;
-		throw new invalid_argument("generator value is not valid");
-	}
+	shared_ptr<BIGNUM> gshared(dlog->getDlog()->g);
+	if (!dlog->validateElement(gshared))
+		throw invalid_argument("generator value is not valid");
 
 	//Create the  generator with the pointer that return from the native function.
-	generator = new OpenSSLZpSafePrimeElement(g, p, false);
+	generator = make_shared<OpenSSLZpSafePrimeElement>(g, p, false);
 
 	//Now that we have p, we can calculate k which is the maximum length of a string to be converted to a Group Element of this group.
 	k = calcK(p);
@@ -184,15 +173,17 @@ OpenSSLDlogZpSafePrime::OpenSSLDlogZpSafePrime(int numBits, mt19937 prg) {
 	biginteger pGenerator = opensslbignum_to_biginteger(dlog->getDlog()->g);
 
 	//Create the GroupElement - generator with the pointer that returned from the native function.
-	generator = new OpenSSLZpSafePrimeElement(pGenerator);
+	generator = make_shared<OpenSSLZpSafePrimeElement>(pGenerator);
 
 	//Get the generated parameters and create a ZpGroupParams object.
 	biginteger p = opensslbignum_to_biginteger(dlog->getDlog()->p);
 	biginteger q = opensslbignum_to_biginteger(dlog->getDlog()->q);
-	biginteger xG = ((ZpElement *)generator)->getElementValue();
-	groupParams = new ZpGroupParams(q, xG, p);
+	auto zShared = std::dynamic_pointer_cast<ZpElement>(generator);
+	biginteger xG = zShared->getElementValue();
+	groupParams = make_shared<ZpGroupParams>(q, xG, p);
 
-	//Now that we have p, we can calculate k which is the maximum length in bytes of a string to be converted to a Group Element of this group. 
+	// Now that we have p, we can calculate k which is the maximum length in bytes of a 
+	// string to be converted to a Group Element of this group. 
 	k = calcK(p);
 
 }
@@ -213,32 +204,34 @@ int OpenSSLDlogZpSafePrime::calcK(biginteger p) {
 	return k;
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::getIdentity() {
-	return new OpenSSLZpSafePrimeElement(1, ((ZpGroupParams *)groupParams)->getP(), false);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::getIdentity() {
+	return make_shared<OpenSSLZpSafePrimeElement>(1, ((ZpGroupParams *)groupParams.get())->getP(), false);
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::createRandomElement() {
-	return new OpenSSLZpSafePrimeElement(((ZpGroupParams*)groupParams)->getP(), random_element_gen);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::createRandomElement() {
+	return make_shared<OpenSSLZpSafePrimeElement>(((ZpGroupParams*)groupParams.get())->getP(), random_element_gen);
 }
 
 
-bool OpenSSLDlogZpSafePrime::isMember(GroupElement * element) {
-	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(element);
+bool OpenSSLDlogZpSafePrime::isMember(shared_ptr<GroupElement> element) {
+	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(element.get());
 	// check if element is ZpElementCryptoPp
 	if (!zp_element)
 		throw invalid_argument("type doesn't match the group type");
 	biginteger element_value = zp_element->getElementValue();
-	return dlog->validateElement(biginteger_to_opensslbignum(element_value));
+	shared_ptr<BIGNUM> sEl(biginteger_to_opensslbignum(element_value));
+	return dlog->validateElement(sEl);
 }
 
 bool OpenSSLDlogZpSafePrime::isGenerator() {
-	return dlog->validateElement(dlog->getDlog()->g);
+	shared_ptr<BIGNUM> sG(dlog->getDlog()->g);
+	return dlog->validateElement(sG);
 }
 
 bool OpenSSLDlogZpSafePrime::validateGroup() {
 	int result;
 	// Run a check of the group.
-	int suc = DH_check(dlog->getDlog(), &result);
+	int suc = DH_check(dlog->getDlog().get(), &result);
 
 	//In case the generator is 2, OpenSSL checks the prime is congruent to 11.
 	//while the IETF's primes are congruent to 23 when g = 2. Without the next check, the IETF parameters would fail validation.
@@ -254,43 +247,45 @@ bool OpenSSLDlogZpSafePrime::validateGroup() {
 	//We check it directly.
 	if (result == 4) {
 		BIGNUM* g = dlog->getDlog()->g;
-		result = !(dlog->validateElement(g));
+		shared_ptr<BIGNUM> gShared(g);
+		result = !(dlog->validateElement(gShared));
 	}
 
 	return result == 0;
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::getInverse(GroupElement * groupElement) {
-	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::getInverse(shared_ptr<GroupElement> groupElement) {
+	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement.get());
 	// check if element is ZpElementCryptoPp
 	if (!zp_element)
 		throw invalid_argument("type doesn't match the group type");
 
-	DH* dh = dlog->getDlog();
+	auto dh = dlog->getDlog();
 	BIGNUM* result = BN_new();
 	BIGNUM* elem = biginteger_to_opensslbignum(zp_element->getElementValue());
-	BN_mod_inverse(result, elem, dh->p, dlog->getCTX());
-	OpenSSLZpSafePrimeElement * inverseElement = new OpenSSLZpSafePrimeElement(opensslbignum_to_biginteger(result));
+	BN_mod_inverse(result, elem, dh->p, dlog->getCTX().get());
+	auto inverseElement = make_shared<OpenSSLZpSafePrimeElement>(opensslbignum_to_biginteger(result));
 
 	BN_free(result);
 	BN_free(elem);
 	return inverseElement;
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::exponentiate(GroupElement * base, biginteger exponent) {
-	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(base);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::exponentiate(shared_ptr<GroupElement> base,
+	biginteger exponent) {
+	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(base.get());
 	// check if element is ZpElementCryptoPp
 	if (!zp_element)
 		throw invalid_argument("type doesn't match the group type");
 
 	// call to native exponentiate function.
-	DH* dh = dlog->getDlog();
-	BIGNUM* expBN = biginteger_to_opensslbignum(exponent);
-	BIGNUM* baseBN = biginteger_to_opensslbignum(zp_element->getElementValue());
+	DH* dh = dlog->getDlog().get();
+	auto expBN = biginteger_to_opensslbignum(exponent);
+	auto baseBN = biginteger_to_opensslbignum(zp_element->getElementValue());
 	BIGNUM* resultBN = BN_new(); 	//Prepare a result element.
 
 	//Raise the given element and put the result in result.
-	BN_mod_exp(resultBN, baseBN, expBN, dh->p, dlog->getCTX());
+	BN_mod_exp(resultBN, baseBN, expBN, dh->p, dlog->getCTX().get());
 	biginteger bi_res = opensslbignum_to_biginteger(resultBN);
 
 	//Release the allocated memory.
@@ -299,23 +294,24 @@ GroupElement * OpenSSLDlogZpSafePrime::exponentiate(GroupElement * base, biginte
 	BN_free(resultBN);
 
 	// build an OpenSSLZpSafePrimeElement element with the result value.
-	OpenSSLZpSafePrimeElement * exponentiateElement = new OpenSSLZpSafePrimeElement(bi_res);
+	auto exponentiateElement = make_shared<OpenSSLZpSafePrimeElement>(bi_res);
 	return exponentiateElement;
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) {
-	OpenSSLZpSafePrimeElement * zp1 = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement1);
-	OpenSSLZpSafePrimeElement * zp2 = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement2);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::multiplyGroupElements(
+	shared_ptr<GroupElement> groupElement1, shared_ptr<GroupElement> groupElement2) {
+	OpenSSLZpSafePrimeElement * zp1 = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement1.get());
+	OpenSSLZpSafePrimeElement * zp2 = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement2.get());
 	if (!zp1 || !zp2)
 		throw invalid_argument("element type doesn't match the group type");
 
 	// Call to native multiply function.
-	DH* dh = dlog->getDlog();
+	DH* dh = dlog->getDlog().get();
 	BIGNUM* result = BN_new();
 	BIGNUM* elem1 = biginteger_to_opensslbignum(zp1->getElementValue());
 	BIGNUM* elem2 = biginteger_to_opensslbignum(zp2->getElementValue());
-	BN_mod_mul(result, elem1, elem2, dh->p, dlog->getCTX());
-	OpenSSLZpSafePrimeElement * mulElement = new OpenSSLZpSafePrimeElement(opensslbignum_to_biginteger(result));
+	BN_mod_mul(result, elem1, elem2, dh->p, dlog->getCTX().get());
+	auto mulElement = make_shared<OpenSSLZpSafePrimeElement>(opensslbignum_to_biginteger(result));
 
 	BN_free(result);
 	BN_free(elem1);
@@ -323,9 +319,10 @@ GroupElement * OpenSSLDlogZpSafePrime::multiplyGroupElements(GroupElement * grou
 	return mulElement;
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) {
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::simultaneousMultipleExponentiations(
+	vector<shared_ptr<GroupElement>> groupElements, vector<biginteger> exponentiations) {
 	for (int i = 0; i < groupElements.size(); i++) {
-		OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElements[i]);
+		OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElements[i].get());
 		if (!zp_element)
 			throw invalid_argument("groupElement doesn't match the DlogGroup");
 	}
@@ -336,14 +333,15 @@ GroupElement * OpenSSLDlogZpSafePrime::simultaneousMultipleExponentiations(vecto
 	return computeNaive(groupElements, exponentiations);
 }
 
-GroupElement* OpenSSLDlogZpSafePrime::generateElement(bool bCheckMembership, vector<biginteger> values) {
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::generateElement(bool bCheckMembership, vector<biginteger> values) {
 	if (values.size() != 1)
-		throw new invalid_argument("To generate an ZpElement you should pass the x value of the point");
-	return new OpenSSLZpSafePrimeElement(values[0], ((ZpGroupParams *)groupParams)->getP(), bCheckMembership);
+		throw invalid_argument("To generate an ZpElement you should pass the x value of the point");
+	return make_shared<OpenSSLZpSafePrimeElement>(values[0], ((ZpGroupParams *)groupParams.get())->getP(), bCheckMembership);
 }
 
-GroupElement* OpenSSLDlogZpSafePrime::reconstructElement(bool bCheckMembership, GroupElementSendableData * data) {
-	ZpElementSendableData * zp_data = dynamic_cast<ZpElementSendableData *>(data);
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::reconstructElement(bool bCheckMembership, 
+	shared_ptr<GroupElementSendableData> data) {
+	ZpElementSendableData * zp_data = dynamic_cast<ZpElementSendableData *>(data.get());
 	if (!zp_data)
 		throw invalid_argument("groupElement doesn't match the group type");
 	vector<biginteger> values = { zp_data->getX() };
@@ -352,10 +350,11 @@ GroupElement* OpenSSLDlogZpSafePrime::reconstructElement(bool bCheckMembership, 
 
 OpenSSLDlogZpSafePrime::~OpenSSLDlogZpSafePrime()
 {
-	delete dlog;
+
 }
 
-GroupElement * OpenSSLDlogZpSafePrime::encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) {
+shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::encodeByteArrayToGroupElement(
+	const vector<unsigned char> & binaryString) {
 
 	// any string of length up to k has numeric value that is less than (p-1)/2 - 1.
 	// if longer than k then throw exception.
@@ -369,31 +368,30 @@ GroupElement * OpenSSLDlogZpSafePrime::encodeByteArrayToGroupElement(const vecto
 	list<unsigned char> newString(binaryString.begin(), binaryString.end());
 	newString.push_front(1);
 
-	byte *bstr = new byte[bs_size + 1];
+	std::shared_ptr<byte> bstr(new byte[bs_size + 1], std::default_delete<byte[]>());
 	for (auto it = newString.begin(); it != newString.end(); ++it) {
 		int index = std::distance(newString.begin(), it);
-		bstr[index] = *it;
+		bstr.get()[index] = *it;
 	}
 	biginteger s = decodeBigInteger(bstr, bs_size+1);
-	delete(bstr);
 
 	//Denote the string of length k by s.
 	//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
-	biginteger y = boost::multiprecision::powm((s + 1), 2, ((ZpGroupParams *)groupParams)->getP());
+	biginteger y = boost::multiprecision::powm((s + 1), 2, ((ZpGroupParams *)groupParams.get())->getP());
 
 	//There is no need to check membership since the "element" was generated so that it is always an element.
-	OpenSSLZpSafePrimeElement * element = new OpenSSLZpSafePrimeElement(y, ((ZpGroupParams *)groupParams)->getP(), false);
+	auto element = make_shared<OpenSSLZpSafePrimeElement>(y, ((ZpGroupParams *)groupParams.get())->getP(), false);
 	return element;
 }
 
-const vector<byte> OpenSSLDlogZpSafePrime::decodeGroupElementToByteArray(GroupElement * groupElement) {
-	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement);
+const vector<byte> OpenSSLDlogZpSafePrime::decodeGroupElementToByteArray(shared_ptr<GroupElement> groupElement) {
+	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement.get());
 	if (!(zp_element))
 		throw invalid_argument("element type doesn't match the group type");
 
 	//Given a group element y, find the two inverses z,-z. Take z to be the value between 1 and (p-1)/2. Return s=z-1
 	biginteger y = zp_element->getElementValue();
-	biginteger p = ((ZpGroupParams *)groupParams)->getP();
+	biginteger p = ((ZpGroupParams *)groupParams.get())->getP();
 	MathAlgorithms::SquareRootResults roots = MathAlgorithms::sqrtModP_3_4(y, p);
 
 	biginteger goodRoot;
@@ -405,18 +403,19 @@ const vector<byte> OpenSSLDlogZpSafePrime::decodeGroupElementToByteArray(GroupEl
 	goodRoot -= 1;
 
 	int len = bytesCount(goodRoot);
-	byte * output = new byte[len];
+	std::shared_ptr<byte> output(new byte[len], std::default_delete<byte[]>());
 	encodeBigInteger(goodRoot, output, len);
 	vector<byte> res;
 
 	// Remove the padding byte at the most significant position (that was added while encoding)
 	for (int i = 1; i < len; ++i)
-		res.push_back(output[i]);
+		res.push_back(output.get()[i]);
 	return res;
 }
 
-const vector<byte> OpenSSLDlogZpSafePrime::mapAnyGroupElementToByteArray(GroupElement * groupElement) {
-	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement);
+const vector<byte> OpenSSLDlogZpSafePrime::mapAnyGroupElementToByteArray(
+	shared_ptr<GroupElement> groupElement) {
+	OpenSSLZpSafePrimeElement * zp_element = dynamic_cast<OpenSSLZpSafePrimeElement *>(groupElement.get());
 	if (!(zp_element))
 		throw invalid_argument("element type doesn't match the group type");
 	string res = string(zp_element->getElementValue());

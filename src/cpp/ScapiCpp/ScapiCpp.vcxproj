@@ -128,6 +128,7 @@
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocol.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolAnd.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolDlog.cpp" />
+    <ClCompile Include="src\interactive_mid_protocols\ZKPedersen.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
     <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
@@ -147,7 +148,6 @@
     <ClInclude Include="include\circuits\FastGarbledBooleanCircuit.hpp" />
     <ClInclude Include="include\comm\Comm.hpp" />
     <ClInclude Include="include\comm\Message.hpp" />
-    <ClInclude Include="include\comm\Socket.hpp" />
     <ClInclude Include="include\comm\TwoPartyComm.hpp" />
     <ClInclude Include="include\infra\Common.hpp" />
     <ClInclude Include="include\infra\ConfigFile.hpp" />

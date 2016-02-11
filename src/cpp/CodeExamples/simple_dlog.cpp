@@ -4,10 +4,10 @@
 int main20(){
 	// initiate a discrete log group
 	// (in this case the OpenSSL implementation of the elliptic curve group K-233)
-	DlogGroup * dlog = new OpenSSLDlogZpSafePrime(128);
+	auto dlog = make_unique<OpenSSLDlogZpSafePrime>(128);
 
 	// get the group generator and order
-	GroupElement * g = dlog->getGenerator();
+	auto g = dlog->getGenerator();
 	biginteger q = dlog->getOrder();
 
 	// create a random exponent r
@@ -15,17 +15,17 @@ int main20(){
 	biginteger r = getRandomInRange(0, q - 1, gen);
 
 	// exponentiate g in r to receive a new group element
-	GroupElement * g1 = dlog->exponentiate(g, r);
+	auto g1 = dlog->exponentiate(g, r);
 	// create a random group element
-	GroupElement * h = dlog->createRandomElement();
+	auto h = dlog->createRandomElement();
 	// multiply elements
-	GroupElement * gMult = dlog->multiplyGroupElements(g1, h);
+	auto gMult = dlog->multiplyGroupElements(g1, h);
 
-	cout << "genrator value is:              " << ((OpenSSLZpSafePrimeElement *)g)->getElementValue() << endl;
+	cout << "genrator value is:              " << ((OpenSSLZpSafePrimeElement *)g.get())->getElementValue() << endl;
 	cout << "exponentiate value is:          " << r << endl;
-	cout << "exponentiation result is:       " << ((OpenSSLZpSafePrimeElement *)g1)->getElementValue() << endl;
-	cout << "random element chosen is:       " << ((OpenSSLZpSafePrimeElement *)h)->getElementValue() << endl;
-	cout << "element multplied by expresult: " << ((OpenSSLZpSafePrimeElement *)gMult)->getElementValue() << endl;
+	cout << "exponentiation result is:       " << ((OpenSSLZpSafePrimeElement *)g1.get())->getElementValue() << endl;
+	cout << "random element chosen is:       " << ((OpenSSLZpSafePrimeElement *)h.get())->getElementValue() << endl;
+	cout << "element multplied by expresult: " << ((OpenSSLZpSafePrimeElement *)gMult.get())->getElementValue() << endl;
 	return 0;
 }
 

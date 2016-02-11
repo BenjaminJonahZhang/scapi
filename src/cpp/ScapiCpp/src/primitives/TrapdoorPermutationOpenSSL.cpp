@@ -133,19 +133,18 @@ biginteger OpenSSLRSAPermutation::computeRSA(biginteger elementP) {
 
 	// Allocate a new byte array to hold the output.
 	int size = RSA_size(rsa);
-	byte* ret = new byte[size];
+	std::shared_ptr<byte> ret(new byte[size], std::default_delete<byte[]>());
 
 	size_t encodedSize = bytesCount(elementP);
-	auto encodedBi = new byte[encodedSize];
+	std::shared_ptr<byte> encodedBi(new byte[encodedSize], std::default_delete<byte[]>());
 	encodeBigInteger(elementP, encodedBi, encodedSize);
-	int success = RSA_public_encrypt(encodedSize, encodedBi, ret, rsa, RSA_NO_PADDING);
+	int success = RSA_public_encrypt(encodedSize, encodedBi.get(), ret.get(), rsa, RSA_NO_PADDING);
 	if (-1 == success)
 	{
 		string error(ERR_reason_error_string(ERR_get_error()));
 		throw runtime_error("failed to compute rsa " + error);
 	}
 	biginteger result = decodeBigInteger(ret, size);
-	delete ret, encodedBi;
 	return result;
 }
 
@@ -164,19 +163,18 @@ TPElement* OpenSSLRSAPermutation::invert(TPElement * tpEl) {
 	
 	// Allocate a new byte array to hold the output.
 	int size = RSA_size(rsa);
-	byte* ret = new byte[size];
+	std::shared_ptr<byte> ret(new byte[size], std::default_delete<byte[]>());
 
 	size_t encodedSize = bytesCount(elementP);
-	auto encodedBi = new byte[encodedSize];
+	std::shared_ptr<byte> encodedBi(new byte[encodedSize], std::default_delete<byte[]>());
 	encodeBigInteger(elementP, encodedBi, encodedSize);
 	
-	string st(&encodedBi[0], &encodedBi[encodedSize]);
+	string st(encodedBi.get(), encodedBi.get()+encodedSize);
 
-	// Invert the RSA permutation on the given bytes.
-	int sucess = RSA_private_decrypt(encodedSize, encodedBi, ret, rsa, RSA_NO_PADDING);
+	// invert the RSA permutation on the given bytes.
+	int sucess = RSA_private_decrypt(encodedSize, encodedBi.get(), ret.get(), rsa, RSA_NO_PADDING);
 	biginteger resValue = decodeBigInteger(ret, size);
-	delete ret, encodedBi;
-	// Creates and initialize a RSAElement with the result.
+	// creates and initialize a RSAElement with the result.
 	RSAElement * returnEl = new RSAElement(modulus, resValue, false);
 	return returnEl; // return the result TPElement.
 }

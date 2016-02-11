@@ -8,14 +8,14 @@
 */
 class SigmaGroupElementMsg : public SigmaProtocolMsg {
 public:
-	SigmaGroupElementMsg(GroupElementSendableData* el) {  this->element = el;  };
-	GroupElementSendableData* getElement() { return element; };
-	void init_from_byte_array(byte * arr, int size) { element->init_from_byte_array(arr, size); };
-	byte * toByteArray() override{ return element->toByteArray();  };
+	SigmaGroupElementMsg(shared_ptr<GroupElementSendableData> el) {  this->element = el;  };
+	shared_ptr<GroupElementSendableData> getElement() { return element; };
+	void init_from_byte_array(shared_ptr<byte> arr, int size) { element->init_from_byte_array(arr, size); };
+	shared_ptr<byte> toByteArray() override{ return element->toByteArray();  };
 	int serializedSize() override { return element->getSerializedSize(); };
 
 private:
-	GroupElementSendableData* element=NULL;
+	shared_ptr<GroupElementSendableData> element=NULL;
 };
 
 /**
@@ -24,10 +24,10 @@ private:
 */
 class SigmaDlogCommonInput : public SigmaCommonInput {
 public:
-	SigmaDlogCommonInput(GroupElement* h) { this->h = h; };
-	GroupElement * getH() { return h; };
+	SigmaDlogCommonInput(shared_ptr<GroupElement> h) { this->h = h; };
+	shared_ptr<GroupElement> getH() { return h; };
 private:
-	GroupElement* h;
+	shared_ptr<GroupElement> h;
 };
 
 /**
@@ -48,7 +48,7 @@ public:
 	/**
 	* Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
 	*/
-	SigmaDlogSimulator(DlogGroup* dlog, int t, std::mt19937 random);
+	SigmaDlogSimulator(shared_ptr<DlogGroup> dlog, int t, std::mt19937 random);
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	*/
@@ -62,8 +62,8 @@ public:
 	* @param challenge
 	* @return the output of the computation - (a, e, eSize, z).
 	*/
-	SigmaSimulatorOutput* simulate(SigmaCommonInput* input, byte* challenge,
-		int challenge_size) override;
+	shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput> input, 
+		shared_ptr<byte> challenge, int challenge_size) override;
 	/**
 	* Computes the simulator computation, using random challenge.<p>
 	* "SAMPLE a random z <- Zq<p>
@@ -72,17 +72,17 @@ public:
 	* @param input MUST be an instance of SigmaDlogCommonInput.
 	* @return the output of the computation - (a, e, z).
 	*/
-	SigmaSimulatorOutput* simulate(SigmaCommonInput* input) override;
+	shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput> input) override;
 
 private:
-	DlogGroup* dlog; 		//Underlying DlogGroup.
+	shared_ptr<DlogGroup> dlog; 		//Underlying DlogGroup.
 	int t;					//Soundness parameter.
 	std::mt19937 random;
 	biginteger qMinusOne;
 	/**
 	* Checks if the given challenge length is equal to the soundness parameter.
 	*/
-	bool checkChallengeLength(byte* challenge, int challenge_size) {
+	bool checkChallengeLength(shared_ptr<byte> challenge, int challenge_size) {
 		// if the challenge's length is equal to t, return true. else, return false.
 		biginteger e = decodeBigInteger(challenge, challenge_size);
 		return (e >= 0) && (e < mp::pow(biginteger(2), t));
@@ -102,18 +102,18 @@ public:
 	/**
 	* Sets the given h and w, such that g^w = h.
 	*/
-	SigmaDlogProverInput(GroupElement* h, biginteger w) {
-		params = new SigmaDlogCommonInput(h);
+	SigmaDlogProverInput(shared_ptr<GroupElement> h, biginteger w) {
+		params = make_shared<SigmaDlogCommonInput>(h);
 		this->w = w;
 	};
 	/**
 	* Returns w element, such that g^w = h.
 	*/
 	biginteger getW() { return w; };
-	SigmaDlogCommonInput* getCommonParams() override { return params; };
+	shared_ptr<SigmaCommonInput> getCommonParams() override { return params; };
 
 private:
-	SigmaDlogCommonInput* params;
+	shared_ptr<SigmaDlogCommonInput> params;
 	biginteger w;
 };
 
@@ -136,7 +136,7 @@ public:
 	/**
 	* Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
 	*/
-	SigmaDlogProverComputation(DlogGroup* dlog, int t, std::mt19937 random);
+	SigmaDlogProverComputation(std::shared_ptr<DlogGroup> dlog, int t, std::mt19937 random);
 	int getSoundnessParam() override { return t; };
 	/**
 	* Computes the first message from the protocol.<p>
@@ -145,31 +145,33 @@ public:
 	* @param input MUST be an instance of SigmaDlogProverInput.
 	* @return the computed message
 	*/
-	SigmaProtocolMsg* computeFirstMsg(SigmaProverInput* input) override;
+	shared_ptr<SigmaProtocolMsg> computeFirstMsg(shared_ptr<SigmaProverInput> input) override;
 	/**
 	* Computes the secong message from the protocol.<p>
 	* "COMPUTE z = (r + ew) mod q".<p>
 	* @param challenge<p>
 	* @return the computed message.
 	*/
-	SigmaProtocolMsg* computeSecondMsg(byte* challenge, int challenge_size) override;
+	shared_ptr<SigmaProtocolMsg> computeSecondMsg(shared_ptr<byte> challenge, int challenge_size) override;
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	*/
-	SigmaSimulator* getSimulator() override { return new SigmaDlogSimulator(dlog, t, random); };
+	shared_ptr<SigmaSimulator> getSimulator() override { 
+		auto res = make_shared<SigmaDlogSimulator>(dlog, t, random);
+		return res; };
 
 private:
-	DlogGroup * dlog;				// Underlying DlogGroup.
+	shared_ptr<DlogGroup> dlog;				// Underlying DlogGroup.
 	int t;	 						// soundness parameter in BITS.
 	std::mt19937 random;
-	SigmaDlogProverInput* input;	// Contains h and w.
+	shared_ptr<SigmaDlogProverInput> input;	// Contains h and w.
 	biginteger r;				// The value chosen in the protocol.
 	biginteger qMinusOne;
 
 	/**
 	* Checks if the given challenge length is equal to the soundness parameter.
 	*/
-	bool checkChallengeLength(byte* challenge, int challenge_size) {
+	bool checkChallengeLength(shared_ptr<byte> challenge, int challenge_size) {
 		biginteger e = decodeBigInteger(challenge, challenge_size);
 		cout << "got challenge: " << e << endl;
 		return (e >= 0) && (e < mp::pow(biginteger(2), t)); // 0 <= e < 2^t
@@ -190,7 +192,8 @@ public:
 	/**
 	* Sets the output of the simulator.
 	*/
-	SigmaDlogSimulatorOutput(SigmaGroupElementMsg* a, byte* e, int eSize, SigmaBIMsg* z) {
+	SigmaDlogSimulatorOutput(shared_ptr<SigmaGroupElementMsg> a, shared_ptr<byte> e, int eSize, 
+		shared_ptr<SigmaBIMsg> z) {
 		this->a = a;
 		this->e = e;
 		this->eSize = eSize;
@@ -199,11 +202,11 @@ public:
 	/**
 	* Returns first message.
 	*/
-	SigmaProtocolMsg* getA() override { return a; };
+	shared_ptr<SigmaProtocolMsg> getA() override { return a; };
 	/**
 	* Returns the challenge.
 	*/
-	byte* getE() override { return e; };
+	shared_ptr<byte> getE() override { return e; };
 	/**
 	* Returns the challenge size.
 	*/
@@ -211,14 +214,14 @@ public:
 	/**
 	* Returns second message.
 	*/
-	SigmaProtocolMsg* getZ() override { return z; };
+	shared_ptr<SigmaProtocolMsg> getZ() override { return z; };
 
 
 private:
-	SigmaGroupElementMsg* a;
-	byte* e;
+	shared_ptr<SigmaGroupElementMsg> a;
+	shared_ptr<byte> e;
 	int eSize;
-	SigmaBIMsg* z;
+	shared_ptr<SigmaBIMsg> z;
 };
 
 /**
@@ -240,7 +243,7 @@ public:
 	* @param t Soundness parameter in BITS.
 	* @param random
 	*/
-	SigmaDlogVerifierComputation(DlogGroup* dlog, int t, std::mt19937 random);
+	SigmaDlogVerifierComputation(std::shared_ptr<DlogGroup> dlog, int t, std::mt19937 random);
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	*/
@@ -253,14 +256,14 @@ public:
 	/**
 	* Sets the given challenge and its size.
 	*/
-	void setChallenge(byte* challenge, int challenge_size) override {
+	void setChallenge(shared_ptr<byte> challenge, int challenge_size) override {
 		e = challenge;
 		eSize = challenge_size;
 	};
 	/**
 	* Returns the sampled challenge.
 	*/
-	byte* getChallenge() override { return e; };
+	shared_ptr<byte> getChallenge() override { return e; };
 	int getChallengeSize() override { return eSize; };
 	/**
 	* Verifies the proof.<p>
@@ -271,12 +274,13 @@ public:
 	* @param input MUST be an instance of SigmaDlogCommonInput.
 	* @return true if the proof has been verified; false, otherwise.
 	*/
-	bool verify(SigmaCommonInput* input, SigmaProtocolMsg* a, SigmaProtocolMsg* z) override;
+	bool verify(shared_ptr<SigmaCommonInput> input, shared_ptr<SigmaProtocolMsg> a,
+		shared_ptr<SigmaProtocolMsg> z) override;
 
 private:
-	DlogGroup* dlog;		// Underlying DlogGroup.
+	shared_ptr<DlogGroup> dlog;		// Underlying DlogGroup.
 	int t; 					// Soundness parameter in BITS.
-	byte* e;				// The challenge.
+	shared_ptr<byte> e;				// The challenge.
 	int eSize;				// The challenge size.
 	std::mt19937 random;
 

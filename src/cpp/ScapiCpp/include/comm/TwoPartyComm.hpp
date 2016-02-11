@@ -75,7 +75,7 @@ public:
 	void write(const Message& msg);
 	void close();
 	bool is_connected() { return m_IsConnected; };
-	vector<byte> * read_one();
+	shared_ptr<vector<byte>> read_one();
 	void write_fast(const Message& msg);
 	//vector<Message> read_all();
 
@@ -88,12 +88,12 @@ private:
 	SocketPartyData other;
 	deque<Message> write_msgs_;
 	Message read_msg_;
-	deque<vector<byte> *> read_msgs_;
+	deque<shared_ptr<vector<byte>>> read_msgs_;
 	boost::asio::io_service& io_service_client_;
 	bool m_IsConnected = false;
 	void handle_connect(const boost::system::error_code& error);
 	void do_write(const Message & msg);
-	void do_write_fast(byte * data, int len);
+	void do_write_fast(shared_ptr<byte> data, int len);
 	void handle_write(const boost::system::error_code& error);
 	void do_close() { clientSocket.close(); };
 	void handle_msg(const Message& msg);
@@ -106,7 +106,7 @@ private:
 	tcp::acceptor acceptor_;
 	boost::asio::io_service& io_service_server;
 	boost::asio::io_service& io_service_client;
-	NativeChannel * channel;
+	std::shared_ptr<NativeChannel> channel;
 	Message msg;
 public:
 	ChannelServer(boost::asio::io_service& io_service, SocketPartyData me, SocketPartyData other) :
@@ -114,7 +114,7 @@ public:
 		acceptor_(io_service, tcp::endpoint(tcp::v4(), me.getPort())) 
 	{
 		Logger::log("Craeting ChannelServer Between me (" + me.to_log_string() + ") and other (" + other.to_log_string() + ")");
-		channel = new NativeChannel(io_service_server, io_service_client, me, other);
+		channel = make_shared<NativeChannel>(io_service_server, io_service_client, me, other);
 		acceptor_.async_accept(channel->getServerSocket(), boost::bind(&ChannelServer::handle_accept, 
 			this, channel, boost::asio::placeholders::error));
 	};
@@ -140,13 +140,13 @@ public:
 		}
 	}
 	bool is_connected() { return channel->is_connected(); };
-	void write(byte* data, int size);
-	vector<byte>* read_one() { return channel->read_one(); };
+	void write(shared_ptr<byte> data, int size);
+	shared_ptr<vector<byte>> read_one() { return channel->read_one(); };
 	//vector<Message> read_all() { return channel->read_all(); };
-	void write_fast(byte * data, int size);
+	void write_fast(shared_ptr<byte> data, int size);
 
 private:
-	void handle_accept(NativeChannel * new_channel, const boost::system::error_code& error) {
+	void handle_accept(shared_ptr<NativeChannel> new_channel, const boost::system::error_code& error) {
 		if (!error)
 			new_channel->start_listening();
 	};

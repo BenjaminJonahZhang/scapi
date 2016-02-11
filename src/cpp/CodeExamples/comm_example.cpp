@@ -18,7 +18,7 @@ int main8(int argc, char* argv[])
 
 		SocketPartyData me(IpAdress::from_string("127.0.0.1"), atoi(argv[1]));
 		SocketPartyData other(IpAdress::from_string(argv[2]), atoi(argv[3]));
-		ChannelServer * server = new ChannelServer(io_service, me, other);
+		auto server = make_unique<ChannelServer>(io_service, me, other);
 		boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
 
 		int i;
@@ -39,13 +39,14 @@ int main8(int argc, char* argv[])
 		cin.clear();
 		bool first = true;
 		char line[Message::max_body_length + 1];
-		vector<byte> * v;
+		shared_ptr<vector<byte>> v;
 		while (std::cin.getline(line, Message::max_body_length + 1))
 		{
 			if (!first)
 			{
 				using namespace std; // For strlen and memcpy.
-				server->write((byte *)line, strlen(line));
+				shared_ptr<byte> sLine((byte*)line);
+				server->write(sLine, strlen(line));
 				cout << "checking for recieved messages" << endl;
 				while ((v = server->read_one()) != NULL)
 				{

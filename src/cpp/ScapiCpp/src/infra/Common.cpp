@@ -67,8 +67,9 @@ size_t bytesCount(biginteger value)
 	return length;
 }
 
-void encodeBigInteger(biginteger value, byte* output, size_t length)
+void encodeBigInteger(biginteger value, std::shared_ptr<byte> output_shared, size_t length)
 {
+	auto output = output_shared.get();
 	if (value.is_zero())
 		*output = 0;
 	else if (value.sign() > 0)
@@ -85,8 +86,9 @@ void encodeBigInteger(biginteger value, byte* output, size_t length)
 	}
 }
 
-biginteger decodeBigInteger(byte* input, size_t length)
+biginteger decodeBigInteger(std::shared_ptr<byte> input_shared, size_t length)
 {
+	auto input = input_shared.get();
 	biginteger result(0);
 	int bits = -8;
 	while (length-- > 1)
@@ -96,13 +98,6 @@ biginteger decodeBigInteger(byte* input, size_t length)
 	if (a >= 0x80)
 		result |= (biginteger) - 1 << (bits + 8);
 	return result;
-}
-
-size_t allocateAndEncodeBigInteger(biginteger value, byte * output) {
-	size_t len = bytesCount(value);
-	output = new byte[len];
-	encodeBigInteger(value, output, len);
-	return len;
 }
 
 biginteger convert_hex_to_biginteger(const string & input) {

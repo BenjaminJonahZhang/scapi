@@ -91,16 +91,16 @@ public:
 	* The committed values can vary, therefore returns a void pointer
 	* @return the committed value.
 	*/
-	virtual void * getX() = 0;
+	virtual std::shared_ptr<void> getX() = 0;
 	/**
 	* Converts the committed value into a plaintext in order to encrypt it.
 	* @return the plaintext contains this commit value.
 	*/
-	virtual Plaintext* convertToPlaintext() = 0;
+	virtual shared_ptr<Plaintext> convertToPlaintext() = 0;
 	/**
 	* Returns a serializable byte * from this object. Size can be fetched using sendableDataSize()
 	*/
-	virtual byte * generateSendableData() = 0;
+	virtual shared_ptr<byte> generateSendableData() = 0;
 	virtual int sendableDataSize() = 0;
 };
 
@@ -109,25 +109,29 @@ public:
 */
 class CmtGroupElementCommitValue : public CmtCommitValue {
 private:
-	GroupElement* x; // the committed value
+	shared_ptr<GroupElement> x; // the committed value
 public:
 	/**
 	* Constructor that sets the commit value.
 	*/
-	CmtGroupElementCommitValue(GroupElement *x) { this->x = x; };
+	CmtGroupElementCommitValue(shared_ptr<GroupElement> x) { this->x = x; };
 	/**
 	* Returns the committed GroupElement. Client needs to cast result to GroupElement*
 	*/
-	void* getX() override { return x; }
+	shared_ptr<void> getX() override { return x; }
 	/**
 	* Converts the committed value to a GroupElementPlaintaxt.
 	*/
-	GroupElementPlaintext* convertToPlaintext() override { return new GroupElementPlaintext(x); };
+	shared_ptr<Plaintext> convertToPlaintext() override {
+		auto res = make_shared<GroupElementPlaintext>(x);
+		return res; 
+	};
 
 	/**
 	* Returns a serialized object representing this commit value.
 	*/
-	byte * generateSendableData() override { return x->generateSendableData()->toByteArray(); };
+	shared_ptr<byte> generateSendableData() override {
+		return x->generateSendableData()->toByteArray(); };
 	virtual int sendableDataSize() override {
 		return x->generateSendableData()->getSerializedSize(); };
 };
@@ -142,16 +146,16 @@ public:
 	/**
 	* Returns the random value used for commit the value.
 	*/
-	virtual RandomValue* getR()=0;
+	virtual shared_ptr<RandomValue> getR()=0;
 	/**
 	* Returns the committed value.
 	*/
-	virtual CmtCommitValue* getX()=0;
+	virtual shared_ptr<CmtCommitValue> getX()=0;
 	/**
 	* The commitment objects can be vary in the different commitment scheme.
 	* Therefore, Returns a void pointer.
 	*/
-	virtual void * getComputedCommitment()=0;
+	virtual shared_ptr<void> getComputedCommitment()=0;
 };
 
 /**
@@ -172,7 +176,7 @@ public:
 	/**
 	* Returns the committed BigInteger. Client should cast to biginteger.
 	*/
-	void* getX() override { return new biginteger(x); };
+	shared_ptr<void> getX() override { return make_shared<biginteger>(x); };
 
 	/**
 	* Converts the committed value to a string.
@@ -182,13 +186,16 @@ public:
 	/**
 	* Converts the committed value to a BigIntegerPlaintaxt.
 	*/
-	BigIntegerPlainText* convertToPlaintext() override { return new BigIntegerPlainText(x); };
+	shared_ptr<Plaintext> convertToPlaintext() override {
+		auto res = make_shared<BigIntegerPlainText>(x);
+		return res;
+	};
 
 	/**
 	* Returns a serialized object representing this commit value.
 	*/
-	byte* generateSendableData() override {
-		byte* output = new byte[byteCount];
+	shared_ptr<byte> generateSendableData() override {
+		std::shared_ptr<byte> output(new byte[byteCount], std::default_delete<byte[]>());
 		encodeBigInteger(x, output, byteCount);
 		return output;
 	};
@@ -200,30 +207,33 @@ public:
 */
 class CmtByteArrayCommitValue : public CmtCommitValue {
 private:
-	byte* x; // the committed value
+	std::shared_ptr<byte> x; // the committed value
 	int len; 
 public:
 	/**
 	* Constructor that sets the commit value.
 	*/
-	CmtByteArrayCommitValue(byte* x, int len) { this->x = x; this->len = len; };
+	CmtByteArrayCommitValue(std::shared_ptr<byte> x, int len) { this->x = x; this->len = len; };
 	/**
 	* Returns the committed byte*. client need to cast to byte*
 	*/
-	void* getX() override{ return x; }
+	shared_ptr<void> getX() override{ return x; }
 	int getXSize() { return len; };
 	/**
 	* Converts the committed value to a string.
 	*/
-	string toString() { return std::string(reinterpret_cast<char const*>(x), len); };
+	string toString() { return std::string(reinterpret_cast<char const*>(x.get()), len); };
 	/**
 	* Converts the committed value to a ByteArrayPlaintext.
 	*/
-	ByteArrayPlaintext* convertToPlaintext() override { return new ByteArrayPlaintext(x, len); };
+	shared_ptr<Plaintext> convertToPlaintext() override {
+		auto res = make_shared<ByteArrayPlaintext>(x, len);
+		return res;
+	};
 	/**
 	* Returns a serialized object representing this commit value.
 	*/
-	byte* generateSendableData() override {return x;}
+	std::shared_ptr<byte> generateSendableData() override {return x;}
 	int sendableDataSize() override { return len; }
 };
 
@@ -244,13 +254,13 @@ public:
 	* The commitment objects can vary, therefore returns an void pointer.
 	* @return the commitment object.
 	*/
-	virtual void* getCommitment()=0;
+	virtual shared_ptr<void> getCommitment()=0;
 	/**
 	* Return byte* representation of the message
 	*/
-	virtual byte* toByteArray() = 0;
+	virtual shared_ptr<byte> toByteArray() = 0;
 	virtual int serializedSize() = 0;
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
+	virtual void init_from_byte_array(std::shared_ptr<byte> arr, int size) = 0;
 };	
 
 /**
@@ -261,12 +271,12 @@ class CmtCDecommitmentMessage {
 	* Returns the committed value.
 	* @return the serializable committed value.
 	*/
-	virtual byte * getSerializedX() = 0;
+	virtual shared_ptr<byte> getSerializedX() = 0;
 	virtual int getSerializedXSize() = 0;
 	/**
 	* Returns the random value used to commit.
 	*/
-	virtual RandomValue* getR() = 0;
+	virtual shared_ptr<RandomValue> getR() = 0;
 
 };
 
@@ -314,7 +324,7 @@ public:
 	* that many commitments are performed one after the other without decommiting them yet.
 	* @return the generated commitment object.
 	*/
-	virtual CmtCCommitmentMsg* generateCommitmentMsg(CmtCommitValue* input, long id)=0;
+	virtual shared_ptr<CmtCCommitmentMsg> generateCommitmentMsg(shared_ptr<CmtCommitValue> input, long id)=0;
 
 	/**
 	* This function is the heart of the commitment phase from the Committer's point of view.
@@ -322,7 +332,7 @@ public:
 	* @param id Unique value attached to the input to keep track of the commitments in
 	* the case that many commitments are performed one after the other without decommiting them yet.
 	*/
-	virtual void commit(CmtCommitValue* input, long id) = 0;
+	virtual void commit(shared_ptr<CmtCommitValue> input, long id) = 0;
 
 	/**
 	* Generate a decommitment message using the given id.<p>
@@ -360,7 +370,7 @@ public:
 	* that many commitments are performed one after the other without decommiting them yet.
 	* @return the generated decommitment object.
 	*/
-	virtual CmtCDecommitmentMessage* generateDecommitmentMsg(long id)=0;
+	virtual shared_ptr<CmtCDecommitmentMessage> generateDecommitmentMsg(long id)=0;
 
 	/**
 	* This function is the heart of the decommitment phase from the Committer's point of view.
@@ -372,7 +382,7 @@ public:
 	* This function samples random commit value to commit on.
 	* @return the sampled commit value.
 	*/
-	virtual CmtCommitValue* sampleRandomCommitValue() =0;
+	virtual shared_ptr<CmtCommitValue> sampleRandomCommitValue() =0;
 
 	/**
 	* This function wraps the raw data x with a suitable CommitValue instance according to the
@@ -380,15 +390,15 @@ public:
 	* @param x array to convert into a commitValue.
 	* @return the created CommitValue.
 	*/
-	virtual CmtCommitValue*  generateCommitValue(byte* x, int len) =0;
+	virtual shared_ptr<CmtCommitValue>  generateCommitValue(shared_ptr<byte> x, int len) =0;
 
 	/**
 	* This function converts the given commit value to a byte array.
 	* @param value to get its bytes.
 	* @return the generated bytes.
 	*/
-	virtual byte* generateBytesFromCommitValue(CmtCommitValue* value)=0;
-	virtual int getBytesSizeFromCommitValue(CmtCommitValue* value)=0;
+	virtual shared_ptr<byte> generateBytesFromCommitValue(shared_ptr<CmtCommitValue> value)=0;
+	virtual int getBytesSizeFromCommitValue(shared_ptr<CmtCommitValue> value)=0;
 
 	/**
 	* This function returns the values calculated during the preprocess phase.<p>
@@ -408,7 +418,7 @@ public:
 	* @param id of the specific commitment
 	* @return values calculated during the commit phase
 	*/
-	virtual CmtCommitmentPhaseValues* getCommitmentPhaseValues(long id) = 0;
+	virtual shared_ptr<CmtCommitmentPhaseValues> getCommitmentPhaseValues(long id) = 0;
 };
 
 /**
@@ -424,14 +434,14 @@ public:
 	* @return the id of the commitment and some other information if necessary according to the 
 	* implementing class.
 	*/
-	virtual CmtRCommitPhaseOutput* receiveCommitment() = 0;
+	virtual shared_ptr<CmtRCommitPhaseOutput> receiveCommitment() = 0;
 
 	/**
 	* This function is the heart of the decommitment phase from the Receiver's point of view.
 	* @param id wait for a specific message according to this id
 	* @return the commitment
 	*/
-	virtual CmtCommitValue* receiveDecommitment(long id) = 0;
+	virtual shared_ptr<CmtCommitValue> receiveDecommitment(long id) = 0;
 
 	/**
 	* Verifies the given decommitment object according to the given commitment object.<p>
@@ -458,21 +468,18 @@ public:
 	* CmtCDecommitmentMessage msg3 = generateDecommitmentMsg(3);
 	* ...
 	*
-	* try {
 	*		//Send the messages by the channel.
-	*		channel.send(msg1);
-	*		channel.send(msg2);
-	*		channel.send(msg3);
-	*	} catch (IOException e) {
-	*		throw new IOException("failed to send the decommitment. The error is: " + e.getMessage());
-	*	}
+	*		channel->write_fast(msg1);
+	*		channel->write_fast(msg2);
+	*		channel->write_fast(msg3);
+	*
 	*
 	* @param commitmentMsg the commitment object.
 	* @param decommitmentMsg the decommitment object
 	* @return the committed value if the decommit succeeded; null, otherwise.
 	*/
-	virtual CmtCommitValue* verifyDecommitment(CmtCCommitmentMsg* commitmentMsg,
-		CmtCDecommitmentMessage* decommitmentMsg) = 0;
+	virtual shared_ptr<CmtCommitValue> verifyDecommitment(shared_ptr<CmtCCommitmentMsg> commitmentMsg,
+		shared_ptr<CmtCDecommitmentMessage> decommitmentMsg) = 0;
 
 	/**
 	* Return the values used during the pre-process phase (usually upon construction). 
@@ -487,14 +494,14 @@ public:
 	* @param id get the commitment values according to this id.
 	* @return a general void pointer.
 	*/
-	virtual void* getCommitmentPhaseValues(long id) = 0;
+	virtual shared_ptr<void> getCommitmentPhaseValues(long id) = 0;
 
 	/**
 	* This function converts the given commit value to a byte array.
 	* @param value to get its bytes.
 	* @return the generated bytes.
 	*/
-	virtual byte* generateBytesFromCommitValue(CmtCommitValue* value)=0;
+	virtual shared_ptr<byte> generateBytesFromCommitValue(shared_ptr<CmtCommitValue> value)=0;
 };
 
 /**
@@ -537,7 +544,7 @@ public:
 	* Verifies that the committed value with the given id was x.
 	* @param id of the committed value.
 	*/
-	virtual CmtCommitValue* verifyCommittedValue(long id) = 0;
+	virtual shared_ptr<CmtCommitValue> verifyCommittedValue(long id) = 0;
 };
 
 /**

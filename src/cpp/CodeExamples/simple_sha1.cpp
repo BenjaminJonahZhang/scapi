@@ -4,7 +4,7 @@
 int main2()
 {
         string input_msg = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-        CryptographicHash * hash = new OpenSSLSHA1();
+        auto hash = make_unique<OpenSSLSHA1>();
         const char *cstr = input_msg.c_str();
         int len = input_msg.size();
         vector<byte> vec(cstr, cstr + len);

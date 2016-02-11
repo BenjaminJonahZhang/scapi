@@ -48,7 +48,7 @@ public:
 	* Runs the protocol.
 	* @param ungarbledInput The input for the circuit, each p1's input wire gets 0 or 1.
 	*/
-	void run(byte * ungarbledInput);
+	void run(byte* ungarbledInput);
 	/**
 	* Runs OT protocol in order to send p2 the necessary keys without revealing any other information.
 	* @param allInputWireValues The keys for each wire.

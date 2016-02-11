@@ -43,7 +43,7 @@ public:
 	/**
 	* Returns the common parameters of the prover and the verifier.
 	*/
-	virtual SigmaCommonInput * getCommonParams()=0;
+	virtual shared_ptr<SigmaCommonInput> getCommonParams()=0;
 };
 /**
 * Marker interface. Every Sigma prover or verifier that consists of 
@@ -63,8 +63,8 @@ class DlogBasedSigma {};
 */
 class SigmaProtocolMsg {
 public:
-	virtual void init_from_byte_array(byte * arr, int size) = 0;
-	virtual byte * toByteArray() = 0;
+	virtual void init_from_byte_array(shared_ptr<byte> arr, int size) = 0;
+	virtual shared_ptr<byte> toByteArray() = 0;
 	virtual int serializedSize() = 0;
 };
 
@@ -87,12 +87,12 @@ public:
 	* This function can be called when a user does not want to save time by 
 	* doing operations in parallel. <p>
 	*/
-	virtual void prove(SigmaProverInput * input) = 0;
+	virtual void prove(shared_ptr<SigmaProverInput> input) = 0;
 	/**
 	* Processes the first step of the sigma protocol. <p>
 	* It computes the first message and sends it to the verifier.
 	*/
-	virtual void processFirstMsg(SigmaProverInput * input)=0;
+	virtual void processFirstMsg(shared_ptr<SigmaProverInput> input)=0;
 	/**
 	* Processes the second step of the sigma protocol. <p>
 	* It receives the challenge from the verifier, computes the second message and then 
@@ -116,13 +116,13 @@ public:
 	* Returns the first message.
 	* @return a - first message
 	*/
-	virtual SigmaProtocolMsg * getA()=0;
+	virtual shared_ptr<SigmaProtocolMsg> getA()=0;
 
 	/**
 	* All SigmaSimulators contains first message, challenge and second message. 
 	* Returns the challenge 
 	*/
-	virtual byte* getE() = 0 ;
+	virtual shared_ptr<byte> getE() = 0 ;
 
 	/**
 	* All SigmaSimulators contains first message, challenge and second message.
@@ -135,7 +135,7 @@ public:
 	* Returns the second message.
 	* @return z - second message
 	*/
-	virtual SigmaProtocolMsg * getZ() = 0;
+	virtual shared_ptr<SigmaProtocolMsg> getZ() = 0;
 };
 
 /**
@@ -150,13 +150,13 @@ public:
 	/**
 	* Computes the simulator computation.
 	*/
-	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input, 
-		byte* challenge, int challenge_size)  =0;
+	virtual shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput> input,
+		shared_ptr<byte> challenge, int challenge_size)  =0;
 
 	/**
 	* Chooses random challenge and computes the simulator computation.
 	*/
-	virtual SigmaSimulatorOutput * simulate(SigmaCommonInput * input) = 0;
+	virtual shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput> input) = 0;
 	/**
 	* Returns the soundness parameter for this Sigma simulator.
 	*/
@@ -181,7 +181,7 @@ class SigmaProtocolVerifier {
 	* This function can be called when a user does not want to save time by doing operations
 	* in parallel.
 	*/
-	virtual bool verify(SigmaCommonInput * input) = 0;
+	virtual bool verify(shared_ptr<SigmaCommonInput> input) = 0;
 	/**
 	* Samples the challenge for this protocol.
 	*/
@@ -195,15 +195,15 @@ class SigmaProtocolVerifier {
 	* Waits to the prover's second message and then verifies the proof.	<p>
 	* This is a blocking function!
 	*/
-	virtual bool processVerify(SigmaCommonInput * input) = 0;
+	virtual bool processVerify(shared_ptr<SigmaCommonInput> input) = 0;
 	/**
 	* Sets the given challenge 
 	*/
-	virtual void setChallenge(byte * challenge, int challenge_size)=0;
+	virtual void setChallenge(shared_ptr<byte> challenge, int challenge_size)=0;
 	/**
 	* Return the challenge byte array
 	*/
-	virtual byte * getChallenge()=0;
+	virtual shared_ptr<byte> getChallenge()=0;
 	/*
 	* Returns the ChallengeSize
 	*/
@@ -219,11 +219,12 @@ public:
 	/**
 	* Computes the first message of the sigma protocol.
 	*/
-	virtual SigmaProtocolMsg * computeFirstMsg(SigmaProverInput * input) =0;
+	virtual shared_ptr<SigmaProtocolMsg> computeFirstMsg(shared_ptr<SigmaProverInput> input) =0;
 	/**
 	* Computes the second message of the sigma protocol.
 	*/
-	virtual SigmaProtocolMsg * computeSecondMsg(byte* challenge, int challenge_size) =0;
+	virtual shared_ptr<SigmaProtocolMsg> computeSecondMsg(
+		shared_ptr<byte> challenge, int challenge_size) =0;
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	* @return t soundness parameter
@@ -232,7 +233,7 @@ public:
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	*/
-	virtual SigmaSimulator * getSimulator() = 0;
+	virtual shared_ptr<SigmaSimulator> getSimulator() = 0;
 };
 
 /**
@@ -250,7 +251,8 @@ public:
 	* @param input
 	* @return true if the proof has been verified; false, otherwise.
 	*/
-	virtual bool verify(SigmaCommonInput * input, SigmaProtocolMsg * a, SigmaProtocolMsg * z) =0;
+	virtual bool verify(shared_ptr<SigmaCommonInput> input, 
+		shared_ptr<SigmaProtocolMsg> a, shared_ptr<SigmaProtocolMsg> z) =0;
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	* @return t soundness parameter
@@ -260,11 +262,11 @@ public:
 	* Sets the given challenge.
 	* @param challenge
 	*/
-	virtual void setChallenge(byte * challenge, int challenge_size) = 0;
+	virtual void setChallenge(shared_ptr<byte> challenge, int challenge_size) = 0;
 	/**
 	* @return the challenge.
 	*/
-	virtual byte * getChallenge() = 0;
+	virtual shared_ptr<byte> getChallenge() = 0;
 
 	virtual int getChallengeSize() = 0;
 };
@@ -291,11 +293,12 @@ public:
 	/**
 	* Constructor that sets the given channel and sigmaProverComputation.
 	*/
-	SigmaProver(ChannelServer * channel, SigmaProverComputation * proverComputation) {
+	SigmaProver(std::shared_ptr<ChannelServer> channel,
+		std::shared_ptr<SigmaProverComputation> proverComputation) {
 		this->channel = channel;
 		this->proverComputation = proverComputation;
 	}
-	void prove(SigmaProverInput * input) override{
+	void prove(shared_ptr<SigmaProverInput> input) override{
 		processFirstMsg(input); // step one of the protocol.
 		processSecondMsg(); // step two of the protocol.
 	};
@@ -306,7 +309,7 @@ public:
 	* 	 SEND the computed message to the verifier".<p>
 	* It computes the first message and sends it to the verifier.
 	*/
-	void processFirstMsg(SigmaProverInput * input) override;
+	void processFirstMsg(shared_ptr<SigmaProverInput> input) override;
 	/**
 	* Processes the second step of the sigma protocol.<p>
 	* 	"RECEIVE challenge from verifier<p>
@@ -318,14 +321,14 @@ public:
 
 
 private:
-	ChannelServer * channel;
-	SigmaProverComputation * proverComputation;	// underlying sigma computation.
+	std::shared_ptr<ChannelServer> channel;
+	std::shared_ptr<SigmaProverComputation> proverComputation;	// underlying sigma computation.
 	bool doneFirstMsg;
 	/**
 	* Sends the given message to the verifier.
 	*/
-	void sendMsgToVerifier(SigmaProtocolMsg * message) { 
-		byte* raw_message = message->toByteArray();
+	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) { 
+		auto raw_message = message->toByteArray();
 		int message_size = message->serializedSize();
 		channel->write_fast(raw_message, message_size);
 	};
@@ -352,23 +355,23 @@ public:
 	/**
 	* Constructor that sets the given channel and random.
 	*/
-	SigmaVerifier(ChannelServer * channel, SigmaVerifierComputation * verifierComputation, 
-		SigmaProtocolMsg * emptyFirstMessage, SigmaProtocolMsg * emptySecondMessage) {
+	SigmaVerifier(shared_ptr<ChannelServer> channel, shared_ptr<SigmaVerifierComputation> verifierComputation,
+		shared_ptr<SigmaProtocolMsg> emptyFirstMessage, shared_ptr<SigmaProtocolMsg> emptySecondMessage) {
 		this->channel = channel;
 		this->verifierComputation = verifierComputation;
 		this->a = emptyFirstMessage;
 		this->z = emptySecondMessage;
 	}
-	bool verify(SigmaCommonInput * input) override;
+	bool verify(shared_ptr<SigmaCommonInput> input) override;
 	void sampleChallenge() override {
 		// delegates to the underlying verifierComputation object.
 		verifierComputation->sampleChallenge();
 	}
-	void setChallenge(byte * challenge, int challenge_size) override{
+	void setChallenge(shared_ptr<byte> challenge, int challenge_size) override{
 		// delegates to the underlying verifierComputation object.
 		verifierComputation->setChallenge(challenge, challenge_size);
 	}
-	byte* getChallenge() override {
+	shared_ptr<byte> getChallenge() override {
 		// delegates to the underlying verifierComputation object.
 		return verifierComputation->getChallenge();
 	}
@@ -376,41 +379,42 @@ public:
 		return verifierComputation->getChallengeSize();
 	}
 	void sendChallenge() override;
-	bool processVerify(SigmaCommonInput * input) override;
+	bool processVerify(shared_ptr<SigmaCommonInput> input) override;
 
 private:
-	ChannelServer * channel;
-	SigmaVerifierComputation * verifierComputation;
-	SigmaProtocolMsg * a;	// first message from the prover.
-	SigmaProtocolMsg * z;	// second message from the prover.
+	shared_ptr<ChannelServer> channel;
+	shared_ptr<SigmaVerifierComputation> verifierComputation;
+	shared_ptr<SigmaProtocolMsg> a;	// first message from the prover.
+	shared_ptr<SigmaProtocolMsg> z;	// second message from the prover.
 	bool doneChallenge;
 	/**
 	* Waits for message from receiver and returns it.
 	* Fills an instance of SigmaProtocolMsg with body from the received message
 	*/
-	void receiveMsgFromProver(SigmaProtocolMsg * msg);
+	void receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> msg);
 	/**
 	* Sends the challenge to the prover.
 	*/
-	void sendChallengeToProver(byte* challenge, int challenge_size) {
+	void sendChallengeToProver(shared_ptr<byte> challenge, int challenge_size) {
 		channel->write_fast(challenge, challenge_size);
 	}
 };
 
 /**
 * Concrete implementation of SigmaProtocol message. <p>
-* This message contains array of SigmaProtocolMsg and used, for example, when the SigmaANDProver sends the messages to the verifier.<p>
+* This message contains array of SigmaProtocolMsg and used, for example, when the SigmaANDProver
+* sends the messages to the verifier.<p>
 */
 class SigmaMultipleMsg : public SigmaProtocolMsg {
 public:
-	SigmaMultipleMsg(vector<SigmaProtocolMsg *> messages) { this->messages = messages; };
-	vector<SigmaProtocolMsg*> getMessages() { return messages; };
-	void init_from_byte_array(byte * arr, int size) override;
-	byte * toByteArray() override;
+	SigmaMultipleMsg(vector<shared_ptr<SigmaProtocolMsg>> messages) { this->messages = messages; };
+	vector<shared_ptr<SigmaProtocolMsg>> getMessages() { return messages; };
+	void init_from_byte_array(shared_ptr<byte> arr, int size) override;
+	shared_ptr<byte> toByteArray() override;
 	int serializedSize() override;
 
 private:
-	vector<SigmaProtocolMsg *> messages;
+	vector<shared_ptr<SigmaProtocolMsg>> messages;
 };
 
 /**
@@ -425,13 +429,13 @@ public:
 	SigmaBIMsg() { this->z = -100; };
 	SigmaBIMsg(biginteger z) { this->z = z; };
 	biginteger getMsg() { return z; };
-	void init_from_byte_array(byte * arr, int size) override { 
+	void init_from_byte_array(shared_ptr<byte> arr, int size) override { 
 		z = decodeBigInteger(arr, size); 
 		size_ = size;
 	};
-	byte * toByteArray() override {
+	shared_ptr<byte> toByteArray() override {
 		size_ = bytesCount(this->z);
-		byte* res = new byte[size_];
+		std::shared_ptr<byte> res(new byte[size_], std::default_delete<byte[]>());
 		encodeBigInteger(this->z, res, size_);
 		return res;
 	}

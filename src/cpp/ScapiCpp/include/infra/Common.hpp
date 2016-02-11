@@ -9,6 +9,7 @@
 #include <boost/timer/timer.hpp>
 #include <math.h> /* pow */
 #include <random>
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
@@ -60,18 +61,12 @@ void copy_byte_array_to_byte_vector(const byte* src, int src_len, vector<byte>& 
 * Number can be postive or negative - the sign will be preserved in the encoding
 * Use byteCount(biginteger) method to calculate the number of bytes needed.
 */
-void encodeBigInteger(biginteger value, byte* output, size_t length);
+void encodeBigInteger(biginteger value, shared_ptr<byte> output, size_t length);
 
 /*
 * Decodoing big integer from byte array back to a biginteger object
 */
-biginteger decodeBigInteger(byte* input, size_t length);
-
-/*
-* Converting big integer to a byte array. Allocate a new array and returns it. make sure to free it!
-* Returns the array size
-*/
-size_t allocateAndEncodeBigInteger(biginteger value, byte * output);
+biginteger decodeBigInteger(shared_ptr<byte> input, size_t length);
 
 biginteger convert_hex_to_biginteger(const string & hex);
 

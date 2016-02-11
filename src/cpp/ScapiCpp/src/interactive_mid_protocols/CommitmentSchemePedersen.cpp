@@ -4,16 +4,16 @@
 /*********************************/
 /*   CmtPedersenReceiverCore     */
 /*********************************/
-CmtPedersenReceiverCore::CmtPedersenReceiverCore(ChannelServer* channel) {
+CmtPedersenReceiverCore::CmtPedersenReceiverCore(shared_ptr<ChannelServer> channel) {
 	auto r = get_seeded_random();
-	DlogGroup * dg = new OpenSSLDlogZpSafePrime(256, r);
+	auto dg = make_shared<OpenSSLDlogZpSafePrime>(256, r);
 	doConstruct(channel, dg, r);
 };
 
-void CmtPedersenReceiverCore::doConstruct(ChannelServer* channel, DlogGroup* dlog,
-	std::mt19937 random) {
+void CmtPedersenReceiverCore::doConstruct(shared_ptr<ChannelServer> channel, 
+	shared_ptr<DlogGroup> dlog, std::mt19937 random) {
 	// the underlying dlog group must be DDH secure.
-	DDH* ddh = dynamic_cast<DDH*>(dlog);
+	DDH* ddh = dynamic_cast<DDH*>(dlog.get());
 	if (!ddh)
 		throw SecurityLevelException("DlogGroup should have DDH security level");
 
@@ -33,18 +33,19 @@ void CmtPedersenReceiverCore::preProcess() {
 	trapdoor = getRandomInRange(0, qMinusOne, random);
 	h = dlog->exponentiate(dlog->getGenerator(), trapdoor);
 	auto sendableData = h->generateSendableData();
-	byte* raw_msg = sendableData->toByteArray();
+	auto raw_msg = sendableData->toByteArray();
 	int len = sendableData->getSerializedSize();
 	channel->write_fast(raw_msg, len);
 }
 
-CmtRBasicCommitPhaseOutput* CmtPedersenReceiverCore::receiveCommitment() {
+shared_ptr<CmtRCommitPhaseOutput> CmtPedersenReceiverCore::receiveCommitment() {
 	// create an empty CmtPedersenCommitmentMessage 
-	CmtPedersenCommitmentMessage* msg = new CmtPedersenCommitmentMessage();
+	auto msg = make_shared<CmtPedersenCommitmentMessage>();
 	// read encoded CmtPedersenCommitmentMessage from channel
 	auto v = channel->read_one();
 	// init the empy CmtPedersenCommitmentMessage using the encdoed data
-	msg->init_from_byte_array(&(v->at(0)), v->size());
+	shared_ptr<byte> arr(&(v->at(0)));
+	msg->init_from_byte_array(arr, v->size());
 	commitmentMap[msg->getId()] = msg;
-	return new CmtRBasicCommitPhaseOutput(msg->getId());
+	return make_shared<CmtRBasicCommitPhaseOutput>(msg->getId());
 }

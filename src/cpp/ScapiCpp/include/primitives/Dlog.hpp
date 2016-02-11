@@ -12,9 +12,9 @@
 */
 class GroupElementSendableData {
 public:
-	virtual byte * toByteArray() = 0;
+	virtual std::shared_ptr<byte> toByteArray() = 0;
 	virtual int getSerializedSize() { return serialized_size; };
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
+	virtual void init_from_byte_array(std::shared_ptr<byte> arr, int size) = 0;
 	virtual ~GroupElementSendableData() = 0; // making this an abstract class
 protected:
 	int serialized_size;
@@ -44,7 +44,7 @@ public:
 	* It puts all the data in an instance of the relevant class that implements the GroupElementSendableData interface.
 	* @return the GroupElementSendableData object
 	*/
-	virtual GroupElementSendableData * generateSendableData() = 0;	
+	virtual shared_ptr<GroupElementSendableData> generateSendableData() = 0;	
 
 	virtual bool operator==(const GroupElement &other) const=0;
 	virtual bool operator!=(const GroupElement &other) const=0;
@@ -109,7 +109,7 @@ public:
 	* The generator g of the group is an element of the group such that, when written multiplicatively, every element of the group is a power of g.
 	* @return the generator of this Dlog group
 	*/
-	virtual GroupElement * getGenerator() = 0;
+	virtual std::shared_ptr<GroupElement> getGenerator() = 0;
 
 	/**
 	* GroupParams is a structure that holds the actual data that makes this group a specific Dlog group.<p>
@@ -117,7 +117,7 @@ public:
 	*
 	* @return the GroupParams of that Dlog group
 	*/
-	virtual GroupParams * getGroupParams() = 0;
+	virtual std::shared_ptr<GroupParams> getGroupParams() = 0;
 
 	/**
 	*
@@ -129,7 +129,7 @@ public:
 	*
 	* @return the identity of this Dlog group
 	*/
-	virtual GroupElement * getIdentity() = 0;
+	virtual std::shared_ptr<GroupElement> getIdentity() = 0;
 
 	/**
 	* Checks if the given element is a member of this Dlog group
@@ -138,7 +138,7 @@ public:
 	* 		   <code>false</code> otherwise.
 	* @throws IllegalArgumentException
 	*/
-	virtual bool isMember(GroupElement * element) = 0;
+	virtual bool isMember(shared_ptr<GroupElement> element) = 0;
 
 	/**
 	* Checks if the order is a prime number
@@ -176,7 +176,7 @@ public:
 	* @return the inverse element of the given GroupElement
 	* @throws IllegalArgumentException
 	**/
-	virtual GroupElement * getInverse(GroupElement  * groupElement) = 0;
+	virtual std::shared_ptr<GroupElement> getInverse(std::shared_ptr<GroupElement> groupElement) = 0;
 
 	/**
 	* Raises the base GroupElement to the exponent. The result is another GroupElement.
@@ -185,7 +185,7 @@ public:
 	* @return the result of the exponentiation
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * exponentiate(GroupElement* base, biginteger exponent) = 0;
+	virtual std::shared_ptr<GroupElement> exponentiate(std::shared_ptr<GroupElement> base, biginteger exponent) = 0;
 
 	/**
 	* Multiplies two GroupElements
@@ -194,19 +194,20 @@ public:
 	* @return the multiplication result
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * multiplyGroupElements(GroupElement * groupElement1, GroupElement * groupElement2) = 0;
+	virtual std::shared_ptr<GroupElement> multiplyGroupElements(std::shared_ptr<GroupElement> groupElement1, 
+		std::shared_ptr<GroupElement> groupElement2) = 0;
 
 	/**
 	* Creates a random member of this Dlog group
 	* @return the random element
 	*/
-	virtual GroupElement * createRandomElement() = 0;
+	virtual std::shared_ptr<GroupElement> createRandomElement() = 0;
 
 	/**
 	* Creates a random generator of this Dlog group
 	* @return the random generator
 	*/
-	virtual GroupElement * createRandomGenerator() = 0;
+	virtual std::shared_ptr<GroupElement> createRandomGenerator() = 0;
 
 	/**
 	* This function allows the generation of a group element by a protocol that holds a Dlog Group but does not know if it is a Zp Dlog Group or an Elliptic Curve Dlog Group.
@@ -219,7 +220,7 @@ public:
 	* @return the generated GroupElement
 	* @throws IllegalArgumentException
 	*/
-	virtual GroupElement * generateElement(bool bCheckMembership, vector<biginteger> values) = 0;
+	virtual std::shared_ptr<GroupElement> generateElement(bool bCheckMembership, vector<biginteger> values) = 0;
 
 
 	/**
@@ -229,7 +230,8 @@ public:
 	* @param data the GroupElementSendableData from which we wish to "reconstruct" an element of this DlogGroup
 	* @return the reconstructed GroupElement
 	*/
-	virtual GroupElement * reconstructElement(bool bCheckMembership, GroupElementSendableData * data) = 0;
+	virtual std::shared_ptr<GroupElement> reconstructElement(bool bCheckMembership,
+		std::shared_ptr<GroupElementSendableData> data) = 0;
 
 	/**
 	* Computes the product of several exponentiations with distinct bases
@@ -240,7 +242,8 @@ public:
 	* @param exponentiations
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * simultaneousMultipleExponentiations(vector<GroupElement *> groupElements, vector<biginteger> exponentiations) = 0;
+	virtual std::shared_ptr<GroupElement> simultaneousMultipleExponentiations(
+		vector<std::shared_ptr<GroupElement>> groupElements, vector<biginteger> exponentiations) = 0;
 
 	/**
 	* Computes the product of several exponentiations of the same base
@@ -253,7 +256,8 @@ public:
 	* @param exponent
 	* @return the exponentiation result
 	*/
-	virtual GroupElement * exponentiateWithPreComputedValues(GroupElement * base, biginteger exponent) = 0;
+	virtual std::shared_ptr<GroupElement> exponentiateWithPreComputedValues(
+		std::shared_ptr<GroupElement> base, biginteger exponent) = 0;
 
 	/**
 	* This function cleans up any resources used by exponentiateWithPreComputedValues for the requested base.
@@ -261,7 +265,7 @@ public:
 	*
 	* @param base
 	*/
-	virtual void endExponentiateWithPreComputedValues(GroupElement * base) = 0;
+	virtual void endExponentiateWithPreComputedValues(std::shared_ptr<GroupElement> base) = 0;
 
 	/**
 	* This function takes any string of length up to k bytes and encodes it to a Group Element.
@@ -273,7 +277,8 @@ public:
 	* @param binaryString the byte array to encode
 	* @return the encoded group Element <B> or null </B>if element could not be encoded
 	*/
-	virtual  GroupElement * encodeByteArrayToGroupElement(const vector<unsigned char> & binaryString) = 0;
+	virtual  std::shared_ptr<GroupElement> encodeByteArrayToGroupElement(
+		const vector<unsigned char> & binaryString) = 0;
 
 	/**
 	* This function decodes a group element to a byte array. This function is guaranteed to work properly ONLY if the group element was obtained as a result of
@@ -285,7 +290,8 @@ public:
 	* @param groupElement the element to decode
 	* @return the decoded byte array
 	*/
-	virtual const vector<unsigned char> decodeGroupElementToByteArray(GroupElement * groupElement) = 0;
+	virtual const vector<unsigned char> decodeGroupElementToByteArray(
+		std::shared_ptr<GroupElement> groupElement) = 0;
 
 
 	/**
@@ -302,7 +308,8 @@ public:
 	* This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array.
 	* @return a byte array representation of the given group element
 	*/
-	virtual const vector<byte> mapAnyGroupElementToByteArray(GroupElement * groupElement) = 0;
+	virtual const vector<byte> mapAnyGroupElementToByteArray(
+		std::shared_ptr<GroupElement> groupElement) = 0;
 };
 
 /**
@@ -313,25 +320,28 @@ class primeOrderSubGroup : public virtual DlogGroup {};
 /**
 * DlogGroupAbs is an abstract class that implements common functionality of the Dlog group.
 */
-class DlogGroupAbs : public virtual primeOrderSubGroup {
+class DlogGroupAbs : public virtual primeOrderSubGroup, public enable_shared_from_this<DlogGroupAbs> {
 
 protected:
-	GroupParams * groupParams;  //group parameters
-	GroupElement * generator;	//generator of the group
+	std::shared_ptr<GroupParams> groupParams;  // group parameters
+	std::shared_ptr<GroupElement> generator;	// generator of the group
 	mt19937 random_element_gen; 
 
-	int k; //k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
+	int k; // k is the maximum length of a string to be converted to a Group Element of this group.
+	       // If a string exceeds the k length it cannot be converted.
 
 	/*
 	* Computes the simultaneousMultiplyExponentiate using a naive algorithm
 	*/
-	GroupElement * computeNaive(vector<GroupElement *> groupElements, vector<biginteger> exponentiations);
+	std::shared_ptr<GroupElement> computeNaive(vector<std::shared_ptr<GroupElement>> groupElements,
+		vector<biginteger> exponentiations);
 	
 	/*
 	* Compute the simultaneousMultiplyExponentiate by LL algorithm.
 	* The code is taken from the pseudo code of LL algorithm in http://dasan.sejong.ac.kr/~chlim/pub/multi_exp.ps.
 	*/
-	GroupElement * computeLL(vector<GroupElement *> groupElements, vector<biginteger> exponentiations);
+	std::shared_ptr<GroupElement> computeLL(vector<std::shared_ptr<GroupElement>> groupElements,
+		vector<biginteger> exponentiations);
 
 private:
 	/**
@@ -343,9 +353,9 @@ private:
 	*/
 	class GroupElementsExponentiations {
 	private:
-		vector<GroupElement* > exponentiations; //vector of group elements that are the result of exponentiations
-		GroupElement * base;  //group element for which the optimized computations are built for
-		DlogGroupAbs * parent;
+		vector<std::shared_ptr<GroupElement>> exponentiations; //vector of group elements that are the result of exponentiations
+		std::shared_ptr<GroupElement> base;  //group element for which the optimized computations are built for
+		std::shared_ptr<DlogGroupAbs> parent;
 		/**
 		* Calculates the necessary additional exponentiations and fills the exponentiations vector with them.
 		* @param size - the required exponent
@@ -360,7 +370,8 @@ private:
 		* @param base
 		* @throws IllegalArgumentException
 		*/
-		GroupElementsExponentiations(DlogGroupAbs * parent_, GroupElement * base_);
+		GroupElementsExponentiations(std::shared_ptr<DlogGroupAbs> parent_, 
+			std::shared_ptr<GroupElement> base_);
 
 		/**
 		* Checks if the exponentiations had already been calculated for the required size.
@@ -368,10 +379,11 @@ private:
 		* @param size - the required exponent
 		* @return groupElement - the exponentiate result
 		*/
-		GroupElement * getExponentiation(biginteger size);
+		shared_ptr<GroupElement> getExponentiation(biginteger size);
 	};
 	// using pointer as key mean different element ==> different keys even if they are 'equal' in other sense
-    std::unordered_map<GroupElement *, GroupElementsExponentiations *> exponentiationsMap; //map for multExponentiationsWithSameBase calculations
+    std::unordered_map<std::shared_ptr<GroupElement>, 
+		std::shared_ptr<GroupElementsExponentiations>> exponentiationsMap; //map for multExponentiationsWithSameBase calculations
 
 	/*
 	* Computes the loop the repeats in the algorithm.
@@ -383,12 +395,15 @@ private:
 	*		result = result *preComp[k][e]
 	*
 	*/
-	GroupElement * computeLoop(vector<biginteger> exponentiations, int w, int h, vector<vector<GroupElement *>> preComp, GroupElement * result, int bitIndex);
+	std::shared_ptr<GroupElement> computeLoop(vector<biginteger> exponentiations, int w, int h, 
+		vector<vector<std::shared_ptr<GroupElement>>> preComp, std::shared_ptr<GroupElement> result,
+		int bitIndex);
 
 	/*
 	* Creates the preComputation table.
 	*/
-	vector<vector<GroupElement *>> createLLPreCompTable(vector<GroupElement *> groupElements, int w, int h);
+	vector<vector<std::shared_ptr<GroupElement>>> createLLPreCompTable(
+		vector<std::shared_ptr<GroupElement>> groupElements, int w, int h);
 
 	/*
 	* returns the w value according to the given t
@@ -400,13 +415,13 @@ public:
 	* If this group has been initialized then it returns the group's generator. Otherwise throws exception.
 	* @return the generator of this Dlog group
 	*/
-	virtual GroupElement * getGenerator() override { return generator; };
+	virtual std::shared_ptr<GroupElement> getGenerator() override { return generator; };
 
 	/**
 	* GroupParams are the parameters of the group that define the actual group. That is, different parameters will create a different group.
 	* @return the GroupDesc of this Dlog group
 	*/
-	GroupParams * getGroupParams() override { return groupParams; };
+	std::shared_ptr<GroupParams> getGroupParams() override { return groupParams; };
 
 	/**
 	* If this group has been initialized then it returns the group's order. Otherwise throws exception.
@@ -433,14 +448,14 @@ public:
 	*
 	* @return the random element
 	*/
-	GroupElement * createRandomElement() override;
+	std::shared_ptr<GroupElement> createRandomElement() override;
 
 	/**
 	* Creates a random generator of this Dlog group
 	*
 	* @return the random generator
 	*/
-	GroupElement * createRandomGenerator()override;
+	std::shared_ptr<GroupElement> createRandomGenerator()override;
 	
 	/**
 	* @return the maximum length of a string to be converted to a Group Element of this group. If a string exceeds this length it cannot be converted.
@@ -462,12 +477,15 @@ public:
 	* @param exponent
 	* @return the exponentiation result
 	*/
-	GroupElement * exponentiateWithPreComputedValues(GroupElement * groupElement, biginteger exponent) override;
+	std::shared_ptr<GroupElement> exponentiateWithPreComputedValues(
+		std::shared_ptr<GroupElement> groupElement, biginteger exponent) override;
 
 	/* 
 	* @see edu.biu.scapi.primitives.dlog.DlogGroup#endExponentiateWithPreComputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
 	*/
-	void endExponentiateWithPreComputedValues(GroupElement * base) override { exponentiationsMap.erase(base); }
+	void endExponentiateWithPreComputedValues(std::shared_ptr<GroupElement> base) override {
+		exponentiationsMap.erase(base); 
+	}
 };
 
 /**********DlogZP hierechy***********************/
@@ -560,7 +578,7 @@ public:
 	bool operator==(const GroupElement &other) const override;
 	bool operator!=(const GroupElement &other) const override;
 	virtual string toString() = 0; 
-	GroupElementSendableData * generateSendableData() override;
+	shared_ptr<GroupElementSendableData> generateSendableData() override;
 };
 
 class ZpElementSendableData : public GroupElementSendableData {
@@ -574,13 +592,13 @@ public:
 	};
 	biginteger getX() { return x; }
 	string toString() { return "ZpElementSendableData [x=" + (string) x + "]"; }
-	byte * toByteArray() override {
+	std::shared_ptr<byte> toByteArray() override {
 		serialized_size = bytesCount(x);
-		byte * result = new byte[serialized_size];
+		std::shared_ptr<byte> result(new byte[serialized_size], std::default_delete<byte[]>());
 		encodeBigInteger(x, result, serialized_size);
 		return result;
 	};
-	void init_from_byte_array(byte* arr, int size) {
+	void init_from_byte_array(std::shared_ptr<byte> arr, int size) {
 		serialized_size = size;
 		x = decodeBigInteger(arr, size);
 	};

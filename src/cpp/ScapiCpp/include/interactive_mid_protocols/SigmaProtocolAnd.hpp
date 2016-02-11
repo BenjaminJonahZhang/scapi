@@ -12,14 +12,14 @@ public:
 	* We pass input by value to avoid unlegal reference and since it is just pointer inside the vector
 	* @param input contains inputs for all the underlying sigma protocol.
 	*/
-	SigmaANDCommonInput(vector<SigmaCommonInput *> input) { sigmaInputs = input; };
+	SigmaANDCommonInput(vector<shared_ptr<SigmaCommonInput>> input) { sigmaInputs = input; };
 	/**
 	* Returns the input array contains inputs for all the underlying sigma protocol.
 	*/
-	vector<SigmaCommonInput*> getInputs() { return sigmaInputs; };
+	vector<shared_ptr<SigmaCommonInput>> getInputs() { return sigmaInputs; };
 
 private:
-	vector<SigmaCommonInput *> sigmaInputs;
+	vector<shared_ptr<SigmaCommonInput>> sigmaInputs;
 };
 
 /**
@@ -32,14 +32,14 @@ public:
 	* Sets the input array.
 	* @param input contains inputs for all the underlying sigma protocol's provers.
 	*/
-	SigmaANDProverInput(vector<SigmaProverInput *> input) { sigmaInputs = input; };
+	SigmaANDProverInput(vector<shared_ptr<SigmaProverInput>> input) { sigmaInputs = input; };
 	/**
 	* Returns the input array contains inputs for all the underlying sigma protocol's provers.
 	*/
-	vector<SigmaProverInput *> getInputs() { return sigmaInputs; };
-	SigmaCommonInput * getCommonParams() override;
+	vector<shared_ptr<SigmaProverInput>> getInputs() { return sigmaInputs; };
+	shared_ptr<SigmaCommonInput> getCommonParams() override;
 private:
-	vector<SigmaProverInput *> sigmaInputs;
+	vector<shared_ptr<SigmaProverInput>> sigmaInputs;
 };
 
 /**
@@ -64,7 +64,7 @@ public:
 	* 		  and the prover wants to prove to the verify that the AND of all statements are true.
 	* @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
 	*/
-	SigmaANDProverComputation(vector<SigmaProverComputation *> provers, int t, std::mt19937 random);
+	SigmaANDProverComputation(vector<shared_ptr<SigmaProverComputation>> provers, int t, std::mt19937 random);
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	*/
@@ -75,22 +75,22 @@ public:
 	* @param input MUST be an instance of SigmaANDInput.
 	* @return SigmaMultipleMsg contains a1, ..., am.
 	*/
-	SigmaProtocolMsg * computeFirstMsg(SigmaProverInput * in) override;
+	shared_ptr<SigmaProtocolMsg> computeFirstMsg(shared_ptr<SigmaProverInput> in) override;
 	/**
 	* Computes the second message of the protocol.<p>
 	* "COMPUTE all second prover messages z1,...,zm".
 	* @param challenge
 	* @return SigmaMultipleMsg contains z1, ..., zm.
 	*/
-	SigmaProtocolMsg * computeSecondMsg(byte* challenge, int challenge_size)override;
+	shared_ptr<SigmaProtocolMsg> computeSecondMsg(shared_ptr<byte> challenge, int challenge_size)override;
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	* @return SigmaANDSimulator
 	*/
-	SigmaSimulator* getSimulator() override; 
+	shared_ptr<SigmaSimulator> getSimulator() override;
 
 private:
-	vector<SigmaProverComputation *> provers;	// underlying Sigma protocol's provers to the AND calculation.
+	vector<shared_ptr<SigmaProverComputation>> provers;	// underlying Sigma protocol's provers to the AND calculation.
 	int len;								// number of underlying provers.
 	int t;									// soundness parameter.
 	mt19937 random;
@@ -98,7 +98,7 @@ private:
 	* Sets the inputs for each one of the underlying prover.
 	* @param input MUST be an instance of SigmaANDProverInput.
 	*/
-	SigmaANDProverInput * checkInput(SigmaProverInput * in);
+	shared_ptr<SigmaANDProverInput> checkInput(shared_ptr<SigmaProverInput> in);
 };
 
 /**
@@ -123,7 +123,7 @@ public:
 	* @param t soundness parameter. t MUST be equal to all t values of the underlying simulators object.
 	* @param random source of randomness
 	*/
-	SigmaANDSimulator(vector<SigmaSimulator*> simulators, int t, std::mt19937 random);
+	SigmaANDSimulator(vector<shared_ptr<SigmaSimulator>> simulators, int t, std::mt19937 random);
 	int getSoundnessParam() override { return t; };
 	/**
 	* Computes the simulator computation with the given challenge.
@@ -131,16 +131,17 @@ public:
 	* @param challenge
 	* @return the output of the computation - (a, e, z).
 	*/
-	SigmaSimulatorOutput* simulate(SigmaCommonInput *input, byte* challenge, int challenge_size) override;
+	shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput>input, 
+		shared_ptr<byte> challenge, int challenge_size) override;
 	/**
 	* Computes the simulator computation with a randomly chosen challenge.
 	* @param input MUST be an instance of SigmaANDCommonInput.
 	* @return the output of the computation - (a, e, z).
 	*/
-	SigmaSimulatorOutput* simulate(SigmaCommonInput *input) override;
+	shared_ptr<SigmaSimulatorOutput> simulate(shared_ptr<SigmaCommonInput> input) override;
 
 private:
-	vector<SigmaSimulator*> simulators;	// Underlying Sigma protocol's simulators to the AND calculation.
+	vector<shared_ptr<SigmaSimulator>> simulators;	// Underlying Sigma protocol's simulators to the AND calculation.
 	int len;							// Number of underlying simulators.
 	int t;								// Soundness parameter.
 	std::mt19937 random;
@@ -166,22 +167,23 @@ public:
 	* @param e challenge
 	* @param z second message
 	*/
-	SigmaANDSimulatorOutput(SigmaMultipleMsg *a, byte* e, int eSize, SigmaMultipleMsg* z) {
+	SigmaANDSimulatorOutput(shared_ptr<SigmaMultipleMsg> a, shared_ptr<byte> e,
+		int eSize, shared_ptr<SigmaMultipleMsg> z) {
 		this->a = a;
 		this->e = e;
 		this->eSize = eSize;
 		this->z = z;
 	};
-	SigmaProtocolMsg *getA() override { return a; };
-	byte* getE() override { return e; };
+	shared_ptr<SigmaProtocolMsg> getA() override { return a; };
+	shared_ptr<byte> getE() override { return e; };
 	int getESize() override { return eSize; }
-	SigmaProtocolMsg * getZ() override { return z; };
+	shared_ptr<SigmaProtocolMsg> getZ() override { return z; };
 
 private:
-	SigmaMultipleMsg* a;
-	byte* e;
+	shared_ptr<SigmaMultipleMsg> a;
+	shared_ptr<byte> e;
 	int eSize;
-	SigmaMultipleMsg* z;
+	shared_ptr<SigmaMultipleMsg> z;
 };
 
 /**
@@ -204,7 +206,7 @@ class SigmaANDVerifierComputation : public SigmaVerifierComputation {
 	* @param t soundness parameter. t MUST be equal to all t values of the underlying verifiers object.
 	* @param random source of randomness
 	*/
-	SigmaANDVerifierComputation(vector<SigmaVerifierComputation*> & verifiers, int t, std::mt19937 random);
+	SigmaANDVerifierComputation(vector<shared_ptr<SigmaVerifierComputation>> & verifiers, int t, std::mt19937 random);
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	*/
@@ -214,11 +216,11 @@ class SigmaANDVerifierComputation : public SigmaVerifierComputation {
 	* 	"SAMPLE a random challenge e<-{0,1}^t".
 	*/
 	void sampleChallenge() override;
-	void setChallenge(byte* challenge, int challenge_size) override {
+	void setChallenge(shared_ptr<byte> challenge, int challenge_size) override {
 		for (auto verifier : verifiers)
 			verifier->setChallenge(challenge, challenge_size);
 	}
-	byte* getChallenge() override { return e; };
+	shared_ptr<byte> getChallenge() override { return e; };
 	int getChallengeSize() override { return eSize; };
 	/**
 	* Computes the verification of the protocol.<p>
@@ -228,12 +230,13 @@ class SigmaANDVerifierComputation : public SigmaVerifierComputation {
 	* @param z second message from prover
 	* @return true if the proof has been verified; false, otherwise.
 	*/
-	bool verify(SigmaCommonInput * input, SigmaProtocolMsg * a, SigmaProtocolMsg * z) override;
+	bool verify(shared_ptr<SigmaCommonInput> input, shared_ptr<SigmaProtocolMsg> a,
+		shared_ptr<SigmaProtocolMsg> z) override;
 
 private:
-	vector<SigmaVerifierComputation *> verifiers;	// underlying Sigma protocol's verifier to the AND calculation
+	vector<shared_ptr<SigmaVerifierComputation>> verifiers;	// underlying Sigma protocol's verifier to the AND calculation
 	int len;										// number of underlying verifiers
-	byte*  e;										// the challenge
+	shared_ptr<byte>  e;										// the challenge
 	int eSize;										// the challenge size
 	int t;											// soundness parameter
 	std::mt19937 random;							// prg
@@ -241,7 +244,7 @@ private:
 	* Sets the inputs for each one of the underlying verifier.
 	* @param input MUST be an instance of SigmaANDCommonInput.
 	*/
-	void checkInput(SigmaCommonInput* in);
+	void checkInput(shared_ptr<SigmaCommonInput> in);
 };
 
 

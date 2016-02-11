@@ -23,7 +23,7 @@ public:
 	* PlaintextSendableData interface.
 	* @return the PlaintextSendableData object
 	*/
-	virtual PlaintextSendableData* generateSendableData()=0;
+	virtual shared_ptr<PlaintextSendableData> generateSendableData()=0;
 };
 
 /**
@@ -42,12 +42,13 @@ public:
 		return (x1==x);
 	};
 
-	PlaintextSendableData* generateSendableData() override {
+	shared_ptr<PlaintextSendableData> generateSendableData() override {
 		// since BigIntegerPlainText is both a Plaintext and a PlaintextSendableData, 
 		// on the one hand it has to implement the generateSendableData() function, 
 		// but on the other hand it is in itself an PlaintextSendableData, so we do not really
 		// generate sendable data, but just return this object.
-		return this;
+		shared_ptr<PlaintextSendableData> res(this);
+		return res;
 	}
 
 	string toString() { return "BigIntegerPlainText [x=" + (string)x + "]"; };
@@ -58,34 +59,35 @@ public:
 */
 class ByteArrayPlaintext : public Plaintext, public PlaintextSendableData {
 private:
-	byte* text = NULL;
+	shared_ptr<byte> text = NULL;
 	int len;
 public:
-	ByteArrayPlaintext(byte* text, int size) { this->text = text; this->len = size; };
-	byte* getText() const { return text; };
+	ByteArrayPlaintext(shared_ptr<byte> text, int size) { this->text = text; this->len = size; };
+	shared_ptr<byte> getText() const { return text; };
 	int getTextSize() const { return len; };
 
 	bool operator==(const ByteArrayPlaintext &other) const {
-		byte* text2 = other.getText();
+		shared_ptr<byte> text2 = other.getText();
 		int len2 = other.getTextSize();
 		if (len2 != len)
 			return false;
 		for (int i = 0; i<len; i++)
-			if (text[i] != text2[i])
+			if (text.get()[i] != text2.get()[i])
 				return false;
 		return true;
 	};
-	PlaintextSendableData* generateSendableData() override {
+	shared_ptr<PlaintextSendableData> generateSendableData() override {
 		// since ByteArrayPlainText is both a Plaintext and a PlaintextSendableData, 
 		// on the one hand it has to implement the generateSendableData() function, 
 		// but on the other hand it is in itself an PlaintextSendableData, so we do not really
 		// generate sendable data, but just return this object.
-		return this;
+		shared_ptr<PlaintextSendableData> res(this);
+		return res;
 	};
 
 	string toString() {
 		return "ByteArrayPlaintext [text=" + 
-			std::string(reinterpret_cast<char const*>(text), len) + "]";
+			std::string(reinterpret_cast<char const*>(text.get()), len) + "]";
 	};
 };
 
@@ -94,30 +96,30 @@ public:
 */
 class GroupElementPlaintext : public Plaintext {
 private:
-	GroupElement* element;
+	shared_ptr<GroupElement> element;
 
 public:
-	GroupElementPlaintext(GroupElement* el) { element = el; };
-	GroupElement* getElement() const { return element; };
+	GroupElementPlaintext(shared_ptr<GroupElement> el) { element = el; };
+	shared_ptr<GroupElement> getElement() const { return element; };
 
 	bool operator==(const GroupElementPlaintext &other) const {
 		return (*(other.getElement()) == *(this->getElement()));
 	};
 
-	PlaintextSendableData* generateSendableData() override {
-		return new GroupElementPlaintextSendableData(element->generateSendableData());
+	shared_ptr<PlaintextSendableData> generateSendableData() override {
+		return make_shared<GroupElementPlaintextSendableData>(element->generateSendableData());
 	}
 
 	// Nested class that holds the sendable data of the outer class
 	class GroupElementPlaintextSendableData : public PlaintextSendableData {
 	private:
-		GroupElementSendableData*  groupElementData;
+		shared_ptr<GroupElementSendableData>  groupElementData;
 	public:
-		GroupElementPlaintextSendableData(GroupElementSendableData* groupElementData) {
+		GroupElementPlaintextSendableData(shared_ptr<GroupElementSendableData> groupElementData) {
 			this->groupElementData = groupElementData;
 		};
 
-		GroupElementSendableData* getGroupElement() { return groupElementData; };
+		shared_ptr<GroupElementSendableData> getGroupElement() { return groupElementData; };
 	};
 };
 
