@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
  */
 public class AppP2Original {	
 	private static final int PARTY = 2;
-	private static final String HOME_DIR = "C:/GitHub/Development/MaliciousYaoProtocol/MaliciousYao";
+	private static final String HOME_DIR = "C:/Code/scapi/src/java/edu/biu/SCProtocols/MaliciousYao";
 	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/AES/NigelAes.txt";
 	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/AES/AESPartyTwoInputs.txt";
 //	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/ADD/NigelAdd32.txt";

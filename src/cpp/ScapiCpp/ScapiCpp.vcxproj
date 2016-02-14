@@ -128,7 +128,7 @@
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocol.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolAnd.cpp" />
     <ClCompile Include="src\interactive_mid_protocols\SigmaProtocolDlog.cpp" />
-    <ClCompile Include="src\interactive_mid_protocols\ZKPedersen.cpp" />
+    <ClCompile Include="src\interactive_mid_protocols\ZeroKnowledge.cpp" />
     <ClCompile Include="src\primitives\Dlog.cpp" />
     <ClCompile Include="src\primitives\DlogOpenSSL.cpp" />
     <ClCompile Include="src\primitives\HashOpenSSL.cpp" />
@@ -163,7 +163,6 @@
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolAnd.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolDlog.hpp" />
     <ClInclude Include="include\interactive_mid_protocols\ZeroKnowledge.hpp" />
-    <ClInclude Include="include\interactive_mid_protocols\ZKPedersen.hpp" />
     <ClInclude Include="include\mid_layer\PlainText.hpp" />
     <ClInclude Include="include\primitives\Dlog.hpp" />
     <ClInclude Include="include\primitives\DlogOpenSSL.hpp" />

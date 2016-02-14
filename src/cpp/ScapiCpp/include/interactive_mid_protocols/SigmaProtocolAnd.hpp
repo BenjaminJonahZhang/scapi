@@ -220,8 +220,7 @@ class SigmaANDVerifierComputation : public SigmaVerifierComputation {
 		for (auto verifier : verifiers)
 			verifier->setChallenge(challenge, challenge_size);
 	}
-	shared_ptr<byte> getChallenge() override { return e; };
-	int getChallengeSize() override { return eSize; };
+	pair<shared_ptr<byte>,int> getChallenge() override { return make_pair(e, eSize); };
 	/**
 	* Computes the verification of the protocol.<p>
 	* 	"ACC IFF all verifier checks are ACC".

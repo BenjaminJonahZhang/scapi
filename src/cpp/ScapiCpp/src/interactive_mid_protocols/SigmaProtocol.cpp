@@ -49,13 +49,12 @@ void SigmaVerifier::sendChallenge() {
 	receiveMsgFromProver(a);
 
 	// get the challenge from the verifierComputation.
-	auto challenge = verifierComputation->getChallenge();
-	int challenge_size = verifierComputation->getChallengeSize();
-	if (challenge_size == 0)
+	auto challengePair = verifierComputation->getChallenge();
+	if (challengePair.second == 0)
 		throw IllegalStateException("challenge_size=0. Make sure that sampleChallenge function is called before sendChallenge");
 	
 	// send the challenge.
-	sendChallengeToProver(challenge.get(), challenge_size);
+	sendChallengeToProver(challengePair.first.get(), challengePair.second);
 
 	// save the state of the protocol.
 	doneChallenge = true;

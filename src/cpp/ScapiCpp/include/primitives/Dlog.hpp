@@ -5,6 +5,11 @@
 #include "SecurityLevel.hpp"
 #include "../infra/MathAlgorithms.hpp"
 
+class InvalidDlogGroupException : public logic_error
+{
+public:
+	InvalidDlogGroupException(const string & msg) : logic_error(msg) {};
+};
 
 /**
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.

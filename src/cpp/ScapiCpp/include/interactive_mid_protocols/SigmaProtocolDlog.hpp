@@ -263,8 +263,7 @@ public:
 	/**
 	* Returns the sampled challenge.
 	*/
-	shared_ptr<byte> getChallenge() override { return e; };
-	int getChallengeSize() override { return eSize; };
+	pair<shared_ptr<byte>, int> getChallenge() override { return make_pair(e, eSize); };
 	/**
 	* Verifies the proof.<p>
 	* Computes the following line from the protocol:<p>

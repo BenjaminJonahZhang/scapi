@@ -10,22 +10,22 @@ public:
 	CheatAttemptException(const string & msg) : logic_error(msg) {};
 };
 
-class InvalidDlogGroupException : public logic_error
-{
-public:
-	InvalidDlogGroupException(const string & msg) : logic_error(msg) {};
-};
-
 /**
 * Marker interface. Each concrete ZK prover's input class should implement this interface.
 */
-class ZKProverInput {};
+class ZKProverInput {
+public:
+	virtual ~ZKProverInput() {};
+};
 /**
 * This interface is a marker interface for Zero Knowledge input, 
 * where there is an implementing class
 * for each concrete Zero Knowledge protocol.
 */
-class ZKCommonInput {};
+class ZKCommonInput {
+public:
+	virtual ~ZKCommonInput() {};
+};
 /**
 * Marker interface for common input of Sigma Protocols.<p>
 * Each Sigma Protocol has a common input for the prover and the verifier, 
@@ -203,11 +203,7 @@ class SigmaProtocolVerifier {
 	/**
 	* Return the challenge byte array
 	*/
-	virtual shared_ptr<byte> getChallenge()=0;
-	/*
-	* Returns the ChallengeSize
-	*/
-	virtual int getChallengeSize() = 0;
+	virtual pair<shared_ptr<byte>, int> getChallenge()=0;
 };
 
 /**
@@ -265,9 +261,7 @@ public:
 	/**
 	* @return the challenge.
 	*/
-	virtual shared_ptr<byte> getChallenge() = 0;
-
-	virtual int getChallengeSize() = 0;
+	virtual pair<shared_ptr<byte>, int> getChallenge() = 0;
 };
 
 /**
@@ -370,12 +364,9 @@ public:
 		// delegates to the underlying verifierComputation object.
 		verifierComputation->setChallenge(challenge, challenge_size);
 	}
-	shared_ptr<byte> getChallenge() override {
+	pair<shared_ptr<byte>,int> getChallenge() override {
 		// delegates to the underlying verifierComputation object.
 		return verifierComputation->getChallenge();
-	}
-	int getChallengeSize() override {
-		return verifierComputation->getChallengeSize();
 	}
 	void sendChallenge() override;
 	bool processVerify(shared_ptr<SigmaCommonInput> input) override;

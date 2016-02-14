@@ -14,6 +14,7 @@
 #include "../ScapiCpp/include/comm/TwoPartyComm.hpp"
 #include "../ScapiCpp/include/circuits/BooleanCircuits.hpp"
 #include "../ScapiCpp/include//interactive_mid_protocols/CommitmentSchemePedersen.hpp"
+#include "../ScapiCpp/include//interactive_mid_protocols/SigmaProtocol.hpp"
 #include <ctype.h>
 
 biginteger endcode_decode(biginteger bi) {
@@ -562,41 +563,41 @@ TEST_CASE("Gates and Wires", "") {
 
 TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 {
-	//SECTION("CmtPedersenCommitmentMessage") {
-	//	biginteger birsa100 = biginteger(rsa100);
-	//	long id = 123123123123123;
-	//	
-	//	// create serialize, and verify original values untouched
-	//	auto es = make_shared<ZpElementSendableData>(birsa100);
-	//	CmtPedersenCommitmentMessage cmtMsg(es, id);
-	//	auto serialized = cmtMsg.toByteArray();
-	//	int serializedSize = cmtMsg.serializedSize();
-	//	REQUIRE(cmtMsg.getId() == id);
-	//	REQUIRE(((ZpElementSendableData*)cmtMsg.getCommitment().get())->getX() == birsa100);
+	SECTION("CmtPedersenCommitmentMessage") {
+		biginteger birsa100 = biginteger(rsa100);
+		long id = 123123123123123;
+		
+		// create serialize, and verify original values untouched
+		auto es = make_shared<ZpElementSendableData>(birsa100);
+		CmtPedersenCommitmentMessage cmtMsg(es, id);
+		auto serialized = cmtMsg.toByteArray();
+		int serializedSize = cmtMsg.serializedSize();
+		REQUIRE(cmtMsg.getId() == id);
+		REQUIRE(((ZpElementSendableData*)cmtMsg.getCommitment().get())->getX() == birsa100);
 
-	//	// verify new one is created with empty values
-	//	CmtPedersenCommitmentMessage cmtMsg2;
-	//	REQUIRE(cmtMsg2.getId() == 0);
-	//	REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == 0);
+		// verify new one is created with empty values
+		CmtPedersenCommitmentMessage cmtMsg2;
+		REQUIRE(cmtMsg2.getId() == 0);
+		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == 0);
 
-	//	// deserialize and verify original values in the new object
-	//	cmtMsg2.init_from_byte_array(serialized, serializedSize);
-	//	REQUIRE(cmtMsg2.getId() == id);
-	//	REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == birsa100);
-	//}
-	//SECTION("SigmaBIMsg") {
-	//	biginteger value = 123456789;
-	//	SigmaBIMsg sMsg(value);
-	//	auto serialized = sMsg.toByteArray();
-	//	int serializedSize = sMsg.serializedSize();
-	//	REQUIRE(sMsg.getMsg() == value);
+		// deserialize and verify original values in the new object
+		cmtMsg2.init_from_byte_array(serialized.get(), serializedSize);
+		REQUIRE(cmtMsg2.getId() == id);
+		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == birsa100);
+	}
+	SECTION("SigmaBIMsg") {
+		biginteger value = 123456789;
+		SigmaBIMsg sMsg(value);
+		auto serialized = sMsg.toByteArray();
+		int serializedSize = sMsg.serializedSize();
+		REQUIRE(sMsg.getMsg() == value);
 
-	//	// verify new one is created with empty values
-	//	SigmaBIMsg sMsg2;
-	//	REQUIRE(sMsg2.getMsg() == -100);
+		// verify new one is created with empty values
+		SigmaBIMsg sMsg2;
+		REQUIRE(sMsg2.getMsg() == -100);
 
-	//	// deserialize and verify original values in the new object
-	//	sMsg.init_from_byte_array(serialized, serializedSize);
-	//	REQUIRE(sMsg.getMsg() == value);
-	//}
+		// deserialize and verify original values in the new object
+		sMsg.init_from_byte_array(serialized.get(), serializedSize);
+		REQUIRE(sMsg.getMsg() == value);
+	}
 }

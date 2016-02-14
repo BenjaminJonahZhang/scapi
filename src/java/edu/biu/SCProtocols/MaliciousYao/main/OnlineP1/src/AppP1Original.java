@@ -18,7 +18,7 @@ import edu.biu.scapi.circuits.fastGarbledCircuit.ScNativeGarbledBooleanCircuit.C
 
 public class AppP1Original {
 	private static final int PARTY = 1;
-	private static final String HOME_DIR = "C:/GitHub/Development/MaliciousYaoProtocol/MaliciousYao";
+	private static final String HOME_DIR = "C:/Code/scapi/src/java/edu/biu/SCProtocols/MaliciousYao";
 	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/AES/NigelAes.txt";
 	private static final String CIRCUIT_INPUT_FILENAME = HOME_DIR + "/assets/circuits/AES/AESPartyOneInputs.txt";
 //	private static final String CIRCUIT_FILENAME = HOME_DIR + "/assets/circuits/ADD/NigelAdd32.txt";

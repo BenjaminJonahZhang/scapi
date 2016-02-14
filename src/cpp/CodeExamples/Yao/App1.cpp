@@ -145,6 +145,7 @@ void execute_party_two(YaoConfig yao_config) {
 }
 
 YaoConfig read_yao_config(string config_file) {
+
 	ConfigFile cf(config_file);
 	int number_of_iterations = stoi(cf.Value("", "number_of_iterations"));
 	string str_print_output = cf.Value("", "print_output");
