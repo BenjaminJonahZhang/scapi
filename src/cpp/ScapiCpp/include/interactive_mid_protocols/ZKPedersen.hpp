@@ -76,7 +76,7 @@ private:
 		auto msg = a->toByteArray();
 		int len = a->serializedSize();
 		// send the first message.
-		sendMsgToVerifier(msg, len);
+		sendMsgToVerifier(msg.get(), len);
 	}
 
 	/**
@@ -92,7 +92,7 @@ private:
 	* Sends the given message to the verifier.
 	* @param message to send to the verifier.
 	*/
-	void sendMsgToVerifier(shared_ptr<byte> msg, int size) { channel->write_fast(msg, size); };
+	void sendMsgToVerifier(byte* msg, int size) { channel->write_fast(msg, size); };
 };
 
 

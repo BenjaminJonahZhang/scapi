@@ -56,27 +56,28 @@ void run_prover(std::shared_ptr<ChannelServer> server, SigmaDlogParams sdp) {
 	std::shared_ptr<GroupElement> h = dg->exponentiate(g, sdp.w);
 	auto proverComputation = make_shared<SigmaDlogProverComputation>(dg, sdp.t, 
 		get_seeded_random());
-	auto sp = make_unique<SigmaProver>(server, proverComputation);
+	auto sp = new SigmaProver(server, proverComputation);
 	auto proverinput = make_shared<SigmaDlogProverInput>(h, sdp.w);
 	sp->prove(proverinput);
 }
 
 void run_verifier(shared_ptr<ChannelServer> server, SigmaDlogParams sdp) {
 	auto zp_params = make_shared<ZpGroupParams>(sdp.q, sdp.g, sdp.p);
-	auto dg = make_unique<OpenSSLDlogZpSafePrime>(zp_params, get_seeded_random());
+	auto openSSLdg = make_shared<OpenSSLDlogZpSafePrime>(zp_params, get_seeded_random());
+	auto dg = std::static_pointer_cast<DlogGroup>(openSSLdg);
 
 	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
 	auto g = dg->getGenerator();
 	auto h = dg->exponentiate(g, sdp.w);
 	auto commonInput = make_shared<SigmaDlogCommonInput>(h);
-	shared_ptr<DlogGroup> dgBase((DlogGroup*)dg.get());
 	auto verifierComputation = make_shared<SigmaDlogVerifierComputation>(
-		dgBase, sdp.t, get_seeded_random());
+		dg, sdp.t, get_seeded_random());
 	auto msg1 = make_shared<SigmaGroupElementMsg>(h->generateSendableData());
 	auto msg2 = make_shared<SigmaBIMsg>();
-	auto v = make_unique<SigmaVerifier>(server, verifierComputation, msg1, msg2);
+	auto v = new SigmaVerifier(server, verifierComputation, msg1, msg2);
 	bool verificationPassed = v->verify(commonInput);
 	cout << "Verifer output: " << (verificationPassed? "Success" : "Failure") << endl;
+	delete v;
 }
 
 int main(int argc, char* argv[]) {

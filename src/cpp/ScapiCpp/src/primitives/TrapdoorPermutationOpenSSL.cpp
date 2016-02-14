@@ -137,14 +137,14 @@ biginteger OpenSSLRSAPermutation::computeRSA(biginteger elementP) {
 
 	size_t encodedSize = bytesCount(elementP);
 	std::shared_ptr<byte> encodedBi(new byte[encodedSize], std::default_delete<byte[]>());
-	encodeBigInteger(elementP, encodedBi, encodedSize);
+	encodeBigInteger(elementP, encodedBi.get(), encodedSize);
 	int success = RSA_public_encrypt(encodedSize, encodedBi.get(), ret.get(), rsa, RSA_NO_PADDING);
 	if (-1 == success)
 	{
 		string error(ERR_reason_error_string(ERR_get_error()));
 		throw runtime_error("failed to compute rsa " + error);
 	}
-	biginteger result = decodeBigInteger(ret, size);
+	biginteger result = decodeBigInteger(ret.get(), size);
 	return result;
 }
 
@@ -167,13 +167,13 @@ TPElement* OpenSSLRSAPermutation::invert(TPElement * tpEl) {
 
 	size_t encodedSize = bytesCount(elementP);
 	std::shared_ptr<byte> encodedBi(new byte[encodedSize], std::default_delete<byte[]>());
-	encodeBigInteger(elementP, encodedBi, encodedSize);
+	encodeBigInteger(elementP, encodedBi.get(), encodedSize);
 	
 	string st(encodedBi.get(), encodedBi.get()+encodedSize);
 
 	// invert the RSA permutation on the given bytes.
 	int sucess = RSA_private_decrypt(encodedSize, encodedBi.get(), ret.get(), rsa, RSA_NO_PADDING);
-	biginteger resValue = decodeBigInteger(ret, size);
+	biginteger resValue = decodeBigInteger(ret.get(), size);
 	// creates and initialize a RSAElement with the result.
 	RSAElement * returnEl = new RSAElement(modulus, resValue, false);
 	return returnEl; // return the result TPElement.

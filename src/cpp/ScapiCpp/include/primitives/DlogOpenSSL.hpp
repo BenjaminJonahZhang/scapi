@@ -16,10 +16,10 @@ private:
 	shared_ptr<BN_CTX> ctx;
 public:
 	OpenSSLDlogZpAdapter(shared_ptr<DH> dlog, shared_ptr<BN_CTX> ctx);
-	~OpenSSLDlogZpAdapter();
+	//~OpenSSLDlogZpAdapter();
 	shared_ptr<DH> getDlog() { return dlog; };
 	shared_ptr<BN_CTX> getCTX() { return ctx; };
-	bool validateElement(shared_ptr<BIGNUM> element);
+	bool validateElement(BIGNUM* element);
 };
 
 /**
@@ -49,7 +49,7 @@ private:
 	int calcK(biginteger p);
 
 public:
-	virtual ~OpenSSLDlogZpSafePrime();
+	//virtual ~OpenSSLDlogZpSafePrime();
 	/**
 	* Initializes the OpenSSL implementation of Dlog over Zp* with the given groupParams.
 	*/

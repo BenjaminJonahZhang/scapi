@@ -63,7 +63,7 @@ class DlogBasedSigma {};
 */
 class SigmaProtocolMsg {
 public:
-	virtual void init_from_byte_array(shared_ptr<byte> arr, int size) = 0;
+	virtual void init_from_byte_array(byte* arr, int size) = 0;
 	virtual shared_ptr<byte> toByteArray() = 0;
 	virtual int serializedSize() = 0;
 };
@@ -223,8 +223,7 @@ public:
 	/**
 	* Computes the second message of the sigma protocol.
 	*/
-	virtual shared_ptr<SigmaProtocolMsg> computeSecondMsg(
-		shared_ptr<byte> challenge, int challenge_size) =0;
+	virtual shared_ptr<SigmaProtocolMsg> computeSecondMsg(byte* challenge, int challenge_size) =0;
 	/**
 	* Returns the soundness parameter for this Sigma protocol.
 	* @return t soundness parameter
@@ -330,7 +329,7 @@ private:
 	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) { 
 		auto raw_message = message->toByteArray();
 		int message_size = message->serializedSize();
-		channel->write_fast(raw_message, message_size);
+		channel->write_fast(raw_message.get(), message_size);
 	};
 };
 
@@ -395,7 +394,7 @@ private:
 	/**
 	* Sends the challenge to the prover.
 	*/
-	void sendChallengeToProver(shared_ptr<byte> challenge, int challenge_size) {
+	void sendChallengeToProver(byte* challenge, int challenge_size) {
 		channel->write_fast(challenge, challenge_size);
 	}
 };
@@ -409,7 +408,7 @@ class SigmaMultipleMsg : public SigmaProtocolMsg {
 public:
 	SigmaMultipleMsg(vector<shared_ptr<SigmaProtocolMsg>> messages) { this->messages = messages; };
 	vector<shared_ptr<SigmaProtocolMsg>> getMessages() { return messages; };
-	void init_from_byte_array(shared_ptr<byte> arr, int size) override;
+	void init_from_byte_array(byte* arr, int size) override;
 	shared_ptr<byte> toByteArray() override;
 	int serializedSize() override;
 
@@ -429,14 +428,14 @@ public:
 	SigmaBIMsg() { this->z = -100; };
 	SigmaBIMsg(biginteger z) { this->z = z; };
 	biginteger getMsg() { return z; };
-	void init_from_byte_array(shared_ptr<byte> arr, int size) override { 
+	void init_from_byte_array(byte* arr, int size) override { 
 		z = decodeBigInteger(arr, size); 
 		size_ = size;
 	};
 	shared_ptr<byte> toByteArray() override {
 		size_ = bytesCount(this->z);
 		std::shared_ptr<byte> res(new byte[size_], std::default_delete<byte[]>());
-		encodeBigInteger(this->z, res, size_);
+		encodeBigInteger(this->z, res.get(), size_);
 		return res;
 	}
 	int serializedSize() override { return size_; };

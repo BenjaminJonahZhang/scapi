@@ -39,7 +39,7 @@ int main8(int argc, char* argv[])
 		cin.clear();
 		bool first = true;
 		char line[Message::max_body_length + 1];
-		shared_ptr<vector<byte>> v;
+		vector<byte> * v;
 		while (std::cin.getline(line, Message::max_body_length + 1))
 		{
 			if (!first)

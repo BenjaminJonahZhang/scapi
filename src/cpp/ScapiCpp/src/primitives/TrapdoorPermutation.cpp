@@ -14,7 +14,7 @@ byte TrapdoorPermutationAbs::hardCorePredicate(TPElement * tpEl) {
 	biginteger elementValue = tpEl->getElement();
 	size_t bytesSize = bytesCount(elementValue);
 	std::shared_ptr<byte> bytesValue(new byte[bytesSize], std::default_delete<byte[]>());
-	encodeBigInteger(elementValue, bytesValue, bytesSize);
+	encodeBigInteger(elementValue, bytesValue.get(), bytesSize);
 
 	// returns the least significant bit (byte, as we said above)
 	byte res = bytesValue.get()[bytesSize - 1];
@@ -32,7 +32,7 @@ byte* TrapdoorPermutationAbs::hardCoreFunction(TPElement * tpEl) {
 	biginteger elementValue = tpEl->getElement();
 	int bytesSize = bytesCount(elementValue);
 	std::shared_ptr<byte> bytesValue(new byte[bytesSize], std::default_delete<byte[]>());
-	encodeBigInteger(elementValue, bytesValue, bytesSize);
+	encodeBigInteger(elementValue, bytesValue.get(), bytesSize);
 	
 	// the number of bytes to get the log (N) least significant bits
 	

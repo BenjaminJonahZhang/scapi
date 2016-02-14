@@ -10,7 +10,7 @@ class SigmaGroupElementMsg : public SigmaProtocolMsg {
 public:
 	SigmaGroupElementMsg(shared_ptr<GroupElementSendableData> el) {  this->element = el;  };
 	shared_ptr<GroupElementSendableData> getElement() { return element; };
-	void init_from_byte_array(shared_ptr<byte> arr, int size) { element->init_from_byte_array(arr, size); };
+	void init_from_byte_array(byte* arr, int size) { element->init_from_byte_array(arr, size); };
 	shared_ptr<byte> toByteArray() override{ return element->toByteArray();  };
 	int serializedSize() override { return element->getSerializedSize(); };
 
@@ -84,7 +84,7 @@ private:
 	*/
 	bool checkChallengeLength(shared_ptr<byte> challenge, int challenge_size) {
 		// if the challenge's length is equal to t, return true. else, return false.
-		biginteger e = decodeBigInteger(challenge, challenge_size);
+		biginteger e = decodeBigInteger(challenge.get(), challenge_size);
 		return (e >= 0) && (e < mp::pow(biginteger(2), t));
 	}
 	/**
@@ -152,7 +152,7 @@ public:
 	* @param challenge<p>
 	* @return the computed message.
 	*/
-	shared_ptr<SigmaProtocolMsg> computeSecondMsg(shared_ptr<byte> challenge, int challenge_size) override;
+	shared_ptr<SigmaProtocolMsg> computeSecondMsg(byte* challenge, int challenge_size) override;
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	*/
@@ -171,7 +171,7 @@ private:
 	/**
 	* Checks if the given challenge length is equal to the soundness parameter.
 	*/
-	bool checkChallengeLength(shared_ptr<byte> challenge, int challenge_size) {
+	bool checkChallengeLength(byte* challenge, int challenge_size) {
 		biginteger e = decodeBigInteger(challenge, challenge_size);
 		cout << "got challenge: " << e << endl;
 		return (e >= 0) && (e < mp::pow(biginteger(2), t)); // 0 <= e < 2^t

@@ -20,14 +20,14 @@ void SigmaProver::processSecondMsg() {
 	auto v = channel->read_one();
 
 	// compute the second message by the underlying proverComputation.
-	shared_ptr<byte> arr(&(v->at(0)));
-	auto z = proverComputation->computeSecondMsg(arr, v->size());
+	auto z = proverComputation->computeSecondMsg(&(v->at(0)), v->size());
 
 	// send the second message.
 	sendMsgToVerifier(z);
 
 	// save the state of this sigma protocol.
 	doneFirstMsg = false;
+	delete v; // alraedy decoded and used at this stage
 }
 
 
@@ -55,7 +55,7 @@ void SigmaVerifier::sendChallenge() {
 		throw IllegalStateException("challenge_size=0. Make sure that sampleChallenge function is called before sendChallenge");
 	
 	// send the challenge.
-	sendChallengeToProver(challenge, challenge_size);
+	sendChallengeToProver(challenge.get(), challenge_size);
 
 	// save the state of the protocol.
 	doneChallenge = true;
@@ -75,6 +75,5 @@ bool SigmaVerifier::processVerify(shared_ptr<SigmaCommonInput> input) {
 
 void SigmaVerifier::receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> msg) {
 	auto v = channel->read_one();
-	shared_ptr<byte> arr(&(v->at(0)));
-	msg->init_from_byte_array(arr, v->size());
+	msg->init_from_byte_array(&(v->at(0)), v->size());
 }

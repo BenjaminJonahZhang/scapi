@@ -163,7 +163,7 @@ private:
 	*   OUTPUT nothing".
 	* This is a blocking function!
 	*/
-	void processSecondMsg(shared_ptr<byte> e, int eSize) {
+	void processSecondMsg(byte* e, int eSize) {
 		// compute the second message by the underlying proverComputation.
 		auto z = sProver->computeSecondMsg(e, eSize);
 		// send the second message.
@@ -177,7 +177,7 @@ private:
 	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) {
 		shared_ptr<byte> raw_message = message->toByteArray();
 		int message_size = message->serializedSize();
-		channel->write_fast(raw_message, message_size);
+		channel->write_fast(raw_message.get(), message_size);
 	};
 };
 

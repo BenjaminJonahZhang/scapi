@@ -34,7 +34,7 @@ shared_ptr<SigmaSimulatorOutput> SigmaDlogSimulator::simulate(shared_ptr<SigmaCo
 
 	// COMPUTE a = g^z*h^(-e)  (where -e here means -e mod q)
 	auto gToZ = dlog->exponentiate(dlog->getGenerator(), z);
-	biginteger e = decodeBigInteger(challenge, challenge_size);
+	biginteger e = decodeBigInteger(challenge.get(), challenge_size);
 	biginteger minusE = dlog->getOrder() - e;
 	auto hToE = dlog->exponentiate(dlogInput->getH(), minusE);
 	auto a = dlog->multiplyGroupElements(gToZ, hToE);
@@ -86,7 +86,7 @@ shared_ptr<SigmaProtocolMsg> SigmaDlogProverComputation::computeFirstMsg(shared_
 
 }
 
-shared_ptr<SigmaProtocolMsg> SigmaDlogProverComputation::computeSecondMsg(shared_ptr<byte> challenge,
+shared_ptr<SigmaProtocolMsg> SigmaDlogProverComputation::computeSecondMsg(byte* challenge,
 	int challenge_size) {
 	if (!checkChallengeLength(challenge, challenge_size)) // check the challenge validity.
 		throw CheatAttemptException(
@@ -128,8 +128,8 @@ void SigmaDlogVerifierComputation::sampleChallenge() {
 		" got: " << e_number << endl;
 	eSize = bytesCount(e_number);
 	// create a new byte array of size t/8, to get the required byte size.
-	std::shared_ptr<byte> e(new byte[eSize], std::default_delete<byte[]>());
-	encodeBigInteger(e_number, e, eSize);
+	e = std::shared_ptr<byte>(new byte[eSize], std::default_delete<byte[]>());
+	encodeBigInteger(e_number, e.get(), eSize);
 }
 
 bool SigmaDlogVerifierComputation::verify(shared_ptr<SigmaCommonInput> input, 
@@ -150,7 +150,7 @@ bool SigmaDlogVerifierComputation::verify(shared_ptr<SigmaCommonInput> input,
 	auto left = dlog->exponentiate(dlog->getGenerator(), exponent->getMsg());
 
 	// compute a*h^e (right side of the verify equation).
-	biginteger eBI = decodeBigInteger(e, eSize); 	// convert e to biginteger.
+	biginteger eBI = decodeBigInteger(e.get(), eSize); 	// convert e to biginteger.
 	auto hToe = dlog->exponentiate(h, eBI); // calculate h^e.
 
 	// calculate a*h^e.

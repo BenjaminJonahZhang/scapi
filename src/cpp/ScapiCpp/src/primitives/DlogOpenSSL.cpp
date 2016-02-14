@@ -22,12 +22,12 @@ OpenSSLDlogZpAdapter::OpenSSLDlogZpAdapter(shared_ptr<DH> dh, shared_ptr<BN_CTX>
 	this->ctx = ctx;
 }
 
-OpenSSLDlogZpAdapter::~OpenSSLDlogZpAdapter() {
-	//BN_CTX_free(ctx.get());
-	//DH_free(dlog.get());
-}
+//OpenSSLDlogZpAdapter::~OpenSSLDlogZpAdapter() {
+//	//BN_CTX_free(ctx.get());
+//	//DH_free(dlog.get());
+//}
 
-bool OpenSSLDlogZpAdapter::validateElement(shared_ptr<BIGNUM> el) {
+bool OpenSSLDlogZpAdapter::validateElement(BIGNUM* el) {
 	//A valid element in the grou pshould satisfy the following:
 	//	1. 0 < el < p.
 	//	2. el ^ q = 1 mod p.
@@ -37,12 +37,12 @@ bool OpenSSLDlogZpAdapter::validateElement(shared_ptr<BIGNUM> el) {
 	//Check that the element is bigger than 0.
 	BIGNUM* zero = BN_new();
 	BN_zero(zero);
-	if (BN_cmp(el.get(), zero) <= 0) {
+	if (BN_cmp(el, zero) <= 0) {
 		result = false;
 	}
 
 	//Check that the element is smaller than p.
-	if (BN_cmp(el.get(), p) > 0) {
+	if (BN_cmp(el, p) > 0) {
 		result = false;
 	}
 
@@ -50,7 +50,7 @@ bool OpenSSLDlogZpAdapter::validateElement(shared_ptr<BIGNUM> el) {
 	auto exp = BN_new();
 
 	//Check that the element raised to q is 1 mod p.
-	int suc = BN_mod_exp(exp, el.get(), q, p, ctx.get());
+	int suc = BN_mod_exp(exp, el, q, p, ctx.get());
 
 	if (!BN_is_one(exp)) {
 		result = false;
@@ -152,8 +152,7 @@ OpenSSLDlogZpSafePrime::OpenSSLDlogZpSafePrime(shared_ptr<ZpGroupParams> groupPa
 	dlog = createOpenSSLDlogZpAdapter(p, q, g);
 
 	//If the generator is not valid, delete the allocated memory and throw exception.
-	shared_ptr<BIGNUM> gshared(dlog->getDlog()->g);
-	if (!dlog->validateElement(gshared))
+	if (!dlog->validateElement(dlog->getDlog()->g))
 		throw invalid_argument("generator value is not valid");
 
 	//Create the  generator with the pointer that return from the native function.
@@ -219,13 +218,11 @@ bool OpenSSLDlogZpSafePrime::isMember(shared_ptr<GroupElement> element) {
 	if (!zp_element)
 		throw invalid_argument("type doesn't match the group type");
 	biginteger element_value = zp_element->getElementValue();
-	shared_ptr<BIGNUM> sEl(biginteger_to_opensslbignum(element_value));
-	return dlog->validateElement(sEl);
+	return dlog->validateElement(biginteger_to_opensslbignum(element_value));
 }
 
 bool OpenSSLDlogZpSafePrime::isGenerator() {
-	shared_ptr<BIGNUM> sG(dlog->getDlog()->g);
-	return dlog->validateElement(sG);
+	return dlog->validateElement(dlog->getDlog()->g);
 }
 
 bool OpenSSLDlogZpSafePrime::validateGroup() {
@@ -243,13 +240,11 @@ bool OpenSSLDlogZpSafePrime::validateGroup() {
 		}
 	}
 
-	//In case the generator is not 2 or 5, openssl does not check it and returns result == 4 in DH_check function.
-	//We check it directly.
-	if (result == 4) {
-		BIGNUM* g = dlog->getDlog()->g;
-		shared_ptr<BIGNUM> gShared(g);
-		result = !(dlog->validateElement(gShared));
-	}
+	// in case the generator is not 2 or 5, openssl does not check it and returns result == 4 
+	// in DH_check function.
+	// we check it directly.
+	if (result == 4) 
+		result = !(dlog->validateElement(dlog->getDlog()->g));
 
 	return result == 0;
 }
@@ -348,10 +343,10 @@ shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::reconstructElement(bool bCheckM
 	return generateElement(bCheckMembership, values);
 }
 
-OpenSSLDlogZpSafePrime::~OpenSSLDlogZpSafePrime()
-{
-
-}
+//OpenSSLDlogZpSafePrime::~OpenSSLDlogZpSafePrime()
+//{
+//
+//}
 
 shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::encodeByteArrayToGroupElement(
 	const vector<unsigned char> & binaryString) {
@@ -373,7 +368,7 @@ shared_ptr<GroupElement> OpenSSLDlogZpSafePrime::encodeByteArrayToGroupElement(
 		int index = std::distance(newString.begin(), it);
 		bstr.get()[index] = *it;
 	}
-	biginteger s = decodeBigInteger(bstr, bs_size+1);
+	biginteger s = decodeBigInteger(bstr.get(), bs_size+1);
 
 	//Denote the string of length k by s.
 	//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
@@ -404,7 +399,7 @@ const vector<byte> OpenSSLDlogZpSafePrime::decodeGroupElementToByteArray(shared_
 
 	int len = bytesCount(goodRoot);
 	std::shared_ptr<byte> output(new byte[len], std::default_delete<byte[]>());
-	encodeBigInteger(goodRoot, output, len);
+	encodeBigInteger(goodRoot, output.get(), len);
 	vector<byte> res;
 
 	// Remove the padding byte at the most significant position (that was added while encoding)

@@ -67,9 +67,8 @@ size_t bytesCount(biginteger value)
 	return length;
 }
 
-void encodeBigInteger(biginteger value, std::shared_ptr<byte> output_shared, size_t length)
+void encodeBigInteger(biginteger value, byte* output, size_t length)
 {
-	auto output = output_shared.get();
 	if (value.is_zero())
 		*output = 0;
 	else if (value.sign() > 0)
@@ -86,9 +85,8 @@ void encodeBigInteger(biginteger value, std::shared_ptr<byte> output_shared, siz
 	}
 }
 
-biginteger decodeBigInteger(std::shared_ptr<byte> input_shared, size_t length)
+biginteger decodeBigInteger(byte* input, size_t length)
 {
-	auto input = input_shared.get();
 	biginteger result(0);
 	int bits = -8;
 	while (length-- > 1)
@@ -132,7 +130,6 @@ std::chrono::time_point<std::chrono::system_clock> scapi_now() {
 
 biginteger getRandomInRange(biginteger min, biginteger max, std::mt19937 random)
 {
-	return min +1;
 	boost::random::uniform_int_distribution<biginteger> ui(min, max);
 	biginteger res = ui(random);
 	return res;

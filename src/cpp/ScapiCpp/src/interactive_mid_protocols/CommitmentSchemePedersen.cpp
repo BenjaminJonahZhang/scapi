@@ -35,7 +35,7 @@ void CmtPedersenReceiverCore::preProcess() {
 	auto sendableData = h->generateSendableData();
 	auto raw_msg = sendableData->toByteArray();
 	int len = sendableData->getSerializedSize();
-	channel->write_fast(raw_msg, len);
+	channel->write_fast(raw_msg.get(), len);
 }
 
 shared_ptr<CmtRCommitPhaseOutput> CmtPedersenReceiverCore::receiveCommitment() {
@@ -44,8 +44,8 @@ shared_ptr<CmtRCommitPhaseOutput> CmtPedersenReceiverCore::receiveCommitment() {
 	// read encoded CmtPedersenCommitmentMessage from channel
 	auto v = channel->read_one();
 	// init the empy CmtPedersenCommitmentMessage using the encdoed data
-	shared_ptr<byte> arr(&(v->at(0)));
-	msg->init_from_byte_array(arr, v->size());
+	msg->init_from_byte_array(&(v->at(0)), v->size());
 	commitmentMap[msg->getId()] = msg;
+	delete v; // no need to hold it anymore - already decoded and copied
 	return make_shared<CmtRBasicCommitPhaseOutput>(msg->getId());
 }

@@ -59,7 +59,7 @@ shared_ptr<SigmaProtocolMsg> SigmaANDProverComputation::computeFirstMsg(shared_p
 }
 
 shared_ptr<SigmaProtocolMsg> SigmaANDProverComputation::computeSecondMsg(
-	shared_ptr<byte> challenge, int challenge_size) {
+	byte* challenge, int challenge_size) {
 	// create an array to hold all messages.
 	vector<shared_ptr<SigmaProtocolMsg>> secondMessages;
 	// compute all second messages and add them to the array list.

@@ -14,7 +14,7 @@ class GroupElementSendableData {
 public:
 	virtual std::shared_ptr<byte> toByteArray() = 0;
 	virtual int getSerializedSize() { return serialized_size; };
-	virtual void init_from_byte_array(std::shared_ptr<byte> arr, int size) = 0;
+	virtual void init_from_byte_array(byte* arr, int size) = 0;
 	virtual ~GroupElementSendableData() = 0; // making this an abstract class
 protected:
 	int serialized_size;
@@ -595,10 +595,10 @@ public:
 	std::shared_ptr<byte> toByteArray() override {
 		serialized_size = bytesCount(x);
 		std::shared_ptr<byte> result(new byte[serialized_size], std::default_delete<byte[]>());
-		encodeBigInteger(x, result, serialized_size);
+		encodeBigInteger(x, result.get(), serialized_size);
 		return result;
 	};
-	void init_from_byte_array(std::shared_ptr<byte> arr, int size) {
+	void init_from_byte_array(byte* arr, int size) override {
 		serialized_size = size;
 		x = decodeBigInteger(arr, size);
 	};

@@ -19,8 +19,8 @@
 biginteger endcode_decode(biginteger bi) {
 	size_t len = bytesCount(bi);
 	std::shared_ptr<byte> output(new byte[len], std::default_delete<byte[]>());
-	encodeBigInteger(bi, output, len);
-	auto res = decodeBigInteger(output, len);
+	encodeBigInteger(bi, output.get(), len);
+	auto res = decodeBigInteger(output.get(), len);
 	return res;
 }
 

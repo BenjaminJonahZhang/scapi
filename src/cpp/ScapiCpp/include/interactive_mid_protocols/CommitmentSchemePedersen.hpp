@@ -50,10 +50,9 @@ public:
 		return NULL;
 	}
 	virtual int serializedSize() override { return serializedSize_; };
-	void init_from_byte_array(std::shared_ptr<byte> arr, int size) {
-		memcpy(&id, arr.get(), sizeof(long));
-		std::shared_ptr<byte> cArr(arr.get() + sizeof(long));
-		c->init_from_byte_array(cArr, size - sizeof(long));
+	void init_from_byte_array(byte * arr, int size) {
+		memcpy(&id, arr, sizeof(long));
+		c->init_from_byte_array(arr + sizeof(long), size - sizeof(long));
 	};
 
 };
@@ -82,7 +81,7 @@ public:
 	*/
 	shared_ptr<byte> getSerializedX() override{
 		std::shared_ptr<byte> res(new byte[len], std::default_delete<byte[]>());
-		encodeBigInteger(x, res, len);
+		encodeBigInteger(x, res.get(), len);
 		return res;
 	}
 	int getSerializedXSize() override { return len; };

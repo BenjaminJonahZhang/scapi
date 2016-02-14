@@ -1,8 +1,8 @@
-number_of_iterations = 1
+number_of_iterations = 100
 print_output = false
 sender_ip = 127.0.0.1
 receiver_ip = 127.0.0.1
-input_section = AES
+input_section = SHA1
 circuit_type = NoFixedKey
 
 [AES]

@@ -8,26 +8,25 @@ void PartyOne::sendP1Inputs(byte* ungarbledInput) {
 	int numberOfp1Inputs = 0;
 	numberOfp1Inputs = circuit->getNumberOfInputs(1);
 	int inputsSize = numberOfp1Inputs*SIZE_OF_BLOCK;
-	std::shared_ptr<byte> p1Inputs(new byte[inputsSize], std::default_delete<byte[]>());
+	byte* p1Inputs = new byte[inputsSize];
 
 	// create an array with the keys corresponding the given input.
 	int inputStartIndex;
 	for (int i = 0; i < numberOfp1Inputs; i++) {
 		inputStartIndex = (2 * i + ((int) ungarbledInput[i]))*SIZE_OF_BLOCK;
-		memcpy(p1Inputs.get() + i*SIZE_OF_BLOCK, allInputs + inputStartIndex, SIZE_OF_BLOCK);
+		memcpy(p1Inputs + i*SIZE_OF_BLOCK, allInputs + inputStartIndex, SIZE_OF_BLOCK);
 	}
 	// send the keys to p2.
 	channel->write_fast(p1Inputs, inputsSize);
+	delete p1Inputs;
 }
 
 void PartyOne::run(byte* ungarbledInput) {
 	values = circuit->garble();
 	// send garbled tables and the translation table to p2.
 	GarbledTablesHolder * tables = circuit->getGarbledTables();
-	shared_ptr<byte> rawTables(tables->toDoubleByteArray()[0]);
-	shared_ptr<byte> tranTables(circuit->getTranslationTable());
-	channel->write_fast(rawTables, tables->getArraySize(0));
-	channel->write_fast(tranTables, circuit->getTranslationTableSize());
+	channel->write_fast(tables->toDoubleByteArray()[0], tables->getArraySize(0));
+	channel->write_fast(circuit->getTranslationTable(), circuit->getTranslationTableSize());
 	// send p1 input keys to p2.
 	sendP1Inputs(ungarbledInput);
 

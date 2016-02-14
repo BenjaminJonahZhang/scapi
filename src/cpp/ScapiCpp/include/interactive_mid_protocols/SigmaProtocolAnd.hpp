@@ -82,7 +82,7 @@ public:
 	* @param challenge
 	* @return SigmaMultipleMsg contains z1, ..., zm.
 	*/
-	shared_ptr<SigmaProtocolMsg> computeSecondMsg(shared_ptr<byte> challenge, int challenge_size)override;
+	shared_ptr<SigmaProtocolMsg> computeSecondMsg(byte* challenge, int challenge_size)override;
 	/**
 	* Returns the simulator that matches this sigma protocol prover.
 	* @return SigmaANDSimulator

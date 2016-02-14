@@ -196,7 +196,7 @@ public:
 	*/
 	shared_ptr<byte> generateSendableData() override {
 		std::shared_ptr<byte> output(new byte[byteCount], std::default_delete<byte[]>());
-		encodeBigInteger(x, output, byteCount);
+		encodeBigInteger(x, output.get(), byteCount);
 		return output;
 	};
 	int sendableDataSize() override { return byteCount; }
@@ -260,7 +260,7 @@ public:
 	*/
 	virtual shared_ptr<byte> toByteArray() = 0;
 	virtual int serializedSize() = 0;
-	virtual void init_from_byte_array(std::shared_ptr<byte> arr, int size) = 0;
+	virtual void init_from_byte_array(byte* arr, int size) = 0;
 };	
 
 /**
