@@ -186,7 +186,7 @@ private:
 	*/
 	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) {
 		shared_ptr<byte> raw_message = message->toByteArray();
-		int message_size = message->serializedSize();
+		int message_size = message->getSerializedSize();
 		channel->write_fast(raw_message.get(), message_size);
 	};
 };
@@ -290,6 +290,193 @@ private:
 	};
 };
 
+// Forward decleration
+class ZKPOKFromSigmaCmtPedersenProver;
+class ZKPOKFromSigmaCmtPedersenVerifier;
+
+/**
+* Concrete implementation of committer with proofs.
+* This implementation uses ZK based on SigmaPedersenKnowledge and SIgmaPedersenCommittedValue.
+*/
+class CmtPedersenWithProofsCommitter : public CmtPedersenCommitter, public CmtWithProofsCommitter {
+private:
+	// proves that the committer knows the committed value.
+	shared_ptr<ZKPOKFromSigmaCmtPedersenProver> knowledgeProver;
+	// proves that the committed value is x.
+	// usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to prove committed value.
+	// in Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
+	// in order to be able to use the Pedersen scheme we need to prove committed value with ZKPOK instead.
+	shared_ptr<ZKPOKFromSigmaCmtPedersenProver> committedValProver;
+
+	/**
+	* Creates the ZK provers using sigma protocols that prove Pedersen's proofs.
+	* @param t
+	*/
+	void doConstruct(int t);
+
+public:
+	/**
+	* Default constructor that gets the channel and creates the ZK provers with default Dlog group.
+	* @param channel
+	*/
+	CmtPedersenWithProofsCommitter(shared_ptr<ChannelServer> channel, int statisticalParamater) :
+		CmtPedersenCommitter(channel) {
+		doConstruct(statisticalParamater);
+	};
+
+	/**
+	* Constructor that gets the channel, dlog, statistical parameter and random and uses them to
+	* create the ZK provers.
+	* @param channel
+	* @param dlog
+	* @param t statistical parameter
+	* @param random
+	*/
+	CmtPedersenWithProofsCommitter(shared_ptr<ChannelServer> channel,
+		shared_ptr<DlogGroup> dlog, int t, std::mt19937 random) :
+		CmtPedersenCommitter(channel, dlog, random) {
+		doConstruct(t);
+	};
+	void proveKnowledge(long id) override;
+	void proveCommittedValue(long id) override;
+};
+
+/**
+* Concrete implementation of receiver with proofs.
+* This implementation uses ZK based on SigmaPedersenKnowledge and SIgmaPedersenCommittedValue.
+*/
+class CmtPedersenWithProofsReceiver : public CmtPedersenReceiver, public CmtWithProofsReceiver {
+private:
+	// Verifies that the committer knows the committed value.
+	shared_ptr<ZKPOKFromSigmaCmtPedersenVerifier> knowledgeVerifier;
+	// Verifies that the committed value is x.
+	// Usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to verify committed value.
+	// In Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
+	// In order to be able to use the Pedersen scheme we need to verify committed value with ZKPOK instead.
+	shared_ptr<ZKPOKFromSigmaCmtPedersenVerifier> committedValVerifier;
+	/**
+	* Creates the ZK verifiers using sigma protocols that verifies Pedersen's proofs.
+	* @param t
+	*/
+	void doConstruct(int t);
+public:
+	/**
+	* Default constructor that gets the channel and creates the ZK verifiers with default Dlog group.
+	* @param channel
+	*/
+	CmtPedersenWithProofsReceiver(shared_ptr<ChannelServer> channel, int t) : CmtPedersenReceiver(channel) {
+		doConstruct(t);
+	};
+
+	/**
+	* Constructor that gets the channel, dlog, statistical parameter and random and uses them to create the ZK provers.
+	* @param channel
+	* @param dlog
+	* @param t statistical parameter
+	* @param random
+	*/
+	CmtPedersenWithProofsReceiver(shared_ptr<ChannelServer> channel,
+		shared_ptr<DlogGroup> dlog, int t, std::mt19937 random) :
+		CmtPedersenReceiver(channel, dlog, random) {
+		doConstruct(t);
+	};
+
+	bool verifyKnowledge(long id) override;
+
+	shared_ptr<CmtCommitValue> verifyCommittedValue(long id) override;
+};
+
+/**
+* Concrete implementation of committer that executes the Pedersen trapdoor commitment
+* scheme in the committer's point of view.<p>
+* This commitment is also a trapdoor commitment in the sense that the receiver after
+* the commitment phase has a trapdoor value, that if known by the committer would enable
+* it to decommit to any value. <p>
+* This trapdoor is output by the receiver and can be used by a higher-level application
+* (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).<p>
+*
+* For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i>
+* by Hazay-Lindell.<p>
+*
+* The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes document
+* at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+*/
+class CmtPedersenTrapdoorCommitter : public CmtPedersenCommitter {
+public:
+	/**
+	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
+	* The receiver needs to be instantiated with the default constructor too.
+	* @param channel
+	*/
+	CmtPedersenTrapdoorCommitter(shared_ptr<ChannelServer> channel) : CmtPedersenCommitter(channel) {};
+
+	/**
+	* Constructor that receives a connected channel (to the receiver), the DlogGroup agreed upon between them and a SecureRandom object.
+	* The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	* @param channel
+	* @param dlog
+	* @param random
+	*/
+	CmtPedersenTrapdoorCommitter(shared_ptr<ChannelServer> channel,
+		shared_ptr<DlogGroup> dlog, std::mt19937 random) :
+		CmtPedersenCommitter(channel, dlog, random) {};
+
+	/**
+	* Validate the h value received from the receiver in the pre process phase.
+	* @param trap the trapdoor outputed from the receiver's commit phase.
+	* @return true, if valid; false, otherwise.
+	*/
+	bool validate(shared_ptr<CmtRCommitPhaseOutput> trap);
+};
+
+/**
+* Concrete implementation of receiver that executes the Pedersen trapdoor commitment
+* scheme in the receiver's point of view.<p>
+* This commitment is also a trapdoor commitment in the sense that the receiver after
+* the commitment phase has a trapdoor value, that if known by the committer would enable
+* it to decommit to any value. <p>
+* This trapdoor is output by the receiver and can be used by a higher-level application
+* (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).<p>
+* For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i>
+* by Hazay-Lindell.<p>
+* The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes
+* document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+*/
+class CmtPedersenTrapdoorReceiver : public CmtPedersenReceiver {
+public:
+	/**
+	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
+	* The committer needs to be instantiated with the default constructor too.
+	* @param ServerChannel
+	*/
+	CmtPedersenTrapdoorReceiver(shared_ptr<ChannelServer> channel) : CmtPedersenReceiver(channel) {};
+
+	/**
+	* Constructor that receives a connected channel (to the receiver),
+	* the DlogGroup agreed upon between them and a SecureRandom object.
+	* The committer needs to be instantiated with the same DlogGroup,
+	* otherwise nothing will work properly.
+	* @param channel
+	* @param dlog
+	* @param random
+	*/
+	CmtPedersenTrapdoorReceiver(shared_ptr<ChannelServer> channel,
+		shared_ptr<DlogGroup> dlog, std::mt19937 random) :
+		CmtPedersenReceiver(channel, dlog, random) {};
+
+	/**
+	* Returns the receiver's trapdoor from the preprocess phase.
+	*/
+	biginteger getTrapdoor() { return trapdoor; };
+	shared_ptr<CmtRCommitPhaseOutput> receiveCommitment() override {
+		// get the output from the super.receiverCommiotment.
+		auto output = this->receiveCommitment();
+		// wrap the output with the trapdoor.
+		return make_shared<CmtRTrapdoorCommitPhaseOutput>(trapdoor, output->getCommitmentId());
+	};
+};
+
+
 /**
 * Concrete implementation of Zero Knowledge prover.<p>
 * This is a transformation that takes any Sigma protocol and any perfectly hiding
@@ -364,7 +551,7 @@ private:
 		// compute the first message by the underlying proverComputation.
 		auto a = sProver->computeFirstMsg(input);
 		auto msg = a->toByteArray();
-		int len = a->serializedSize();
+		int len = a->getSerializedSize();
 		// send the first message.
 		sendMsgToVerifier(msg.get(), len);
 	}
@@ -421,7 +608,7 @@ private:
 	*/
 	void receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> emptyMsg) {
 		auto v = channel->read_one();
-		emptyMsg->init_from_byte_array(&(v->at(0)), v->size());
+		emptyMsg->initFromByteVector(v);
 	};
 
 	/**
@@ -429,7 +616,7 @@ private:
 	*/
 	void receiveTrapFromProver(shared_ptr<CmtRCommitPhaseOutput> emptyOutput) {
 		auto v = channel->read_one();
-		emptyOutput->init_from_byte_array(&(v->at(0)), v->size());
+		emptyOutput->initFromByteVector(v);
 	}
 	/**
 	* Verifies the proof.

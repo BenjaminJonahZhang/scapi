@@ -44,3 +44,5 @@ public:
 	virtual void close() = 0;
 	virtual bool isClosed() = 0;
 };
+
+

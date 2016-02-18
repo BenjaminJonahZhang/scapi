@@ -74,5 +74,5 @@ bool SigmaVerifier::processVerify(shared_ptr<SigmaCommonInput> input) {
 
 void SigmaVerifier::receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> msg) {
 	auto v = channel->read_one();
-	msg->init_from_byte_array(&(v->at(0)), v->size());
+	msg->initFromByteVector(v);
 }

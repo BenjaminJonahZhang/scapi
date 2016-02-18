@@ -4,7 +4,10 @@
 /**
 * General interface for random values.
 */
-class RandomValue {};
+class RandomValue {
+public :
+	virtual ~RandomValue() {};
+};
 
 /**
 * Concrete class for BigInteger random value.

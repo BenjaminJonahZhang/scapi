@@ -15,11 +15,9 @@ public:
 * This is a marker interface. It allows the generation of a GroupElement at an abstract level without knowing the actual type of Dlog Group.
 *
 */
-class GroupElementSendableData {
+class GroupElementSendableData : public NetworkSerialized {
 public:
-	virtual std::shared_ptr<byte> toByteArray() = 0;
-	virtual int getSerializedSize() { return serialized_size; };
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
+	virtual int getSerializedSize() override { return serialized_size; };
 	virtual ~GroupElementSendableData() = 0; // making this an abstract class
 protected:
 	int serialized_size;
@@ -79,11 +77,10 @@ public:
 inline GroupParams::~GroupParams() { };
 
 /**
-* This is the general interface for the discrete logarithm group. Every class in the DlogGroup family implements this interface.
-* <p>
-* The discrete logarithm problem is as follows: given a generator g of a finite
-* group G and a random element h in G, find the (unique) integer x such that
-* g^x = h.<p>
+* This is the general interface for the discrete logarithm group. 
+* Every class in the DlogGroup family implements this interface.
+* The discrete logarithm problem is as follows: given a generator g of a finite group G and 
+* a random element h in G, find the (unique) integer x such that g^x = h.
 * In cryptography, we are interested in groups for which the discrete logarithm problem (Dlog for short) is assumed to be hard.<p>
 * The two most common classes are the group Zp* for a large p, and some Elliptic curve groups.<p>
 *
@@ -96,9 +93,6 @@ inline GroupParams::~GroupParams() { };
 *  - {@code mapAnyGroupElementToByteArray(GroupElement element) : byte[]}<p>
 *
 *  The first two work as a pair and decodeGroupElementToByteArray is the inverse of encodeByteArrayToGroupElement, whereas the last one works alone and does not have an inverse.
-*
-* @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
-*
 */
 class DlogGroup
 {
@@ -603,7 +597,7 @@ public:
 		encodeBigInteger(x, result.get(), serialized_size);
 		return result;
 	};
-	void init_from_byte_array(byte* arr, int size) override {
+	void initFromByteArray(byte* arr, int size) override {
 		serialized_size = size;
 		x = decodeBigInteger(arr, size);
 	};

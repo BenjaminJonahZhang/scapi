@@ -80,3 +80,16 @@ std::chrono::time_point<std::chrono::system_clock> scapi_now();
 * Returns a random biginteger uniformly distributed in [min, max]
 */
 biginteger getRandomInRange(biginteger min, biginteger max, std::mt19937 random);
+
+/**
+* Abstract market interface that allow serialization and deserialization from byte array and size
+*/
+class NetworkSerialized {
+public:
+	virtual int getSerializedSize() = 0;
+	virtual shared_ptr<byte> toByteArray() = 0;
+	virtual void initFromByteArray(byte* arr, int size) = 0;
+	virtual void initFromByteVector(vector<byte> * byteVectorPtr) {
+		initFromByteArray(&(byteVectorPtr->at(0)), byteVectorPtr->size());
+	}
+};

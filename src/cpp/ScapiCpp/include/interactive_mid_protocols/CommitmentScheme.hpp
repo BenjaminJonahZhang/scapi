@@ -30,15 +30,12 @@
 * General interface of the receiver's output of the commit phase.
 * All receivers have output from the commit phase, that at least includes the commitment id.
 */
-class CmtRCommitPhaseOutput {
+class CmtRCommitPhaseOutput: public NetworkSerialized {
 public:
 	/**
 	* Returns the id of the received commitment message.
 	*/
 	virtual long getCommitmentId() = 0;
-	virtual int serializedSize() = 0;
-	virtual shared_ptr<byte> toByteArray() =0;
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
 };
 
 /**
@@ -57,6 +54,10 @@ public:
 	* Returns the id of the received commitment message.
 	*/
 	long getCommitmentId() override { return commitmentId; };
+	// network serialization implementation:
+	void initFromByteArray(byte* arr, int size) override;
+	shared_ptr<byte> toByteArray() override;
+	int getSerializedSize() override;
 };
 
 /**
@@ -80,6 +81,11 @@ public:
 	* Returns the trapdoor of this commitment.
 	*/
 	biginteger getTrap() { return trap; };
+	
+	// network serialization implementation:
+	void initFromByteArray(byte* arr, int size) override;
+	shared_ptr<byte> toByteArray() override;
+	int getSerializedSize() override;
 };
 
 /**
@@ -245,7 +251,7 @@ public:
 * commitments are performed by the committer without decommiting in between the commitments.
 * Each commitment has an id attached to it used lated for decommitment.
 */
-class CmtCCommitmentMsg {
+class CmtCCommitmentMsg : public NetworkSerialized {
 public:
 	/**
 	* Returns the unique id of the commitment.
@@ -256,18 +262,13 @@ public:
 	* @return the commitment object.
 	*/
 	virtual shared_ptr<void> getCommitment()=0;
-	/**
-	* Return byte* representation of the message
-	*/
-	virtual shared_ptr<byte> toByteArray() = 0;
-	virtual int serializedSize() = 0;
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
 };	
 
 /**
 * General interface for the decommitment message the committer sends to the receiver.
 */
 class CmtCDecommitmentMessage {
+public:
 	/**
 	* Returns the committed value.
 	* @return the serializable committed value.

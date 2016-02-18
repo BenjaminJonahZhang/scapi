@@ -1,14 +1,9 @@
 #pragma once
 #include "../infra/Common.hpp"
+#include "../primitives/SecurityLevel.hpp"
 #include "../comm/TwoPartyComm.hpp"
 #include <openssl/rand.h>
 
-
-class CheatAttemptException : public logic_error
-{
-public:
-	CheatAttemptException(const string & msg) : logic_error(msg) {};
-};
 
 /**
 * Marker interface. Each concrete ZK prover's input class should implement this interface.
@@ -61,12 +56,7 @@ class DlogBasedSigma {};
 * is an implementing class for each concrete Sigma message, 
 * like GroupElement message or BigInteger message.
 */
-class SigmaProtocolMsg {
-public:
-	virtual void init_from_byte_array(byte* arr, int size) = 0;
-	virtual shared_ptr<byte> toByteArray() = 0;
-	virtual int serializedSize() = 0;
-};
+class SigmaProtocolMsg : public NetworkSerialized {};
 
 /**
 * General interface for Sigma Protocol prover. Every class that implements it is signed as 
@@ -322,7 +312,7 @@ private:
 	*/
 	void sendMsgToVerifier(shared_ptr<SigmaProtocolMsg> message) { 
 		auto raw_message = message->toByteArray();
-		int message_size = message->serializedSize();
+		int message_size = message->getSerializedSize();
 		channel->write_fast(raw_message.get(), message_size);
 	};
 };
@@ -399,9 +389,9 @@ class SigmaMultipleMsg : public SigmaProtocolMsg {
 public:
 	SigmaMultipleMsg(vector<shared_ptr<SigmaProtocolMsg>> messages) { this->messages = messages; };
 	vector<shared_ptr<SigmaProtocolMsg>> getMessages() { return messages; };
-	void init_from_byte_array(byte* arr, int size) override;
+	void initFromByteArray(byte* arr, int size) override;
 	shared_ptr<byte> toByteArray() override;
-	int serializedSize() override;
+	int getSerializedSize() override;
 
 private:
 	vector<shared_ptr<SigmaProtocolMsg>> messages;
@@ -419,7 +409,9 @@ public:
 	SigmaBIMsg() { this->z = -100; };
 	SigmaBIMsg(biginteger z) { this->z = z; };
 	biginteger getMsg() { return z; };
-	void init_from_byte_array(byte* arr, int size) override { 
+
+	// SerializedNetwork implementation:
+	void initFromByteArray(byte* arr, int size) override {
 		z = decodeBigInteger(arr, size); 
 		size_ = size;
 	};
@@ -429,5 +421,5 @@ public:
 		encodeBigInteger(this->z, res.get(), size_);
 		return res;
 	}
-	int serializedSize() override { return size_; };
+	int getSerializedSize() override { return size_; };
 };

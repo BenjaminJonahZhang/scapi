@@ -89,7 +89,7 @@ bool ZKFromSigmaVerifier::verify(shared_ptr<ZKCommonInput> input,
 
 void ZKFromSigmaVerifier::receiveMsgFromProver(shared_ptr<SigmaProtocolMsg> concreteMsg) {
 	auto raw_msg = channel->read_one();
-	concreteMsg->init_from_byte_array(&(raw_msg->at(0)), raw_msg->size());
+	concreteMsg->initFromByteVector(raw_msg);
 }
 
 /************************************************/
@@ -123,12 +123,12 @@ void ZKPOKFromSigmaCmtPedersenProver::processSecondMsg(shared_ptr<byte> e, int e
 
 	// send the second message.
 	auto raw_z = z->toByteArray();
-	int raw_z_size = z->serializedSize();
+	int raw_z_size = z->getSerializedSize();
 	sendMsgToVerifier(raw_z.get(), raw_z_size);
 
 	// send the trap.
 	auto raw_trap = trap->toByteArray();
-	int raw_trap_size = trap->serializedSize();
+	int raw_trap_size = trap->getSerializedSize();
 	sendMsgToVerifier(raw_trap.get(), raw_trap_size);
 }
 
@@ -172,3 +172,14 @@ bool ZKPOKFromSigmaCmtPedersenVerifier::verify(shared_ptr<ZKCommonInput> input,
 	// if decommit and sigma verify returned true, return ACCEPT. Else, return REJECT.
 	return valid;
 }
+
+/********************************************/
+/*   CmtPedersenWithProofsCommitter         */
+/********************************************/
+void CmtPedersenWithProofsCommitter::doConstruct(int t) {
+	//SigmaProverComputation pedersenCommittedValProver = new SigmaPedersenCommittedValueProverComputation(dlog, t, random);
+	//SigmaProverComputation pedersenCTKnowledgeProver = new SigmaPedersenCmtKnowledgeProverComputation(dlog, t, random);
+	//knowledgeProver = make_shared<ZKPOKFromSigmaCmtPedersenProver>(channel, pedersenCTKnowledgeProver);
+	//committedValProver = make_shared<ZKPOKFromSigmaCmtPedersenProver>(channel, pedersenCommittedValProver);
+}
+

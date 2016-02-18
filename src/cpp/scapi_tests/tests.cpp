@@ -571,7 +571,7 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		auto es = make_shared<ZpElementSendableData>(birsa100);
 		CmtPedersenCommitmentMessage cmtMsg(es, id);
 		auto serialized = cmtMsg.toByteArray();
-		int serializedSize = cmtMsg.serializedSize();
+		int serializedSize = cmtMsg.getSerializedSize();
 		REQUIRE(cmtMsg.getId() == id);
 		REQUIRE(((ZpElementSendableData*)cmtMsg.getCommitment().get())->getX() == birsa100);
 
@@ -581,7 +581,7 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == 0);
 
 		// deserialize and verify original values in the new object
-		cmtMsg2.init_from_byte_array(serialized.get(), serializedSize);
+		cmtMsg2.initFromByteArray(serialized.get(), serializedSize);
 		REQUIRE(cmtMsg2.getId() == id);
 		REQUIRE(((ZpElementSendableData*)cmtMsg2.getCommitment().get())->getX() == birsa100);
 	}
@@ -589,7 +589,7 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		biginteger value = 123456789;
 		SigmaBIMsg sMsg(value);
 		auto serialized = sMsg.toByteArray();
-		int serializedSize = sMsg.serializedSize();
+		int serializedSize = sMsg.getSerializedSize();
 		REQUIRE(sMsg.getMsg() == value);
 
 		// verify new one is created with empty values
@@ -597,7 +597,7 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		REQUIRE(sMsg2.getMsg() == -100);
 
 		// deserialize and verify original values in the new object
-		sMsg.init_from_byte_array(serialized.get(), serializedSize);
+		sMsg.initFromByteArray(serialized.get(), serializedSize);
 		REQUIRE(sMsg.getMsg() == value);
 	}
 }

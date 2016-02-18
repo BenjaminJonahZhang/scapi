@@ -41,3 +41,5 @@ make.dependencies
 *.diagsession
 src/cpp/ScapiCpp/x64/Release/config_for_test.txt
 src/cpp/scapi_tests/config_for_test.txt
+src/java/edu/biu/SCProtocols/MaliciousYao/data/P1/*
+src/java/edu/biu/SCProtocols/MaliciousYao/data/P2/*

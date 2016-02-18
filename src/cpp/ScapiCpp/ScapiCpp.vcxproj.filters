@@ -227,5 +227,8 @@
     <ClInclude Include="include\interactive_mid_protocols\CommitmentSchemePedersen.hpp">
       <Filter>Header Files\InteractiveMidProtocols</Filter>
     </ClInclude>
+    <ClInclude Include="include\interactive_mid_protocols\SigmaProtocolPedersen.hpp">
+      <Filter>Header Files\InteractiveMidProtocols</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

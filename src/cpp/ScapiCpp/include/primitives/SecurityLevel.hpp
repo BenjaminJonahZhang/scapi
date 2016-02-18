@@ -81,3 +81,9 @@ class SecurityLevelException : public logic_error
 public:
 	SecurityLevelException(const string & msg) : logic_error(msg) {};
 };
+
+class CheatAttemptException : public logic_error
+{
+public:
+	CheatAttemptException(const string & msg) : logic_error(msg) {};
+};
