@@ -43,7 +43,7 @@ public:
 * In the basic case, the receiver outputs the id of the received commitment.
 */
 class CmtRBasicCommitPhaseOutput : public CmtRCommitPhaseOutput {
-private:
+protected:
 	long commitmentId;
 public:
 	/**
@@ -55,9 +55,16 @@ public:
 	*/
 	long getCommitmentId() override { return commitmentId; };
 	// network serialization implementation:
-	void initFromByteArray(byte* arr, int size) override;
-	shared_ptr<byte> toByteArray() override;
-	int getSerializedSize() override;
+	int getSerializedSize() override {return sizeof(long); };
+	std::shared_ptr<byte> toByteArray() override {
+		byte * result = new byte[sizeof(long)];
+		copy(((byte*)&commitmentId), ((byte*)&commitmentId) + sizeof(long), result);
+		std::shared_ptr<byte> result_shared(result, std::default_delete<byte[]>());
+		return result_shared;
+	}
+	void initFromByteArray(byte * arr, int size) override {
+		memcpy(&commitmentId, arr, sizeof(long));
+	};
 };
 
 /**
@@ -67,7 +74,10 @@ public:
 class CmtRTrapdoorCommitPhaseOutput : public CmtRBasicCommitPhaseOutput {
 private:
 	biginteger trap;
+	int serialized_size;
+	int trapSize;
 public:
+	CmtRTrapdoorCommitPhaseOutput() : CmtRTrapdoorCommitPhaseOutput(0, 0) {};
 	/**
 	* Constructor that sets the given commitment id.
 	* @param trapdoor the receiver's trapdoor for this commitment.
@@ -76,6 +86,8 @@ public:
 	CmtRTrapdoorCommitPhaseOutput(biginteger trapdoor, long commitmentId) :
 		CmtRBasicCommitPhaseOutput(commitmentId) {
 		this->trap = trapdoor;
+		this->trapSize = bytesCount(trap);
+		this->serialized_size = trapSize + sizeof(long);
 	};
 	/**
 	* Returns the trapdoor of this commitment.
@@ -83,9 +95,21 @@ public:
 	biginteger getTrap() { return trap; };
 	
 	// network serialization implementation:
-	void initFromByteArray(byte* arr, int size) override;
-	shared_ptr<byte> toByteArray() override;
-	int getSerializedSize() override;
+
+	std::shared_ptr<byte> toByteArray() override {
+		byte * result = new byte[serialized_size];
+		copy(((byte*)&commitmentId), ((byte*)&commitmentId) + sizeof(long), result);
+		encodeBigInteger(trap, result + sizeof(long), trapSize);
+		std::shared_ptr<byte> result_shared(result, std::default_delete<byte[]>());
+		return result_shared;
+	}
+	int getSerializedSize() override { return serialized_size; };
+	void initFromByteArray(byte * arr, int size) override {
+		memcpy(&commitmentId, arr, sizeof(long));
+		trapSize = size - sizeof(long);
+		trap = decodeBigInteger(arr + sizeof(long), trapSize);
+		serialized_size = trapSize + sizeof(long);
+	};
 };
 
 /**
@@ -267,7 +291,7 @@ public:
 /**
 * General interface for the decommitment message the committer sends to the receiver.
 */
-class CmtCDecommitmentMessage {
+class CmtCDecommitmentMessage : public NetworkSerialized{
 public:
 	/**
 	* Returns the committed value.

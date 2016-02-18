@@ -597,7 +597,51 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		REQUIRE(sMsg2.getMsg() == -100);
 
 		// deserialize and verify original values in the new object
-		sMsg.initFromByteArray(serialized.get(), serializedSize);
-		REQUIRE(sMsg.getMsg() == value);
+		sMsg2.initFromByteArray(serialized.get(), serializedSize);
+		REQUIRE(sMsg2.getMsg() == value);
 	}
+	SECTION("CmtPedersenDecommitmentMessage") {
+		biginteger value(rsa100);
+		auto r = make_shared<BigIntegerRandomValue>(value);
+		biginteger x(1234);
+		CmtPedersenDecommitmentMessage cpdm(x, r);
+		auto serialized = cpdm.toByteArray();
+		int serializedSize = cpdm.getSerializedSize();
+		auto biR = dynamic_pointer_cast<BigIntegerRandomValue>(cpdm.getR());
+		REQUIRE(biR->getR() == value);
+		REQUIRE(cpdm.getX() == x);
+
+		// verify new one is created with empty values
+		auto r2 = make_shared<BigIntegerRandomValue>(0);
+		CmtPedersenDecommitmentMessage cpdm2;
+		auto biR2 = dynamic_pointer_cast<BigIntegerRandomValue>(cpdm2.getR());
+		REQUIRE(!biR2);
+		REQUIRE(cpdm2.getX() == 0);
+
+		// deserialize and verify original values in the new object
+		cpdm2.initFromByteArray(serialized.get(), serializedSize);
+		auto biR3 = dynamic_pointer_cast<BigIntegerRandomValue>(cpdm2.getR());
+		REQUIRE(biR3->getR() == value);
+		REQUIRE(cpdm2.getX() == x);
+	}
+	SECTION("CmtRTrapdoorCommitPhaseOutput") {
+		biginteger trap(rsa100);
+		long commitmentId = 123456789;
+		CmtRTrapdoorCommitPhaseOutput cmtTrapOut(trap, commitmentId);
+		auto serialized = cmtTrapOut.toByteArray();
+		int serializedSize = cmtTrapOut.getSerializedSize();
+		REQUIRE(cmtTrapOut.getCommitmentId() == commitmentId);
+		REQUIRE(cmtTrapOut.getTrap() == trap);
+
+		// verify new one is created with empty values
+		CmtRTrapdoorCommitPhaseOutput cmtTrapOut2;
+		REQUIRE(cmtTrapOut2.getCommitmentId() == 0);
+		REQUIRE(cmtTrapOut2.getTrap() == 0);
+
+		// deserialize and verify original values in the new object
+		cmtTrapOut2.initFromByteArray(serialized.get(), serializedSize);
+		REQUIRE(cmtTrapOut2.getCommitmentId() == commitmentId);
+		REQUIRE(cmtTrapOut2.getTrap() == trap);
+	}
+	
 }

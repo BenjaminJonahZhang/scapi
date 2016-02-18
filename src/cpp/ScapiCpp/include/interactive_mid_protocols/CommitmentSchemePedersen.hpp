@@ -62,9 +62,10 @@ public:
 class CmtPedersenDecommitmentMessage : public CmtCDecommitmentMessage {
 private:
 	biginteger x; // committer's private input x in Zq
-	int len;
+	int lenX, lenR, serializedSize;
 	shared_ptr<BigIntegerRandomValue> r; // random value sampled during the sampleRandomValues stage;
 public:
+	CmtPedersenDecommitmentMessage() : CmtPedersenDecommitmentMessage(0, NULL) {};
 	/**
 	* Constructor that sets the given committed value and random value.
 	* @param x the committed value
@@ -73,18 +74,40 @@ public:
 	CmtPedersenDecommitmentMessage(biginteger x, shared_ptr<BigIntegerRandomValue> r) {
 		this->x = x;
 		this->r = r;
-		this->len = bytesCount(x);
+		this->lenX = bytesCount(x);
+		this->lenR = r? bytesCount(r->getR()) : 0;
+		this->serializedSize = lenX + lenR;
 	};
 	/**
 	* Returns the committed value.
 	*/
 	shared_ptr<byte> getSerializedX() override{
-		std::shared_ptr<byte> res(new byte[len], std::default_delete<byte[]>());
-		encodeBigInteger(x, res.get(), len);
+		std::shared_ptr<byte> res(new byte[lenX], std::default_delete<byte[]>());
+		encodeBigInteger(x, res.get(), lenX);
 		return res;
 	}
-	int getSerializedXSize() override { return len; };
-	shared_ptr<RandomValue> getR() override{ return r; };
+	shared_ptr<RandomValue> getR() override { return r; };
+	biginteger getRValue() { return r->getR(); }
+	int getSerializedXSize() override { return lenX; };
+	biginteger getX() { return x; };
+	// network serialization implementation:
+	void initFromByteArray(byte* arr, int size) override {
+		memcpy(&lenX, arr, sizeof(int));
+		x = decodeBigInteger(arr + sizeof(int), lenX);
+		memcpy(&lenR, arr + sizeof(int) + lenX, sizeof(int));
+		biginteger rVal = decodeBigInteger(arr + 2* sizeof(int) + lenX, lenR);
+		r = make_shared<BigIntegerRandomValue>(rVal);
+	}
+	shared_ptr<byte> toByteArray() override {
+		byte * result = new byte[serializedSize];
+		copy(((byte*)&lenX), ((byte*)&lenX) + sizeof(int), result);
+		encodeBigInteger(x, result+sizeof(int), lenX);
+		copy(((byte*)&lenR), ((byte*)&lenR) + sizeof(int), result+lenX+sizeof(int));
+		encodeBigInteger(r->getR(), result+lenX+2*sizeof(int), lenR);
+		std::shared_ptr<byte> result_shared(result, std::default_delete<byte[]>());
+		return result_shared;
+	}
+	int getSerializedSize() override { return serializedSize; };
 };
 
 /**

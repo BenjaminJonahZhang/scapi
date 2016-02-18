@@ -118,6 +118,13 @@ mt19937 get_seeded_random() {
 	return mt;
 }
 
+mt19937_64 get_seeded_random64() {
+	mt19937_64 mt;
+	auto seed = chrono::high_resolution_clock::now().time_since_epoch().count();
+	mt.seed(seed);
+	return mt;
+}
+
 void print_elapsed_ms(std::chrono::time_point<std::chrono::system_clock> start, string message) {
 	auto end = std::chrono::system_clock::now();
 	int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

@@ -19,6 +19,9 @@
     <Filter Include="Source Files\SigmaProtocols">
       <UniqueIdentifier>{5dfb209e-d577-4e73-bcf0-68d86bc4b977}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ZKSigmaProtocol">
+      <UniqueIdentifier>{249e8bc6-44fe-4914-a8b6-7afe017cf5b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -42,6 +45,9 @@
     </ClCompile>
     <ClCompile Include="SigmaProtocols\SigmaProtocolExample.cpp">
       <Filter>Source Files\SigmaProtocols</Filter>
+    </ClCompile>
+    <ClCompile Include="ZKSigmaProtocols\ZKSigma.cpp">
+      <Filter>Source Files\ZKSigmaProtocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

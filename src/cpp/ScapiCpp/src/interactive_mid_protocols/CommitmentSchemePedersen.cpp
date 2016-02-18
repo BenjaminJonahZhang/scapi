@@ -49,6 +49,53 @@ shared_ptr<CmtRCommitPhaseOutput> CmtPedersenReceiverCore::receiveCommitment() {
 	return make_shared<CmtRBasicCommitPhaseOutput>(msg->getId());
 }
 
+shared_ptr<CmtCommitValue> CmtPedersenReceiverCore::receiveDecommitment(long id) {
+	auto v = channel->read_one();
+	shared_ptr<CmtPedersenDecommitmentMessage> msg = make_shared<CmtPedersenDecommitmentMessage>();
+	msg->initFromByteVector(v);
+	auto receivedCommitment = commitmentMap[id];
+	auto cmtCommitMsg = std::static_pointer_cast<CmtCCommitmentMsg>(receivedCommitment);
+	return verifyDecommitment(cmtCommitMsg, msg);
+}
+
+shared_ptr<CmtCommitValue> CmtPedersenReceiverCore::verifyDecommitment(
+	shared_ptr<CmtCCommitmentMsg> commitmentMsg,
+	shared_ptr<CmtCDecommitmentMessage> decommitmentMsg) {
+	auto decommitmentMsgPedersen = dynamic_pointer_cast<CmtPedersenDecommitmentMessage>(decommitmentMsg);
+	auto commitmentMsgPedersen = dynamic_pointer_cast<CmtPedersenCommitmentMessage>(commitmentMsg);
+	biginteger x = decommitmentMsgPedersen->getX();
+	biginteger r = decommitmentMsgPedersen->getRValue();
+
+	// if x is not in Zq return null
+	if (x<0 || x>dlog->getOrder())
+		return NULL;
+	// calculate c = g^r * h^x
+	auto gTor = dlog->exponentiate(dlog->getGenerator(), r);
+	auto hTox = dlog->exponentiate(h, x);
+	auto cmt = commitmentMsgPedersen->getCommitment();
+	auto ge = static_pointer_cast<GroupElementSendableData>(cmt);
+	auto commitmentElement = dlog->reconstructElement(true, ge);
+	if(*commitmentElement == *(dlog->multiplyGroupElements(gTor, hTox)))
+		return make_shared<CmtBigIntegerCommitValue>(x);
+	// in the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
+	// for now we return null as a mode of reject. If the returned value of this function is not
+	// null then it means ACCEPT
+	return NULL;
+}
+
+void** CmtPedersenReceiverCore::getPreProcessedValues() {
+	return NULL;
+}
+int CmtPedersenReceiverCore::getPreProcessedValuesSize() {
+	return -1;
+}
+
+shared_ptr<void> CmtPedersenReceiverCore::getCommitmentPhaseValues(long id) {
+	auto voidPtr = commitmentMap[id]->getCommitment();
+	auto ge = static_pointer_cast<GroupElementSendableData>(voidPtr);
+	return dlog->reconstructElement(true, ge);
+}
+
 /*********************************/
 /*   CmtPedersenCommitterCore    */
 /*********************************/
