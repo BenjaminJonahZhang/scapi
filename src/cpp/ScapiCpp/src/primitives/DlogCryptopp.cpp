@@ -1,3 +1,4 @@
+#ifdef ABARAK_NO_DEF_BUILD_ERR
 #include "../../include/primitives/DlogCryptopp.hpp"
 
 
@@ -282,3 +283,4 @@ CryptoPpDlogZpSafePrime::~CryptoPpDlogZpSafePrime()
 		 throw invalid_argument("data type doesn't match the group type");
 	 return generateElement(bCheckMembership, vector<biginteger>({ zp_data->getX() }));
  }
+#endif
