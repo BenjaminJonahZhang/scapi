@@ -22,21 +22,15 @@ You'll need to install:
 
 1. Install `git`_
 2. Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc.
-3. Install `boost`_ versio 1_60. Follow instructions in the link, including running ./b2 install
+3. Install `boost`_ versio 1_60. Follow instructions in the link, including running ./b2 install. 
 4. Install `cryptopp`_
 5. Install `OpenSSL`_
 
 On Ubuntu environment is should look like: ::
 
   $ sudo apt-get update
-  $ sudo apt-get install build-essential
-  $ sudo apt-get install git
-  $ sudo apt-get install libcrypto++9v5 libcrypto++9v5-dbg
-  $ sudo apt-get install libssl-ocaml-dev libssl-dev  
-  $ cd ~ 
-  $ wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download
-  $ tar -xvf ./download
-  
+  $ sudo apt-get install git build-essential
+  $ sudo apt-get install libcrypto++ libssl-ocaml-dev libssl-dev  
   
 .. _Source:
 
