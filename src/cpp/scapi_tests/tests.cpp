@@ -26,6 +26,7 @@ biginteger endcode_decode(biginteger bi) {
 }
 
 string rsa100 = "1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139";
+string xx = "12796996813601383763849798056730343283682939747202100943566894545802445831004";
 
 TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 
@@ -108,6 +109,8 @@ TEST_CASE("Common methods", "[boost, common, math, log, bitLength, helper]") {
 		REQUIRE(bi_res == -birsa100);
 		bi_res = endcode_decode(197);
 		REQUIRE(bi_res == 197);
+		bi_res = endcode_decode(biginteger(xx));
+		REQUIRE(bi_res == biginteger(xx));
 
 	}
 
@@ -601,15 +604,15 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		REQUIRE(sMsg2.getMsg() == value);
 	}
 	SECTION("CmtPedersenDecommitmentMessage") {
-		biginteger value(rsa100);
-		auto r = make_shared<BigIntegerRandomValue>(value);
-		biginteger x(1234);
-		CmtPedersenDecommitmentMessage cpdm(x, r);
+		biginteger rvalue(rsa100);
+		biginteger xvalue(95612134554333);
+		auto r = make_shared<BigIntegerRandomValue>(rvalue);
+		CmtPedersenDecommitmentMessage cpdm(xvalue, r);
 		auto serialized = cpdm.toByteArray();
 		int serializedSize = cpdm.getSerializedSize();
 		auto biR = dynamic_pointer_cast<BigIntegerRandomValue>(cpdm.getR());
-		REQUIRE(biR->getR() == value);
-		REQUIRE(cpdm.getX() == x);
+		REQUIRE(biR->getR() == rvalue);
+		REQUIRE(cpdm.getX() == xvalue);
 
 		// verify new one is created with empty values
 		auto r2 = make_shared<BigIntegerRandomValue>(0);
@@ -621,8 +624,8 @@ TEST_CASE("serialization", "[SerializedData, CmtCCommitmentMsg]")
 		// deserialize and verify original values in the new object
 		cpdm2.initFromByteArray(serialized.get(), serializedSize);
 		auto biR3 = dynamic_pointer_cast<BigIntegerRandomValue>(cpdm2.getR());
-		REQUIRE(biR3->getR() == value);
-		REQUIRE(cpdm2.getX() == x);
+		REQUIRE(biR3->getR() == rvalue);
+		REQUIRE(cpdm2.getX() == xvalue);
 	}
 	SECTION("CmtRTrapdoorCommitPhaseOutput") {
 		biginteger trap(rsa100);

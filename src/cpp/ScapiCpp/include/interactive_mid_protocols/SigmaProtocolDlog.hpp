@@ -174,7 +174,6 @@ private:
 	*/
 	bool checkChallengeLength(byte* challenge, int challenge_size) {
 		biginteger e = decodeBigInteger(challenge, challenge_size);
-		cout << "got challenge: " << e << endl;
 		return (e >= 0) && (e < mp::pow(biginteger(2), t)); // 0 <= e < 2^t
 	};
 	/**

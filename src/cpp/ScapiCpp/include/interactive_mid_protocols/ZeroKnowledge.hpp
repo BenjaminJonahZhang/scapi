@@ -445,13 +445,6 @@ public:
 class CmtPedersenTrapdoorReceiver : public CmtPedersenReceiver {
 public:
 	/**
-	* Constructor that receives a connected channel (to the receiver) and chooses default dlog and random.
-	* The committer needs to be instantiated with the default constructor too.
-	* @param ServerChannel
-	*/
-	CmtPedersenTrapdoorReceiver(shared_ptr<ChannelServer> channel) : CmtPedersenReceiver(channel) {};
-
-	/**
 	* Constructor that receives a connected channel (to the receiver),
 	* the DlogGroup agreed upon between them and a SecureRandom object.
 	* The committer needs to be instantiated with the same DlogGroup,
@@ -470,7 +463,7 @@ public:
 	biginteger getTrapdoor() { return trapdoor; };
 	shared_ptr<CmtRCommitPhaseOutput> receiveCommitment() override {
 		// get the output from the super.receiverCommiotment.
-		auto output = this->receiveCommitment();
+		auto output = CmtPedersenReceiverCore::receiveCommitment();
 		// wrap the output with the trapdoor.
 		return make_shared<CmtRTrapdoorCommitPhaseOutput>(trapdoor, output->getCommitmentId());
 	};
@@ -493,9 +486,9 @@ public:
 	* @param sProver underlying sigma prover to use.
 	*/
 	ZKPOKFromSigmaCmtPedersenProver(shared_ptr<ChannelServer> channel,
-		shared_ptr<SigmaProverComputation> sProver) {
+		shared_ptr<SigmaProverComputation> sProver, shared_ptr<DlogGroup> dg) {
 		this->sProver = sProver;
-		this->receiver = make_shared<CmtPedersenTrapdoorReceiver>(channel);
+		this->receiver = make_shared<CmtPedersenTrapdoorReceiver>(channel, dg, get_seeded_random());
 		this->channel = channel;
 	}
 
@@ -599,6 +592,7 @@ private:
 	long commit(shared_ptr<byte> e, int eSize) {
 		auto val = committer->generateCommitValue(e, eSize);
 		long id = random();
+		id = abs(id);
 		committer->commit(val, id);
 		return id;
 	};
@@ -639,10 +633,10 @@ public:
 	*/
 	ZKPOKFromSigmaCmtPedersenVerifier(shared_ptr<ChannelServer> channel,
 		shared_ptr<SigmaVerifierComputation> sVerifier, std::mt19937_64 random,
-		shared_ptr<CmtRCommitPhaseOutput> emptyTrap) {
+		shared_ptr<CmtRCommitPhaseOutput> emptyTrap, shared_ptr<DlogGroup> dg) {
 		this->channel = channel;
 		this->sVerifier = sVerifier; 
-		this->committer = make_shared<CmtPedersenTrapdoorCommitter>(channel); 
+		this->committer = make_shared<CmtPedersenTrapdoorCommitter>(channel, dg, get_seeded_random());
 		this->random = random;
 		this->trap = emptyTrap;
 	};

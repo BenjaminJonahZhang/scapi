@@ -44,6 +44,8 @@ shared_ptr<CmtRCommitPhaseOutput> CmtPedersenReceiverCore::receiveCommitment() {
 	auto v = channel->read_one();
 	// init the empy CmtPedersenCommitmentMessage using the encdoed data
 	msg->initFromByteVector(v);
+	auto cm = msg->getCommitment();
+	auto cmtCommitMsg = std::static_pointer_cast<ZpElementSendableData>(cm);
 	commitmentMap[msg->getId()] = msg;
 	delete v; // no need to hold it anymore - already decoded and copied
 	return make_shared<CmtRBasicCommitPhaseOutput>(msg->getId());
@@ -67,7 +69,7 @@ shared_ptr<CmtCommitValue> CmtPedersenReceiverCore::verifyDecommitment(
 	biginteger r = decommitmentMsgPedersen->getRValue();
 
 	// if x is not in Zq return null
-	if (x<0 || x>dlog->getOrder())
+	if (x<0 || x>dlog->getOrder()) 
 		return NULL;
 	// calculate c = g^r * h^x
 	auto gTor = dlog->exponentiate(dlog->getGenerator(), r);
@@ -182,8 +184,8 @@ shared_ptr<CmtCDecommitmentMessage> CmtPedersenCommitterCore::generateDecommitme
 void CmtPedersenCommitterCore::decommit(long id) {
 	// fetch the commitment according to the requested ID
 	auto msg = generateDecommitmentMsg(id);
-	auto bMsg = msg->getSerializedX();
-	int size = msg->getSerializedXSize();
+	auto bMsg = msg->toByteArray();
+	int size = msg->getSerializedSize();
 	channel->write_fast(bMsg.get(), size);
 }
 

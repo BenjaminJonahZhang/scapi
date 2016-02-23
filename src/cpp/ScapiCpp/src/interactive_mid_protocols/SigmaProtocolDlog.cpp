@@ -82,6 +82,7 @@ shared_ptr<SigmaProtocolMsg> SigmaDlogProverComputation::computeFirstMsg(shared_
 	auto a = dlog->exponentiate(dlog->getGenerator(), r);
 	auto x = a->generateSendableData();
 	// create and return SigmaGroupElementMsg with a.
+	auto xz = dynamic_pointer_cast<ZpElementSendableData>(x);
 	return make_shared<SigmaGroupElementMsg>(x);
 
 }
@@ -134,10 +135,16 @@ void SigmaDlogVerifierComputation::sampleChallenge() {
 
 bool SigmaDlogVerifierComputation::verify(shared_ptr<SigmaCommonInput> input, 
 	shared_ptr<SigmaProtocolMsg> a, shared_ptr<SigmaProtocolMsg> z) {
-	SigmaDlogCommonInput* cInput = (SigmaDlogCommonInput*)input.get();
+	auto cInput = std::dynamic_pointer_cast<SigmaDlogCommonInput>(input);
+	if (!cInput)
+		throw invalid_argument("input to Dlog verifier should always be instance of SigmaDlogCommonInput");
 	bool verified = true;
-	SigmaGroupElementMsg* firstMsg = (SigmaGroupElementMsg*)a.get();
-	SigmaBIMsg* exponent = (SigmaBIMsg*)z.get();
+	auto firstMsg = std::dynamic_pointer_cast<SigmaGroupElementMsg>(a);
+	if (!firstMsg)
+		throw invalid_argument("first message to Dlog verifier should always be instance of SigmaGroupElementMsg");
+	auto exponent = std::dynamic_pointer_cast<SigmaBIMsg>(z);
+	if (!exponent)
+		throw invalid_argument("second message to Dlog verifier should always be instance of SigmaBIMsg");
 
 	auto aElement = dlog->reconstructElement(true, firstMsg->getElement());
 

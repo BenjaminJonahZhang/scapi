@@ -1,71 +1,21 @@
 #include "SigmaProtocolExample.hpp"
 
-
-
-struct ZKSigmaDlogParams {
-	biginteger w;
-	biginteger p;
-	biginteger q;
-	biginteger g;
-	int t;
-	IpAdress proverIp;
-	IpAdress verifierIp;
-	int proverPort;
-	int verifierPort;
-
-	ZKSigmaDlogParams(biginteger w, biginteger p, biginteger q, biginteger g, int t,
-		IpAdress proverIp, IpAdress verifierIp, int proverPort, int verifierPort) {
-		this->w = w; // witness
-		this->p = p; // group order - must be prime
-		this->q = q; // sub group order - prime such that p=2q+1
-		this->g = g; // generator of Zq
-		this->t = t; // soundness param must be: 2^t<q
-		this->proverIp = proverIp;
-		this->verifierIp = verifierIp;
-		this->proverPort = proverPort;
-		this->verifierPort = verifierPort;
-	};
-};
-
-ZKSigmaDlogParams readSigmaConfig(string config_file) {
-	ConfigFile cf(config_file);
-	string input_section = cf.Value("", "input_section");
-	biginteger p  = biginteger(cf.Value(input_section, "p"));
-	biginteger q = biginteger(cf.Value(input_section, "q"));
-	biginteger g = biginteger(cf.Value(input_section, "g"));
-	biginteger w = biginteger(cf.Value(input_section, "w"));
-	int t = stoi(cf.Value(input_section, "t"));
-	string proverIpStr = cf.Value("", "proverIp");
-	string verifierIpStr = cf.Value("", "verifierIp");
-	int proverPort = stoi(cf.Value("", "proverPort"));
-	int verifierPort = stoi(cf.Value("", "verifierPort"));
-	auto proverIp = IpAdress::from_string(proverIpStr);
-	auto verifierIp = IpAdress::from_string(verifierIpStr);
-	return ZKSigmaDlogParams(w, p, q, g, t, proverIp, verifierIp, proverPort, verifierPort);
-}
-
-void SigmaProtocolExampleUsage(char * argv0) {
-	std::cerr << "Usage: " << argv0 << " <1(=prover)|2(=verifier)> config_file_path" << std::endl;
-}
-
-void run_prover(std::shared_ptr<ChannelServer> server, ZKSigmaDlogParams sdp) {
+void run_prover(std::shared_ptr<ChannelServer> server, SigmaDlogParams sdp, ProverVerifierExample& pe) {
 	auto zp_params = make_shared<ZpGroupParams>(sdp.q, sdp.g, sdp.p);
 	auto dg = make_shared<OpenSSLDlogZpSafePrime>(zp_params);
 	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
-	std::shared_ptr<GroupElement> g = dg->getGenerator();
-	std::shared_ptr<GroupElement> h = dg->exponentiate(g, sdp.w);
-	auto proverComputation = make_shared<SigmaDlogProverComputation>(dg, sdp.t, 
+	auto g = dg->getGenerator();
+	auto h = dg->exponentiate(g, sdp.w);
+	auto proverComputation = make_shared<SigmaDlogProverComputation>(dg, sdp.t,
 		get_seeded_random());
-	auto sp = new SigmaProver(server, proverComputation);
-	auto proverinput = make_shared<SigmaDlogProverInput>(h, sdp.w);
-	sp->prove(proverinput);
+	auto proverInput = make_shared<SigmaDlogProverInput>(h, sdp.w);
+	pe.prove(server, proverComputation, dg, proverInput);
 }
 
-void run_verifier(shared_ptr<ChannelServer> server, ZKSigmaDlogParams sdp) {
+void run_verifier(shared_ptr<ChannelServer> server, SigmaDlogParams sdp, ProverVerifierExample& pe) {
 	auto zp_params = make_shared<ZpGroupParams>(sdp.q, sdp.g, sdp.p);
 	auto openSSLdg = make_shared<OpenSSLDlogZpSafePrime>(zp_params, get_seeded_random());
 	auto dg = std::static_pointer_cast<DlogGroup>(openSSLdg);
-
 	server->try_connecting(500, 5000); // sleep time=500, timeout = 5000 (ms);
 	auto g = dg->getGenerator();
 	auto h = dg->exponentiate(g, sdp.w);
@@ -74,21 +24,19 @@ void run_verifier(shared_ptr<ChannelServer> server, ZKSigmaDlogParams sdp) {
 		dg, sdp.t, get_seeded_random());
 	auto msg1 = make_shared<SigmaGroupElementMsg>(h->generateSendableData());
 	auto msg2 = make_shared<SigmaBIMsg>();
-	auto v = new SigmaVerifier(server, verifierComputation, msg1, msg2);
-	bool verificationPassed = v->verify(commonInput);
-	cout << "Verifer output: " << (verificationPassed? "Success" : "Failure") << endl;
-	delete v;
+	bool verificationPassed = pe.verify(server, verifierComputation, msg1, msg2, commonInput, openSSLdg);
+	cout << "Verifer output: " << (verificationPassed ? "Success" : "Failure") << endl;
+
 }
 
-int main5678s(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	if (argc != 3) {
-		SigmaProtocolExampleUsage(argv[0]);
+		SigmaUsage(argv[0]);
 		return 1;
 	}
-	ZKSigmaDlogParams sdp = readSigmaConfig(argv[2]);
+	auto sdp = readSigmaConfig(argv[2]);
 	string side(argv[1]);
 
-	Logger::configure_logging();
 	boost::asio::io_service io_service;
 	SocketPartyData proverParty(sdp.proverIp, sdp.proverPort);
 	SocketPartyData verifierParty(sdp.verifierIp, sdp.verifierPort);
@@ -96,15 +44,16 @@ int main5678s(int argc, char* argv[]) {
 		make_shared<ChannelServer>(io_service, proverParty, verifierParty) : 
 		make_shared<ChannelServer>(io_service, verifierParty, proverParty);
 	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
+	auto pve = getProverVerifier(sdp);
 	try {
 		if (side == "1") {
-			run_prover(server, sdp);
+			run_prover(server, sdp, *pve);
 		}
 		else if (side == "2") {
-			run_verifier(server, sdp);
+			run_verifier(server, sdp, *pve);
 		}
 		else {
-			SigmaProtocolExampleUsage(argv[0]);
+			SigmaUsage(argv[0]);
 			return 1;
 		}
 	}

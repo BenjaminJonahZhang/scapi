@@ -76,7 +76,7 @@ public:
 		this->r = r;
 		this->lenX = bytesCount(x);
 		this->lenR = r? bytesCount(r->getR()) : 0;
-		this->serializedSize = lenX + lenR;
+		this->serializedSize = lenX + lenR + 2*sizeof(int);
 	};
 	/**
 	* Returns the committed value.
@@ -97,6 +97,7 @@ public:
 		memcpy(&lenR, arr + sizeof(int) + lenX, sizeof(int));
 		biginteger rVal = decodeBigInteger(arr + 2* sizeof(int) + lenX, lenR);
 		r = make_shared<BigIntegerRandomValue>(rVal);
+		serializedSize = lenX + lenR + 2*sizeof(int);
 	}
 	shared_ptr<byte> toByteArray() override {
 		byte * result = new byte[serializedSize];

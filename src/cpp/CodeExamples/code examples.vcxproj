@@ -112,7 +112,6 @@
     <ClCompile Include="Yao\YaoParties.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="ZKSigmaProtocols\ZKSigma.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SigmaProtocols\SigmaProtocolExample.hpp" />

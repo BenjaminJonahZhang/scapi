@@ -104,6 +104,7 @@ void ZKPOKFromSigmaCmtPedersenProver::prove(shared_ptr<ZKProverInput> input) {
 
 	// run the receiver in TRAP_COMMIT.commit 
 	auto trap = receiveCommit();
+	auto trapR = dynamic_pointer_cast<CmtRTrapdoorCommitPhaseOutput>(trap);
 	// compute the first message a in sigma, using (x,w) as input and 
 	// send a to V
 	processFirstMsg(sigmaProverInput);
@@ -152,7 +153,6 @@ bool ZKPOKFromSigmaCmtPedersenVerifier::verify(shared_ptr<ZKCommonInput> input,
 	long id = commit(ePair.first, ePair.second);
 	// wait for a message a from P
 	receiveMsgFromProver(emptyA);
-
 	// run COMMIT.decommit as the decommitter
 	committer->decommit(id);
 

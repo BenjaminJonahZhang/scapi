@@ -142,3 +142,10 @@ biginteger getRandomInRange(biginteger min, biginteger max, std::mt19937 random)
 	return res;
 }
 
+void print_byte_array(byte * arr, int len, string message)
+{
+	cout << message << endl;
+	for (int i = 0; i < len; i++)
+		cout << (int)arr[i] << ",";
+	cout << endl;
+}
