@@ -14,7 +14,7 @@ There are a few prerequisites you must install before being able to compile scap
 
 1.  Install `git`_
 2.  Install `java`_, `junit4`_, and `ant`_
-3.  Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc. Under Ubuntu you can simply run ``sudo apt-get install build-essential``.
+3.  Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc. Under Ubuntu you can simply run ``sudo apt-get install build-essential``. 
 
 On Ubuntu environment is should look like: ::
 
@@ -25,6 +25,10 @@ On Ubuntu environment is should look like: ::
   $ sudo apt-get install build-essential
   $ sudo apt-get install ant
   $ sudo apt-get install junit4
+  
+.. note::
+  Notice that scapi should compile with gcc 4.7 or higher (if you also compile the c++ version - see specific instruction in c++ section)
+  
 
 .. _`Mac OS X`:
 
