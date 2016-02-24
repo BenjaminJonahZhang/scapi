@@ -92,5 +92,5 @@ The c++ implementation usally follows the same concept except when language spec
 .. _boost: http://www.boost.org/doc/libs/1_60_0/more/getting_started/unix-variants.html
 .. _cryptopp: https://www.cryptopp.com/
 .. _OpenSSL: https://www.openssl.org/
-.. _scapi_java: https://github.com/cryptobiu/scapi/edit/master/doc/source/install.rst
+.. _scapi_java: http://scapi.readthedocs.org/en/latest/install.html
 
