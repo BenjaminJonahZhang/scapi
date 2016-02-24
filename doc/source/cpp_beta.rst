@@ -18,6 +18,7 @@ Prerequisites on Linux
 ---------------------
 There are a few prerequisites you must install before being able to compile scapi on your machine. 
 First you'll need to intall scapi for java first - see `scapi_java`_
+You must install g++4.7 or higher. For the simple_dlog example you'll have to install g++4.9 since it is using c++14 features.
 You'll need to install:
 
 1. Install `git`_
@@ -30,7 +31,7 @@ On Ubuntu environment is should look like: ::
 
   $ sudo apt-get update
   $ sudo apt-get install git build-essential
-  $ sudo apt-get install libcrypto++ libssl-ocaml-dev libssl-dev  
+  $ sudo apt-get install libssl-ocaml-dev libssl-dev  
   
 .. _Source:
 
@@ -77,6 +78,16 @@ More advanced examples can be found under Yao folder. This example require two i
 and in another instance: ::
   
   $ ./App1.exe 2
+  
+Another advanced example is the sigma protocols one. Running the prover side: ::
+
+  $ cd scapi/src/cpp/CodeExamples/SigmaProtocols
+  $ make
+  $ ./SigmaProtocolExample.exe 1 ./SigmaConfig.txt
+
+and in another instance, running the verifier side: ::
+
+  $ ./SigmaProtocolExample.exe 2 ./SigmaConfig.txt
 
 .. _Further: 
 
