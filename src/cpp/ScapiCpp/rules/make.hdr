@@ -134,7 +134,7 @@ SRCDIR:= $(strip $(SRCDIR))
 include $(MAKE_RULES_DIR)$(MAKE_OS)/rules.hdr
 
 makefiles::
-        @$(ECHO) MAKE_OS= $(MAKE_OS)
+	@$(ECHO) MAKE_OS= $(MAKE_OS)
 	@$(ECHO) OBJDIR= $(OBJDIR)
 	@$(ECHO) LIBDIR= $(LIBDIR)
 	@$(ECHO) SRCDIR= $(SRCDIR)
