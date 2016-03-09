@@ -3,90 +3,91 @@
 SCAPI in C++ (Beta)
 ===================
 
-Until recently Scapi was a java-only library that in some cases wrapped native elements using JNI.
-We recently started to implement a c++ version of Scapi.
-Java-Scapi is great for fast development of application and for POCing cryptographic protocols.
+Until recently SCAPI was a java-only library that in some cases wrapped native elements using JNI.
+SCAPI is now supported and maintained in C++ version as well.
+Roughly speacking, Java-SCAPI is great for fast development of application and for POCing cryptographic protocols.
 However, when performance is a main concern, a c++ implementation might be more suitable.
 
 This is still "work in progress" and should be considered as beta. 
-Currently the main part that was implemented is the "primitive layer" of scapi
-but the scapi team is working these days on expending the c++ implementaion further.
+There are few modules that exist in the java version but were still not ported to the C++ version.
+The SCAPI team is working these days on expending the c++ implementation further.
 
 .. _Linux:
 
+The following explains how to install libscapi (SCAPI c++) on Ubuntu. For other Linux variants it should work as well with the appropriate adjustments.
+
 Prerequisites on Linux
 ---------------------
-There are a few prerequisites you must install before being able to compile scapi on your machine. 
-First you'll need to intall scapi for java first - see `scapi_java`_
-You must install g++4.7 or higher. For the simple_dlog example you'll have to install g++4.9 since it is using c++14 features.
-You'll need to install:
-
-1. Install `git`_
-2. Install the `gcc`_ compiler environment: `gcc`, `make`, `ar`, `ld`, etc.
-3. Install `boost`_ versio 1_60. Follow instructions in the link, including running ./b2 install. 
-4. Install `cryptopp`_
-5. Install `OpenSSL`_
-
-On Ubuntu environment is should look like: ::
+Update and install git, gcc, and open ssl. On Ubuntu environment is should look like: ::
 
   $ sudo apt-get update
-  $ sudo apt-get install git build-essential
-  $ sudo apt-get install libssl-ocaml-dev libssl-dev  
+  $ sudo apt-get install -y git build-essential
+  $ sudo apt-get install -y libssl-ocaml-dev libssl-dev  
   
-.. _Source:
+Download and install boost (the last step might take some time. patience): ::
+  
+  $ wget -O boost_1_60_0.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download
+  $ tar --bzip2 -xf boost_1_60_0.tar.bz2
+  $ cd boost_1_60_0
+  $  ./bootstrap.sh
+  $  ./b2 
 
-Installing Scapi from Source (On UNIX-based Operating Systems)
---------------------------------------------------------------
+More details about boost here: http://www.boost.org/doc/libs/1_60_0/more/getting_started/unix-variants.html  
 
-In order to install scapi: ::
+Download and build libscap: ::
 
-  $ git clone git://github.com/cryptobiu/scapi.git
-  $ git submodule init
-  $ git submodule update
-  $ cd scapi/src/cpp/ScapiCpp
+  $ cd ~
+  $ git clone https://github.com/cryptobiu/libscapi.git
+  $ cd libscapi
   $ make
   
-.. _Tests:
+Publish new libs: ::
+  
+  $ sudo ldconfig ~/boost_1_60_0/stage/lib/ ~/libscapi/install/lib/
 
-Running the tests
------------------
+Build and run test: ::
 
-Go to the scapi_test folder and run make and then execute test.exe: ::
-
-  $ cd ~/scapi/src/cpp/scapi_tests
+  $ cd ~/libscapi/test
   $ make
-  $ ./test.exe
+  $ ./tests.exe
 
-.. _Link:
+Build and run simple samples
 
-Likning against the scapi lib
------------------------------
-
-Can look at the different make file for reference. We inlcuded few sample files for quick start: ::
-
-  $ cd scapi/src/cpp/CodeExamples
+  $ cd ~/libscapi/samples
   $ make
-  $ ./simple_dlog.exe
-  $ ./simple_sha1.exe
+  $ ./simple_sha1.exe # should run and output some data
+  $ ./simple_dlog.exe # should run and output some data
 
-More advanced examples can be found under Yao folder. This example require two instance running on the same machine. To compile and run: ::
+Build and run complex samples:
 
-  $ cd scapi/src/cpp/CodeExamples/Yao
+Semi-honset YAO: ::
+  $ cd ~/libscapi/samples/YAO
   $ make
-  $ ./App1.exe 1
+
+Edit file ~/libscapi/samples/Yao/YaoConfig.txt and update a section (e.g., AES) and choose this section in the 'section' param
+for example verify that under AES the circuit_file path is updated to:
+circuit_file = /home/ubuntu/libscapi/samples/assets/circuits/AES/NigelAes.txt
+
+open two terminals and cd to: ~/libscapi/samples/Yao.
+run in one terminal: ::
+  
+  $ ./App1.exe 1 ./YaoConfig.txt
+And in the other: ::
+  $ ./App1.exe 2 ./YaoConfig.txt
 
 and in another instance: ::
   
   $ ./App1.exe 2
   
-Another advanced example is the sigma protocols one. Running the prover side: ::
-
-  $ cd scapi/src/cpp/CodeExamples/SigmaProtocols
+Another advanced example is the sigma protocols one: ::
+  $ cd ~/libscapi/samples/sigma
   $ make
+  
+Optional: Edit the config file (should work using the default)
+In one terminal: ::
   $ ./SigmaProtocolExample.exe 1 ./SigmaConfig.txt
 
-and in another instance, running the verifier side: ::
-
+And in the other: ::
   $ ./SigmaProtocolExample.exe 2 ./SigmaConfig.txt
 
 .. _Further: 
