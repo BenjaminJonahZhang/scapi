@@ -51,7 +51,7 @@ Build and run test: ::
   $ make
   $ ./tests.exe
 
-Build and run simple samples
+Build and run simple samples: ::
 
   $ cd ~/libscapi/samples
   $ make
@@ -59,8 +59,8 @@ Build and run simple samples
   $ ./simple_dlog.exe # should run and output some data
 
 Build and run complex samples:
-
 Semi-honset YAO: ::
+
   $ cd ~/libscapi/samples/YAO
   $ make
 
@@ -72,22 +72,23 @@ open two terminals and cd to: ~/libscapi/samples/Yao.
 run in one terminal: ::
   
   $ ./App1.exe 1 ./YaoConfig.txt
+
 And in the other: ::
+
   $ ./App1.exe 2 ./YaoConfig.txt
 
-and in another instance: ::
-  
-  $ ./App1.exe 2
-  
 Another advanced example is the sigma protocols one: ::
+
   $ cd ~/libscapi/samples/sigma
   $ make
   
 Optional: Edit the config file (should work using the default)
 In one terminal: ::
+
   $ ./SigmaProtocolExample.exe 1 ./SigmaConfig.txt
 
 And in the other: ::
+
   $ ./SigmaProtocolExample.exe 2 ./SigmaConfig.txt
 
 .. _Further: 
