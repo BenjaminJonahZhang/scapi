@@ -18,11 +18,12 @@ The following explains how to install libscapi (SCAPI c++) on Ubuntu. For other 
 
 Prerequisites on Linux
 ---------------------
-Update and install git, gcc, and open ssl. On Ubuntu environment is should look like: ::
+Update and install git, gcc, gmp, and open ssl. On Ubuntu environment is should look like: ::
 
   $ sudo apt-get update
   $ sudo apt-get install -y git build-essential
-  $ sudo apt-get install -y libssl-ocaml-dev libssl-dev  
+  $ sudo apt-get install -y libssl-ocaml-dev libssl-dev 
+  $ sudo apt-get install -y libgmp3-dev
   
 Download and install boost (the last step might take some time. patience): ::
   
