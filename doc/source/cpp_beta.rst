@@ -105,26 +105,26 @@ Prerequisites:
 2. Download and install boost binaries for windos: https://sourceforge.net/projects/boost/files/boost-binaries/1.60.0/ choose 64 bit version 14
 
 The windows solutions assume that boost is installed at
-First pull libscapi from GitHub. For convenient we will assume that libscapi is located at: `c:\code\scapi\libscapi`. If it is located somewhere eles then the following paths should be adjusted accrodingly.
+First pull libscapi from GitHub. For convenient we will assume that libscapi is located at: ``c:\code\scapi\libscapi```. If it is located somewhere eles then the following paths should be adjusted accrodingly.
 
 1. Build Miracl for windows 64:
-	A. Open solution MiraclWin64.sln at: `C:\code\libscapi\lib\MiraclCompilation`
+	A. Open solution MiraclWin64.sln at: ``C:\code\libscapi\lib\MiraclCompilation``
 	B. Build the solution once for debug and once for release
 2. Build OTExtension for window 64:
-	A. Open solution OTExtension.sln at `C:\code\libscapi\lib\OTExtension\Win64-sln`
+	A. Open solution OTExtension.sln at ``C:\code\libscapi\lib\OTExtension\Win64-sln``
 	B. Build solution once for debug and once for release
 3. Build GarbledCircuit project
-	A. Open solution ScGarbledCircuitWin64.sln at `C:\code\libscapi\lib\ScGarbledCircuit\ScGarbledCircuitWin64`
+	A. Open solution ScGarbledCircuitWin64.sln at ``C:\code\libscapi\lib\ScGarbledCircuit\ScGarbledCircuitWin64``
 	B. Build solution once for debug and once for release
 4. Build the NTL solution:
-  A. Open solution NTL-WIN64.sln at `C:\code\libscapi\lib\NTL\windows\NTL-WIN64`
-  B. Build solution once for debug and once for release
+  	A. Open solution NTL-WIN64.sln at ``C:\code\libscapi\lib\NTL\windows\NTL-WIN64``
+  	B. Build solution once for debug and once for release
 5. Build Scapi Solution including examples and test:
-	A. Open solution ScapiCpp.sln at `C:\code\libscapi\windows-solutions\scapi-sln`
+	A. Open solution ScapiCpp.sln at ``C:\code\libscapi\windows-solutions\scapi-sln``
 	B. Build solution once for debug and once for release - (as needed)
 	
 6. Run tests.
-	A. Go to `C:\code\libscapi\windows-solutions\scapi-sln\x64\debug`
+	A. Go to ``C:\code\libscapi\windows-solutions\scapi-sln\x64\debug``
 	B. run ./scapi_tests.exe and make sure all is green
 7. Run example:
 	A. open two terminals
