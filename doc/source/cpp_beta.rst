@@ -104,8 +104,10 @@ Prerequisites:
 1. Download and install open ssl for windows: https://slproweb.com/products/Win32OpenSSL.html (choose 64bit not light)
 2. Download and install boost binaries for windos: https://sourceforge.net/projects/boost/files/boost-binaries/1.60.0/ choose 64 bit version 14
 
-The windows solutions assume that boost is installed at
-First pull libscapi from GitHub. For convenient we will assume that libscapi is located at: ``c:\code\scapi\libscapi```. If it is located somewhere eles then the following paths should be adjusted accrodingly.
+The windows solutions assume that boost is installed at ``C:\local\boost_1_60_0`` and that OpenSSL at: ``C:\OpenSSL-Win64``
+
+
+Pull libscapi from GitHub. For convenient we will assume that libscapi is located at: ``c:\code\scapi\libscapi```. If it is located somewhere eles then the following paths should be adjusted accrodingly.
 
 1. Build Miracl for windows 64:
 	A. Open solution MiraclWin64.sln at: ``C:\code\libscapi\lib\MiraclCompilation``
@@ -128,9 +130,9 @@ First pull libscapi from GitHub. For convenient we will assume that libscapi is 
 	B. run ./scapi_tests.exe and make sure all is green
 7. Run example:
 	A. open two terminals
-	B. in both of them go to: `C:\code\libscapi\windows-solutions\scapi-sln\x64\debug`
-	C. In the first run:  `"code examples.exe" 1 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt `
-	   In the second run: `"code examples.exe" 2 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt`
+	B. in both of them go to: ``C:\code\libscapi\windows-solutions\scapi-sln\x64\debug``
+	C. In the first run:  ``"code examples.exe" 1 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt``
+	   In the second run: ``"code examples.exe" 2 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt``
 	D. Make sure you get success notice
 
 .. _Further: 
