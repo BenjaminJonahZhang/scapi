@@ -18,6 +18,9 @@ Installing SCAPI - Linux
 ---------------------
 The following explains how to install libscapi (SCAPI c++) on Ubuntu. For other Linux variants it should work as well with the appropriate adjustments.
 
+Prerequisites
+~~~~~~~~~~~~
+
 Update and install git, gcc, gmp, and open ssl. On Ubuntu environment is should look like: ::
 
   $ sudo apt-get update
@@ -35,7 +38,10 @@ Download and install boost (the last step might take some time. patience): ::
 
 More details about boost here: http://www.boost.org/doc/libs/1_60_0/more/getting_started/unix-variants.html  
 
-Download and build libscap: ::
+Building libscapi and publishing libs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download and build libscapi: ::
 
   $ cd ~
   $ git clone https://github.com/cryptobiu/libscapi.git
@@ -46,52 +52,60 @@ Publish new libs: ::
   
   $ sudo ldconfig ~/boost_1_60_0/stage/lib/ ~/libscapi/install/lib/
 
-Build and run test: ::
+Building and Running the Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to build and run tests: ::
 
   $ cd ~/libscapi/test
   $ make
   $ ./tests.exe
 
-Build and run simple samples: ::
+Samples
+~~~~~~~
+
+Build and run the samples program: ::
 
   $ cd ~/libscapi/samples
   $ make
-  $ ./simple_sha1.exe # should run and output some data
-  $ ./simple_dlog.exe # should run and output some data
 
-Build and run complex samples:
-Semi-honset YAO: ::
+In order to see all available samples: ::
 
-  $ cd ~/libscapi/samples/YAO
-  $ make
+ $ ./libscapi_example.exe
+ 
+In order to run simple examples (dlog or sha1): ::
 
-Edit file ~/libscapi/samples/Yao/YaoConfig.txt and update a section (e.g., AES) and choose this section in the 'section' param
-for example verify that under AES the circuit_file path is updated to:
-circuit_file = /home/ubuntu/libscapi/samples/assets/circuits/AES/NigelAes.txt
+ $ ./libscapi_example.exe dlog 
+ $ ./libscapi_example.exe sha1
+ 
+You should get some print outs if everything works well.
 
-open two terminals and cd to: ~/libscapi/samples/Yao.
-run in one terminal: ::
+In order to run the CommExample. Open two terminals. In the first run: ::
+ 
+ $ ./libscapi_example.exe comm 1 Comm/CommConfig.txt
+ 
+And in the other run: ::
+
+ $ ./libscapi_example.exe comm 2 Comm/CommConfig.txt
+
+In order to run Semi-honset YAO, run in the first terminal: ::
+
+  $ ./libscapi_example.exe yao 1 Yao/YaoConfig.txt
+
+And in the second: ::
   
-  $ ./App1.exe 1 ./YaoConfig.txt
-
-And in the other: ::
-
-  $ ./App1.exe 2 ./YaoConfig.txt
-
-Another advanced example is the sigma protocols one: ::
-
-  $ cd ~/libscapi/samples/sigma
-  $ make
+  $ ./libscapi_example.exe yao 2 Yao/YaoConfig.txt
   
-Optional: Edit the config file (should work using the default)
-In one terminal: ::
+Finally in order to run the Sigma example - in the first terminal run: ::
 
-  $ ./SigmaProtocolExample.exe 1 ./SigmaConfig.txt
+  $ ./libscapi_example.exe sigma 1 SigmaPrototocls/SigmaConfig.txt
 
-And in the other: ::
+And in the second terminal: ::
 
-  $ ./SigmaProtocolExample.exe 2 ./SigmaConfig.txt
-  
+ $ ./libscapi_example.exe sigma 1 SigmaPrototocls/SigmaConfig.txt
+
+You can edit the config file in order to play with the different params in all examples.
+
 .. _Windows:
 
 Installing SCAPI - Windows
