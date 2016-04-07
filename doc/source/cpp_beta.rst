@@ -145,9 +145,9 @@ Pull libscapi from GitHub. For convenient we will assume that libscapi is locate
 7. Run example:
 	A. open two terminals
 	B. in both of them go to: ``C:\code\libscapi\windows-solutions\scapi-sln\x64\debug``
-	C. In the first run:  ``"code examples.exe" 1 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt``
-	   In the second run: ``"code examples.exe" 2 ..\..\..\..\samples\SigmaProtocols\SigmaConfig.txt``
-	D. Make sure you get success notice
+	C. To see available samples run ``libscapi_examples.exe``
+	D. Follow instruction of how to run the different samples as exaplained in the linux section
+	E. You can edit the different config file to play with the paramaters
 
 .. _Further: 
 
