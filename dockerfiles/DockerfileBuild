@@ -1,0 +1,19 @@
+############################################################
+# Dockerfile to build LibScapi Libs ready for compiling libscapi itself
+# Based on scapicryptobiu/libscapi_base
+# Tagged: scapicryptobiu/libscapi_libs
+############################################################
+
+# Set the base image to libscapi base
+FROM scapicryptobiu/scapi_base:latest
+
+# fetch libscapi and build it
+WORKDIR /root
+RUN mkdir scapi
+COPY . scapi/
+
+WORKDIR scapi
+RUN mkdir build
+
+# Install Scapi
+RUN sudo make install

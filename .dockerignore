@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+.gitmodules
+.gitattributes
+
+# Docker
+.docker
+.dockerignore
+
+# C extensions
+*.so
+*.exe
+*.lib
+*.a
+*.o
+*.sdf
+
+compile-*
+build.sh
+rebuild.sh
+
+# Distribution / packaging
+docs/
+build/
+dokcerfiles/
+install/
+obj
+windows-solutions
+*/Win64-sln/*
+lib/MiraclCompilation/MiraclTest
+samples/assets/circuits/AESMULT
+.git/objects
