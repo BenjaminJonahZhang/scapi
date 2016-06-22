@@ -16,6 +16,6 @@ WORKDIR scapi
 RUN mkdir build
 
 # Install Scapi
-WORKDIR scapi
+
 RUN sudo make prefix=/usr
 RUN sudo make install prefix=/usr
