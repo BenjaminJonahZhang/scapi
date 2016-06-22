@@ -1,3 +1,6 @@
+git submodule init
+git submodule update
+
 # delete all existing containers
 docker ps -a -q | xargs --no-run-if-empty docker rm
 # delete all images

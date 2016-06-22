@@ -21,6 +21,7 @@ build.sh
 rebuild.sh
 
 # Distribution / packaging
+lib/BouncyCastle/core/src/test/
 docs/
 build/
 dokcerfiles/
