@@ -17,4 +17,4 @@ RUN mkdir build
 
 # Install Scapi
 WORKDIR scapi
-RUN make
+RUN make install
