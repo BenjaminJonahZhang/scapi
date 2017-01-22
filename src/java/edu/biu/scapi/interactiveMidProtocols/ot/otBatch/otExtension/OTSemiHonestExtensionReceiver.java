@@ -118,9 +118,9 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 		//We set the version to be the general case, if a different call was made we will change it later to the relevant version.
 		String version = "general";
 		
-		//Check if the input is valid. If input is not instance of OTRExtensionInput, throw Exception.
+		//Check if the input is valid. If input is not instance of OTExtensionRInput, throw Exception.
 		if (!(input instanceof OTExtensionRInput)){
-			throw new IllegalArgumentException("input should be an instance of OTRExtensionInput.");
+			throw new IllegalArgumentException("input should be an instance of OTExtensionRInput.");
 		}
 		
 		//If the user gave correlated input, change the version of the OT to correlated.
