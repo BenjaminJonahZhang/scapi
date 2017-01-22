@@ -94,11 +94,11 @@ public class OfflineAppP2 {
 			
 		}
 		for (int i=0; i<mainGbc.length; i++){
-			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, true, false, true);
+			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, ScNativeGarbledBooleanCircuit.CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		for (int i=0; i<crGbc.length; i++){
-			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, true, false, true);
+			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, ScNativeGarbledBooleanCircuit.CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		ExecutionParameters mainExecution = new ExecutionParameters(mainCircuit, mainGbc, N1, s1, B1, p1);
@@ -123,7 +123,7 @@ public class OfflineAppP2 {
 				long start = System.nanoTime();
 				
 				// and run the protocol
-				protocol = new OfflineProtocolP2(mainExecution, crExecution, primitives, commConfig, otReceiver);
+				protocol = new OfflineProtocolP2(mainExecution, crExecution, primitives, commConfig, otReceiver, false);
 				
 				
 				System.out.println(String.format("Starting Offline protocol (P2)"));

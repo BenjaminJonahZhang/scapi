@@ -67,11 +67,11 @@ public class OnlineAppP2 {
 		FastGarbledBooleanCircuit[] crGbc = new ScNativeGarbledBooleanCircuit[B2];
 		
 		for (int i=0; i<B1; i++){
-			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, true, false, true);
+			mainGbc[i] = new ScNativeGarbledBooleanCircuit(circuitFile, ScNativeGarbledBooleanCircuit.CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		for (int i=0; i<B2; i++){
-			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, true, false, true);
+			crGbc[i] = new ScNativeGarbledBooleanCircuit(crCircuitFile, ScNativeGarbledBooleanCircuit.CircuitType.FREE_XOR_HALF_GATES, true);
 		}
 		
 		ExecutionParameters mainExecution = new ExecutionParameters(mainCircuit, mainGbc, N1, s1, B1, p1);
