@@ -1,0 +1,30 @@
+n1 = 32
+b1 = 7
+s1 = 40
+p1 = 0.62
+n2 = 32
+b2 = 20
+s2 = 40
+p2 = 0.71
+num_threads = 8 
+
+input_section = AES 
+
+# OS name is added automatically
+[AES-Linux]
+circuit_file = ../../samples/assets/circuits/AES/NigelAes.txt
+input_file_party_1 = ../../samples/assets/circuits/AES/AESPartyOneInputs.txt
+input_file_party_2 = ../../samples/assets/circuits/AES/AESPartyTwoInputs.txt
+
+[AES-Windows]
+main_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/NigelAes.txt
+cr_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/CheatingRecovery/UnlockP1Input.txt
+main_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/aes.matrix
+cr_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/cr.matrix
+bucket_prefix_main1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P1/aes
+bucket_prefix_cr1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P1/cr
+bucket_prefix_main2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/aes
+bucket_prefix_cr2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/cr
+input_file_party_1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/AESPartyOneInputs.txt
+input_file_party_2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/AESPartyTwoInputs.txt
+parties_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/conf/PartiesConfig.txt
