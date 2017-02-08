@@ -5,7 +5,9 @@
 #include <libscapi/protocols/GMW/GMWParty.h>
 #include <libscapi/protocols/GMW/Circuit.h>
 
-
+/**
+ * Create the GMW party and return a pointer to the created object.
+ */
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_createGMWParty
         (JNIEnv *env, jobject, jint id , jstring circuitFileName, jstring partiesFileName, jstring inputsFileName, jint numThreads){
 
@@ -25,6 +27,9 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_createGMWParty
     return (long) party;
 }
 
+/**
+ * Run the GMW protocol - offline then online. 
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_runProtocol
 		(JNIEnv *env, jobject, jlong party){
 
@@ -40,6 +45,9 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_runProtocol
 	return result;
 }
 
+/**
+ * Delete the allocated memory.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_deleteGMW
 (JNIEnv *, jobject, jlong party) {
 	delete (GMWParty*)party;

@@ -1,5 +1,14 @@
 #include "MaliciousYaoProtocol.h"
 
+/**
+ * Create the offline protocol.
+ * It contains the following steps:
+ * 1. Create the communication between the parties
+ * 2. Create circuits and other execution parameters for the protocol
+ * 3. Create the OT sender / receiver
+ * 4. Create the protocol party
+ * 5. Create MaliciousYaoHandler with all the created arguments.
+ */
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_createYaoParty
 (JNIEnv * env, jobject, jint id, jstring configFileName) {
 	//Convert the jni objects to c++ objects.
@@ -53,7 +62,8 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYao
 		handler = new MaliciousYaoHandler((long)p1, yaoConfig, commConfig, io_service);
 	}
 	else if (id == 2) {
-
+		//OT malicious receiver
+		//Get the data of the OT server.
 		auto maliciousOtServer = commConfig->getMaliciousOTServer();
 #ifdef _WIN32
 		shared_ptr<OTBatchReceiver> otReceiver = make_shared<OTExtensionMaliciousReceiver>(*maliciousOtServer, mainCircuit[0]->getNumberOfInputs(2));
@@ -67,11 +77,9 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYao
 	return (long)handler;
 }
 
-/*
-* Class:     edu_biu_scapi_protocols_maliciousYao_MaliciousYaoParty
-* Method:    runProtocol
-* Signature: (IJ)[B
-*/
+/**
+ * Execute the offline protocol.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_runProtocol
 (JNIEnv * env, jobject, jint id, jlong maliciousHandler) {
 	string tmp = "reset times";
@@ -80,11 +88,9 @@ JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoO
 	auto commParty = handler->getCommConfig()->getCommParty();
 	if (id == 1) {
 		OfflineProtocolP1* p1 = (OfflineProtocolP1*)handler->getParty();
-		
 		int readsize = commParty[0]->read(tmpBuf, tmp.size());
 		commParty[0]->write((const byte *)tmp.c_str(), tmp.size());
 		
-		// we start counting the running time just before estalishing communication
 		auto start = chrono::high_resolution_clock::now();
 
 		p1->run();
@@ -112,7 +118,7 @@ JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoO
 		
 		commParty[0]->write((const byte *)tmp.c_str(), tmp.size());
 		int readsize = commParty[0]->read(tmpBuf, tmp.size());
-		// we start counting the running time just before estalishing communication
+		
 		auto start = chrono::high_resolution_clock::now();
 
 		//run the protocol
@@ -139,6 +145,10 @@ JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoO
 	}
 }
 
+/**
+ * Delete the allocated memory.
+ * First delete the protocol party, then delete the handler.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_deleteMaliciousYao
 (JNIEnv *, jobject, jint id, jlong maliciousHandler) {
 	MaliciousYaoHandler* handler = (MaliciousYaoHandler*)maliciousHandler;
@@ -149,6 +159,15 @@ JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoO
 	delete handler;
 }
 
+/**
+* Create the online protocol.
+* It contains the following steps:
+* 1. Create the communication between the parties
+* 2. Readthe buckets from the disk
+* 3. Only p2 - create circuits and other execution parameters for the protocol
+* 4. Create the protocol party
+* 5. Create MaliciousYaoHandler with all the created arguments.
+*/
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_createYaoParty
 (JNIEnv *env, jobject, jint id, jstring configFileName) {
 
@@ -222,6 +241,10 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYao
 	return (long)handler;
 }
 
+/**
+ * Execute the online phase of the protocol.
+ * The buckets to use are the bucket indexed by startExecutionNumber to endExecutionNumber.
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_runProtocol
 (JNIEnv * env, jobject, jint id, jlong maliciousHandler, jint startExecutionNumber, jint endExecutionNumber) {
 	MaliciousYaoHandler* handler = (MaliciousYaoHandler*)maliciousHandler;
@@ -240,8 +263,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_Malicio
 		if (id == 1) {
 			commParty[0]->write((const byte*)tmp.c_str(), tmp.size());
 			int readsize = commParty[0]->read(tmpBuf, tmp.size());
-			//cout << "read size = " << readsize << endl;
-
+			
 			auto mainBucket = handler->getMainBuckets1()[i];
 			auto crBucket = handler->getCRBuckets1()[i];
 
@@ -258,7 +280,6 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_Malicio
 		else if (id == 2) {
 
 			int readsize = commParty[0]->read(tmpBuf, tmp.size());
-			//cout << "read size = " << readsize << endl;
 			commParty[0]->write((const byte*)tmp.c_str(), tmp.size());
 
 			auto mainBucket = handler->getMainBuckets2()[i];
@@ -299,6 +320,10 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_Malicio
 	return result;
 }
 
+/**
+* Delete the allocated memory.
+* First delete the protocol party, then delete the handler.
+*/
 JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_deleteMaliciousYao
 (JNIEnv *, jobject, jint id , jlong maliciousHandler) {
 	MaliciousYaoHandler* handler = (MaliciousYaoHandler*)maliciousHandler;

@@ -1,6 +1,9 @@
 #include "YaoProtocol.h"
 #include <libscapi\protocols\SemiHonestYao\YaoParties.hpp>
 
+/**
+ * Create the Yao party.
+ */
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_createYaoParty
 (JNIEnv *env, jobject, jint id, jstring configFileName) {
 	//Convert the jni objects to c++ objects.
@@ -17,6 +20,11 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_cr
 	}
 }
 
+/**
+ *  Run the protocol according the number of execution given in the config file.
+ * In case of party two, the output is the output of the circuit.
+ * In case of party one, the output is an empty array. (p1 has no input in this protocol)
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_runProtocol
 (JNIEnv *env, jobject,  jint id, jlong party) {
 	
@@ -53,6 +61,9 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoPar
 	return result;
 }
 
+/**
+ * Delete the allocated memory.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_deleteYao
 (JNIEnv *, jobject, jint id, jlong party) {
 	if (id == 1)

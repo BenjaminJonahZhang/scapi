@@ -72,23 +72,34 @@ extern "C" {
 }
 
 using namespace std;
+
+/**
+ * This struct contains some parameters used by the malicious yao parties
+ */
 struct MaliciousYaoConfig {
 
-	string main_circuit_file;
-	string cr_circuit_file;
-	string main_matrix;
-	string cr_matrix;
-	string input_file_1;
-	string input_file_2;
-	string bucket_prefix_main1, bucket_prefix_main2;
-	string bucket_prefix_cr1, bucket_prefix_cr2;
-	string parties_file;
-	string ec_file;
+	string main_circuit_file;	//Name of the main circuit file
+	string cr_circuit_file;		//Name of the cheating recovery circuit file
+
+	//Parameters that determines the number of buckets, buckets sizes, probability and security.
 	int n1, b1, s1;
 	int n2, b2, s2;
 	double p1, p2;
-	int num_threads;
+	int num_threads;	//Number of treads to use in the execution
 
+	//The following parameters used by the online protocol:
+	string main_matrix;			//Name of the main matrix file
+	string cr_matrix;			// Name of the cheating recovery matrix file
+	string input_file_1;		//Name of p1 inputs file
+	string input_file_2;		//Name of p2 inputs file
+	string bucket_prefix_main1, bucket_prefix_main2; //Prefix for p1 buckets
+	string bucket_prefix_cr1, bucket_prefix_cr2;	 //Prefix for p2 buckets
+	string parties_file;		//Name of the file that manage the communication
+	string ec_file;				//Name of the file contains the elliptic curves.
+	
+	/**
+	 * Read the config file and set all parameters.
+	 */
 	MaliciousYaoConfig(string config_file) {
 #ifdef _WIN32
 		string os = "Windows";
@@ -125,29 +136,43 @@ struct MaliciousYaoConfig {
 	MaliciousYaoConfig() {}
 };
 
+
+/**
+ * This class holds some values used in the protocol.
+ * A pointer to this class is sent to the java object as the pointer to the native implementation.
+ */
 class MaliciousYaoHandler {
 private:
-	long party;
-	MaliciousYaoConfig yaoConfig;
-	shared_ptr<CommunicationConfig> commConfig;
-	boost::asio::io_service* io_service;
+	long party;										//The actual party of the protocol. Can be either p1 or p2, online or offline.
+	MaliciousYaoConfig yaoConfig;					//Holds the protocol cofiguration 
+	shared_ptr<CommunicationConfig> commConfig;		//manage the communication
+	boost::asio::io_service* io_service;			//used in the communication
 	vector<shared_ptr<BucketBundle>> mainBucketsP1; //used in online p1
-	vector<shared_ptr<BucketBundle>> crBucketsP1; //used in online p1
+	vector<shared_ptr<BucketBundle>> crBucketsP1;	//used in online p1
 	vector<shared_ptr<BucketLimitedBundle>> mainBucketsP2; //used in online p2
-	vector<shared_ptr<BucketLimitedBundle>> crBucketsP2; //used in online p2
-	shared_ptr<ExecutionParameters> mainExecution; //Used in Online p2
-	shared_ptr<ExecutionParameters> crExecution;
-	shared_ptr<KProbeResistantMatrix> mainMatrix, crMatrix;
-	shared_ptr<CircuitInput> input;
+	vector<shared_ptr<BucketLimitedBundle>> crBucketsP2;   //used in online p2
+	shared_ptr<ExecutionParameters> mainExecution;	//Used in Online p2
+	shared_ptr<ExecutionParameters> crExecution;	//Used in Online p2
+	shared_ptr<KProbeResistantMatrix> mainMatrix, crMatrix; //Used in Online p2
+	shared_ptr<CircuitInput> input;					//Input of the protocol
 
 public:
+	/**
+	 * This constructor used by the offline protocol (p1 and p2)
+	 */
 	MaliciousYaoHandler(long party, MaliciousYaoConfig yaoConfig, const shared_ptr<CommunicationConfig> & commConfig, boost::asio::io_service* io_service)
 		: party(party), yaoConfig(yaoConfig), commConfig(commConfig), io_service(io_service) {}
 
+	/**
+	* This constructor used by party one of the online protocol
+	*/
 	MaliciousYaoHandler(MaliciousYaoConfig yaoConfig, const shared_ptr<CommunicationConfig> & commConfig, boost::asio::io_service* io_service, 
 		const vector<shared_ptr<BucketBundle>> & mainBuckets, const vector<shared_ptr<BucketBundle>> & crBuckets, const shared_ptr<CircuitInput> & input)
 		: yaoConfig(yaoConfig), commConfig(commConfig), io_service(io_service), mainBucketsP1(mainBuckets), crBucketsP1(crBuckets), input(input){}
 
+	/**
+	* This constructor used by party two of the online protocol
+	*/
 	MaliciousYaoHandler(MaliciousYaoConfig yaoConfig, const shared_ptr<CommunicationConfig> & commConfig, boost::asio::io_service* io_service, 
 		const shared_ptr<ExecutionParameters> & mainExecution, const shared_ptr<ExecutionParameters> & crExecution, const shared_ptr<KProbeResistantMatrix> & mainMatrix, 
 		const shared_ptr<KProbeResistantMatrix> & crMatrix, const vector<shared_ptr<BucketLimitedBundle>> & mainBuckets, const vector<shared_ptr<BucketLimitedBundle>> & crBuckets,
@@ -155,6 +180,10 @@ public:
 		: yaoConfig(yaoConfig), commConfig(commConfig), io_service(io_service), mainExecution(mainExecution), crExecution(crExecution),
 		  mainMatrix(mainMatrix), crMatrix(crMatrix), mainBucketsP2(mainBuckets), crBucketsP2(crBuckets), input(input){}
 
+	/**
+	 * The party should be deleted outside since this class does not know which concrete party it have.
+	 * This destructor close the channel and edeltes it. All other members are shared pointers so there is no need to delete them.
+	 */
 	~MaliciousYaoHandler() {
 		io_service->stop();
 		delete io_service;
@@ -175,6 +204,7 @@ public:
 	shared_ptr<CircuitInput> getInput() { return input; }
 };
 
+//Used in party two of the online protocol.
 block** saveBucketGarbledTables(int size, BucketLimitedBundle * bucket);
 void restoreBucketTables(int size, BucketLimitedBundle* bucket, block** tables);
 
