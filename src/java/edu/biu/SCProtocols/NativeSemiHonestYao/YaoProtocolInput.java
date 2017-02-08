@@ -2,24 +2,25 @@ package edu.biu.SCProtocols.NativeSemiHonestYao;
 
 import edu.biu.scapi.comm.ProtocolInput;
 
+/**
+ * This class manage the input for the Yao protocol. <p>
+ * The input are the id of the party and the name of the config file. <p>
+ *  
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class YaoProtocolInput implements ProtocolInput {
 
 	private int id;
-	private int number_of_iterations;
-	private String configFileName;
+	private String configFileName; //Contains the 
 	
-	public YaoProtocolInput(int number_of_iterations, int id, String configFileName){
-		this.number_of_iterations = number_of_iterations;
+	public YaoProtocolInput(int id, String configFileName){
 		this.id = id;
 		this.configFileName = configFileName;
 	}
 	
 	public int getID(){
 		return id;
-	}
-	
-	public int getNumberOfIterations(){
-		return number_of_iterations;
 	}
 	
 	public String getConfigFileName(){

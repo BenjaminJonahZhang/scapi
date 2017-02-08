@@ -2,6 +2,14 @@ package edu.biu.SCProtocols.gmw;
 
 import edu.biu.scapi.comm.ProtocolInput;
 
+/**
+ * This class manage the input for the GMW protocol. <p>
+ * The input are the id of the party, the files contain the 1. circuit 2. parties data 3. inputs, 
+ * and the number of threads to use in the protocol. <p>
+ *  
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class GmwProtocolInput implements ProtocolInput {
 
 	private int id;

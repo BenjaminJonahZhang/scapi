@@ -19,6 +19,7 @@ input_file_party_2 = ../../samples/assets/circuits/AES/AESPartyTwoInputs.txt
 [AES-Windows]
 main_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/NigelAes.txt
 cr_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/CheatingRecovery/UnlockP1Input.txt
+ec_file = ../../libscapi/include/configFiles/NISTEC.txt
 main_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/aes.matrix
 cr_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/cr.matrix
 bucket_prefix_main1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P1/aes

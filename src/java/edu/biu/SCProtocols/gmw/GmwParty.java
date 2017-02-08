@@ -4,13 +4,26 @@ import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolInput;
 import edu.biu.scapi.comm.ProtocolOutput;
 
+/**
+ * This is a wrapper to the native implementation of the GMW protocol. <p>
+ * A general explanation of the GMW protocol can be found at {@link http://crypto.biu.ac.il/sites/default/files/Winter%20School%2015%20-%20GMW%20and%20OT%20extension.pdf}.
+ * This implementation is more efficient since we use Beaver's multiplication triples instead of 1 out of 4 OT. <P>
+ * 
+ * The native implementation can be found at {@link https://github.com/cryptobiu/libscapi/tree/dev/protocols/GMW}<p>
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class GmwParty implements Protocol{
 
-	private long nativeParty;
-	private GmwProtocolOutput output;
+	private long nativeParty;			//A pointer to the native implementation
+	private GmwProtocolOutput output;	//The output of the protocol
+	
+	//JNI functions that call the native implementation
 	private native long createGMWParty(int id, String circuitFileName, String partiesFileName, 
 			String inputsFileName, int numOfThreads);
 	private native byte[] runProtocol(long nativeParty);
+	private native void deleteGMW(long nativeParty);
 	
 	@Override
 	public void start(ProtocolInput protocolInput) {
@@ -19,13 +32,14 @@ public class GmwParty implements Protocol{
 		}
 		
 		GmwProtocolInput input = (GmwProtocolInput) protocolInput;
+		//Creates the native party
 		nativeParty = createGMWParty(input.getID(), input.getCircuitFileName(), input.getPartiesFileName(), 
 									 input.getInputsFileName(), input.getNumOfThreads());
-		
 	}
 
 	@Override
 	public void run() {
+		//Executes the native protocol
 		byte[] nativeOutput = runProtocol(nativeParty);
 		output = new GmwProtocolOutput(nativeOutput);
 	}
@@ -35,10 +49,21 @@ public class GmwParty implements Protocol{
 		return output;
 	}
 	
+	/**
+	 * deletes the related GMW object
+	 */
+	protected void finalize() throws Throwable {
+
+		// delete the dynamic allocation of GMW party pointer.
+		deleteGMW(nativeParty);
+
+		super.finalize();
+	}
+	
 	//loads the dll
-	 static {
-	        System.loadLibrary("LibscapiJavaInterface");
-	 }
+	static {
+	       System.loadLibrary("LibscapiJavaInterface");
+	}
 
 	public static void main(String[] args){
 		
