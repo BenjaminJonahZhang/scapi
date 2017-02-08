@@ -44,3 +44,5 @@ src/cpp/scapi_tests/config_for_test.txt
 src/java/edu/biu/SCProtocols/MaliciousYao/data/P1/*
 src/java/edu/biu/SCProtocols/MaliciousYao/data/P2/*
 src/cpp/ScapiCpp/.make/*
+src/jni/LibscapiJavaInterface/LibscapiJavaInterface.VC.opendb
+src/jni/LibscapiJavaInterface/x64/Release/LibscapiJavaInterface.exp

@@ -6,7 +6,7 @@
 #include <libscapi/protocols/GMW/Circuit.h>
 
 
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_protocols_gmw_GmwParty_createGMWParty
+JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_createGMWParty
         (JNIEnv *env, jobject, jint id , jstring circuitFileName, jstring partiesFileName, jstring inputsFileName, jint numThreads){
 
 	//Convert the jni objects to c++ objects.
@@ -25,7 +25,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_protocols_gmw_GmwParty_createGMWParty
     return (long) party;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_protocols_gmw_GmwParty_runProtocol
+JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_runProtocol
 		(JNIEnv *env, jobject, jlong party){
 
 	//Run the protocol/
