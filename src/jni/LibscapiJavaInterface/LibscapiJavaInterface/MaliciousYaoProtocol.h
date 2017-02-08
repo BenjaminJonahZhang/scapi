@@ -23,10 +23,10 @@ extern "C" {
 	/*
 	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty
 	* Method:    createYaoParty
-	* Signature: (ILjava/lang/String;Ljava/lang/String;)J
+	* Signature: (ILjava/lang/String;)J
 	*/
 	JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_createYaoParty
-		(JNIEnv *, jobject, jint, jstring, jstring);
+		(JNIEnv *, jobject, jint, jstring);
 
 	/*
 	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty
@@ -37,12 +37,20 @@ extern "C" {
 		(JNIEnv *, jobject, jint, jlong);
 
 	/*
+	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty
+	* Method:    deleteMaliciousYao
+	* Signature: (IJ)V
+	*/
+	JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_deleteMaliciousYao
+		(JNIEnv *, jobject, jint, jlong);
+
+	/*
 	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty
 	* Method:    createYaoParty
-	* Signature: (ILjava/lang/String;Ljava/lang/String;)J
+	* Signature: (ILjava/lang/String;)J
 	*/
 	JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_createYaoParty
-		(JNIEnv *, jobject, jint, jstring, jstring);
+		(JNIEnv *, jobject, jint, jstring);
 
 	/*
 	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty
@@ -51,6 +59,14 @@ extern "C" {
 	*/
 	JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_runProtocol
 		(JNIEnv *, jobject, jint, jlong, jint, jint);
+
+	/*
+	* Class:     edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty
+	* Method:    deleteMaliciousYao
+	* Signature: (IJ)V
+	*/
+	JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_deleteMaliciousYao
+		(JNIEnv *, jobject, jint, jlong);
 
 #ifdef __cplusplus
 }
@@ -67,6 +83,7 @@ struct MaliciousYaoConfig {
 	string bucket_prefix_main1, bucket_prefix_main2;
 	string bucket_prefix_cr1, bucket_prefix_cr2;
 	string parties_file;
+	string ec_file;
 	int n1, b1, s1;
 	int n2, b2, s2;
 	double p1, p2;
@@ -93,6 +110,7 @@ struct MaliciousYaoConfig {
 		bucket_prefix_main2 = cf.Value(input_section, "bucket_prefix_main2");
 		bucket_prefix_cr2 = cf.Value(input_section, "bucket_prefix_cr2");
 		parties_file = cf.Value(input_section, "parties_file");
+		ec_file = cf.Value(input_section, "ec_file");
 		n1 = stoi(cf.Value("", "n1"));
 		b1 = stoi(cf.Value("", "b1"));
 		s1 = stoi(cf.Value("", "s1"));
@@ -136,6 +154,11 @@ public:
 		const shared_ptr<CircuitInput> & input)
 		: yaoConfig(yaoConfig), commConfig(commConfig), io_service(io_service), mainExecution(mainExecution), crExecution(crExecution),
 		  mainMatrix(mainMatrix), crMatrix(crMatrix), mainBucketsP2(mainBuckets), crBucketsP2(crBuckets), input(input){}
+
+	~MaliciousYaoHandler() {
+		io_service->stop();
+		delete io_service;
+	}
 
 	long getParty() { return party; }
 	MaliciousYaoConfig getConfig() { return yaoConfig; }

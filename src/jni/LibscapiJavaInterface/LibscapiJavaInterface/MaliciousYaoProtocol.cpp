@@ -1,15 +1,14 @@
 #include "MaliciousYaoProtocol.h"
 
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_createYaoParty
-(JNIEnv * env, jobject, jint id, jstring configFileName, jstring ecFileName) {
+(JNIEnv * env, jobject, jint id, jstring configFileName) {
 	//Convert the jni objects to c++ objects.
 	const char* configFile = env->GetStringUTFChars(configFileName, NULL);
-	const char* ecFile = env->GetStringUTFChars(ecFileName, NULL);
 	MaliciousYaoConfig yaoConfig(configFile);
 	//set io_service for peer to peer communication
 	boost::asio::io_service* io_service = new boost::asio::io_service();
 	//set crypto primitives
-	CryptoPrimitives::setCryptoPrimitives(ecFile);
+	CryptoPrimitives::setCryptoPrimitives(yaoConfig.ec_file);
 	
 	CryptoPrimitives::setNumOfThreads(yaoConfig.num_threads);
 
@@ -140,17 +139,26 @@ JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoO
 	}
 }
 
+JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOfflineParty_deleteMaliciousYao
+(JNIEnv *, jobject, jint id, jlong maliciousHandler) {
+	MaliciousYaoHandler* handler = (MaliciousYaoHandler*)maliciousHandler;
+	if (id == 1) {
+		delete (OfflineProtocolP1*)handler->getParty();
+	} else 
+		delete (OfflineProtocolP2*)handler->getParty();
+	delete handler;
+}
+
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_createYaoParty
-(JNIEnv *env, jobject, jint id, jstring configFileName, jstring ecFileName) {
+(JNIEnv *env, jobject, jint id, jstring configFileName) {
 
 	//Convert the jni objects to c++ objects.
 	const char* configFile = env->GetStringUTFChars(configFileName, NULL);
-	const char* ecFile = env->GetStringUTFChars(ecFileName, NULL);
 	MaliciousYaoConfig yaoConfig(configFile);
 	//set io_service for peer to peer communication
 	boost::asio::io_service* io_service = new boost::asio::io_service();
 	//set crypto primitives
-	CryptoPrimitives::setCryptoPrimitives(ecFile);
+	CryptoPrimitives::setCryptoPrimitives(yaoConfig.ec_file);
 
 	CryptoPrimitives::setNumOfThreads(yaoConfig.num_threads);
 
@@ -289,6 +297,17 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_Malicio
 
 	//Return the output
 	return result;
+}
+
+JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeMaliciousYao_MaliciousYaoOnlineParty_deleteMaliciousYao
+(JNIEnv *, jobject, jint id , jlong maliciousHandler) {
+	MaliciousYaoHandler* handler = (MaliciousYaoHandler*)maliciousHandler;
+	if (id == 1) {
+		delete (OnlineProtocolP1*)handler->getParty();
+	}
+	else
+		delete (OnlineProtocolP2*)handler->getParty();
+	delete handler;
 }
 
 block** saveBucketGarbledTables(int size, BucketLimitedBundle * bucket) {

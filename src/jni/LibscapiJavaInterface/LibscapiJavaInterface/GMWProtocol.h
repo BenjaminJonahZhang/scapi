@@ -30,6 +30,14 @@ extern "C" {
 	JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_runProtocol
 		(JNIEnv *, jobject, jlong);
 
+	/*
+	* Class:     edu_biu_SCProtocols_gmw_GmwParty
+	* Method:    deleteGMW
+	* Signature: (J)V
+	*/
+	JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_deleteGMW
+		(JNIEnv *, jobject, jlong);
+
 #ifdef __cplusplus
 }
 #endif

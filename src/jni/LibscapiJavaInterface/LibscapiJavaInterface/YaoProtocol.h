@@ -21,7 +21,15 @@ extern "C" {
 	* Signature: (IIJ)[B
 	*/
 	JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_runProtocol
-		(JNIEnv *, jobject, jint, jint, jlong);
+		(JNIEnv *, jobject, jint, jlong);
+
+	/*
+	* Class:     edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty
+	* Method:    deleteYao
+	* Signature: (J)V
+	*/
+	JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_NativeSemiHonestYao_YaoParty_deleteYao
+		(JNIEnv *, jobject, jint, jlong);
 
 #ifdef __cplusplus
 }

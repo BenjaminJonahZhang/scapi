@@ -39,3 +39,8 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_runProtocol
 	//Return the output
 	return result;
 }
+
+JNIEXPORT void JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_deleteGMW
+(JNIEnv *, jobject, jlong party) {
+	delete (GMWParty*)party;
+}
