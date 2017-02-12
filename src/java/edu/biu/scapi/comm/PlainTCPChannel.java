@@ -182,7 +182,7 @@ public class PlainTCPChannel extends PlainChannel{
 	 * is not up yet then we sleep for a while and try again until the connection is established. This is done by the SecuringConnectionThread which keeps trying
 	 * until it succeeds or a timeout has been reached.<p>		
 	 * After the connection has succeeded the input and output streams are set for the send and receive functions.
-	 * @return
+	 * @return true when connected
 	 * @throws IOException 
 	 */
 	protected boolean connect() throws IOException {

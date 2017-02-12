@@ -46,7 +46,7 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
  * ciphertext (u1,u2,e,v) with public-key g1,g2,c,d,h is x. <p>
  * The protocol is for the case that the prover knows the randomness used to encrypt.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.10 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.10 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -109,7 +109,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with the given challenge.
-	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaCramerShoupEncryptedValueInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
@@ -125,7 +125,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with a randomly chosen challenge.
-	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaCramerShoupEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */

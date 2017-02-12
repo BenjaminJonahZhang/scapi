@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that the value committed to in the commitment (h,c1, c2) is x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.7 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.7 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -116,7 +116,6 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	/**
 	 * Converts the input to an input object for the underlying simulator.
 	 * @param in
-	 * @return
 	 */
 	private SigmaDHCommonInput convertInput(SigmaCommonInput in) {
 		if (!(in instanceof SigmaElGamalCommittedValueCommonInput)){

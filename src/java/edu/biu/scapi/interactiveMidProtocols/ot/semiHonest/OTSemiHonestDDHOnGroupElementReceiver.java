@@ -39,7 +39,7 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  * Concrete class for Semi-Honest OT assuming DDH receiver ON GROUP ELEMENT.<p>
  * This class derived from OTSemiHonestDDHReceiverAbs and implements the functionality related to the GroupElement inputs.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 4.1 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 4.1 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

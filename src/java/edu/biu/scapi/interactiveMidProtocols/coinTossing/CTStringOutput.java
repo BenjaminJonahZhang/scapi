@@ -35,7 +35,6 @@ public class CTStringOutput implements CTOutput{
 	
 	/**
 	 * Constructor that sets the given output String.
-	 * @param output
 	 */
 	public CTStringOutput(byte[] result){
 		outputedString = result;

@@ -80,7 +80,7 @@ public class OpenSSLCTREncRandomIV extends OpenSSLEncWithIVAbs implements CTREnc
 	 * The only valid name is AES.
 	 * @param prpName the name of a specific Pseudorandom permutation, for example "AES".
 	 * @param random  a user provided source of randomness.
-	 * @throw IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
+	 * @throws IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
 	 */
 	public OpenSSLCTREncRandomIV(String prpName, SecureRandom random) {
 		super(prpName, random);		

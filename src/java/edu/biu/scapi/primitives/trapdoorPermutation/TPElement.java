@@ -44,7 +44,6 @@ public interface TPElement{
 	
 	/**
 	 * This function extracts the actual value of the TPElement and wraps it in a TPElementSendableData that as it name indicates can be send using the serialization mechanism.  
-	 * @return
 	 */
 	public TPElementSendableData generateSendableData();
 	

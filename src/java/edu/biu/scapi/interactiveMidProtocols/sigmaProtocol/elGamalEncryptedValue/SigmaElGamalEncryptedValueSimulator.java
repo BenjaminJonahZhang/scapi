@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * This implementation simulates the case that the prover convince a verifier that the value encrypted under ElGamal in the 
  * ciphertext (c1, c2) with public-key h is x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.9 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.9 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -104,7 +104,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with the given challenge.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
+	 * @param in MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
@@ -120,7 +120,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with a randomly chosen challenge.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */

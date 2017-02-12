@@ -79,7 +79,7 @@ public class OpenSSLCBCEncRandomIV extends OpenSSLEncWithIVAbs implements CBCEnc
 	 * The valid names are AES and TripleDES.
 	 * @param prpName the name of a specific Pseudorandom permutation, for example "AES".
 	 * @param random  a user provided source of randomness.
-	 * @throw IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
+	 * @throws IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
 	 */
 	public OpenSSLCBCEncRandomIV(String prpName, SecureRandom random) {
 		super(prpName, random);

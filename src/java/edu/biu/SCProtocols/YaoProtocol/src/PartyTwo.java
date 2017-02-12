@@ -158,7 +158,7 @@ public class PartyTwo {
 	/**
 	 * Compute the garbled circuit.
 	 * @param otOutput The output from the OT protocol, which are party two inputs.
-	 * @return 
+	 * @return the output of the protocol
 	 */
 	private byte[] computeCircuit(OTBatchROutput otOutput) {
 		

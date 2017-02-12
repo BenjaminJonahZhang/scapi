@@ -14,8 +14,8 @@ public class ElGamalKEMCiphertext implements AsymmetricCiphertext{
 	/**
 	 * Create an instance of this container class.
 	 * This constructor is used by the Encryption Scheme as a result of a call to function encrypt. 
-	 * @param c1 the first part of the cihertext
-	 * @param c2 the second part of the ciphertext
+	 * @param u the first part of the cihertext
+	 * @param w the second part of the ciphertext
 	 */
 	public ElGamalKEMCiphertext(GroupElement u, SymmetricCiphertext w){
 		this.u = u;

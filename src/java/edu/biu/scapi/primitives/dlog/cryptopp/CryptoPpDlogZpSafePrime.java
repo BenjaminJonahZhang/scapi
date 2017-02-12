@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -383,7 +384,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	
 	/**
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
-	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
+	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link DlogGroup#reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
 	 */
 	@Override
 	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {

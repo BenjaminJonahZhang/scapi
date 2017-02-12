@@ -22,7 +22,7 @@ import edu.biu.scapi.securityLevel.EquivocalCmt;
  * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol of the commitment value.Pseudo code:<p>
  * The equivocality property means that a simulator can decommit to any value it needs (needed for proofs of security).<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 3.7 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.7 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

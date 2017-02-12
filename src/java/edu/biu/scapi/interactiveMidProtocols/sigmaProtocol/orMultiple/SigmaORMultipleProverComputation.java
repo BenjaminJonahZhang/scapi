@@ -44,7 +44,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * This protocol is used for a prover to convince a verifier that at least k out of n statements are true, 
  * where each statement can be proven by an associated Sigma protocol.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.16 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.16 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -200,7 +200,7 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	 *  For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)<p>
 		For every i in I, RUN the prover P on statement xi to get first message ai<p>
 		SET a=(a1,...,an)". 
-	 * @param input MUST be an instance of SigmaORMultipleInput.
+	 * @param in MUST be an instance of SigmaORMultipleInput.
 	 * @return SigmaMultipleMsg contains a1, ..., am. 
 	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers. 

@@ -53,7 +53,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * It uses El Gamal encryption for byte arrays, that is, the encryption class used is 
  * ScElGamalOnByteArray. This default cannot be changed.<p>
  *
- * The pseudo code of this protocol can be found in Protocol 3.4 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.4 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -117,8 +117,8 @@ public class CmtElGamalOnByteArrayReceiver extends CmtElGamalReceiverCore implem
 	 *		OUTPUT REJ<p>
 	 *	ELSE<p>
 	 *	    OUTPUT ACC and value x"<p>
-	 * @param id the id of the commitment.
-	 * @param msg the receiver message from the committer
+	 * @param commitmentMsg the commitment of the message.
+	 * @param decommitmentMsg the decommitment of the message
 	 * @return the committed value if the decommit succeeded; null, otherwise.
 	 */
 	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {

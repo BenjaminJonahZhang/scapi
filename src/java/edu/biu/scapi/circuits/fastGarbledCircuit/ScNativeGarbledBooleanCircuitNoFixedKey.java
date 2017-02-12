@@ -102,7 +102,6 @@ public class ScNativeGarbledBooleanCircuitNoFixedKey implements FastGarbledBoole
 	 * 
 	 * @param fileName the name of the circuit file.
 	 * @param isFreeXor a flag indicating the use of the optimization of FreeXor
-	 * @param isRowReduction a flag indicating the use of the optimization of Row Reduction
 	 */
 	public ScNativeGarbledBooleanCircuitNoFixedKey(String fileName, boolean isFreeXor){
 
@@ -217,8 +216,7 @@ public class ScNativeGarbledBooleanCircuitNoFixedKey implements FastGarbledBoole
 	}
 	/**
 	 * Computes the circuit using the given inputs. <p>
-	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
-	 * @param garbledInput A single key for each input wire.
+	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate(byte[])} method.
 	 * @return returns an array containing the garbled value of each output wire.
 	 * @throws NotAllInputsSetException if the given inputs array is not the same size of the inputs for this circuit.
 	 */

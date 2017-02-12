@@ -80,10 +80,10 @@ public class OTExtensionMaliciousSender  implements Malicious, OTBatchSender{
 	 * A constructor that creates the native sender with communication abilities. It uses the ip address and port given in the party object.<p>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
 	 * THE SENDER ACTS AS THE SERVER!!!
-	 * @param party An object that holds the ip address and port.
-	 * @param koblitzOrZpSize An integer that determines whether the OT extension uses Zp or ECC koblitz. The optional parameters are the following.
-	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp.
-	 * @param numOfThreads    
+	 * @param bindAddress the ip of this party.
+	 * @param listeningPort the port of this party.
+	 * @param numBaseOts base ots in the ot extension
+	 * @param numOts number of ots to do in parallel
 	 */
 	public OTExtensionMaliciousSender(String bindAddress, int listeningPort, int numOfThreads, int numBaseOts, int numOts){
 	
@@ -94,7 +94,9 @@ public class OTExtensionMaliciousSender  implements Malicious, OTBatchSender{
 	/**
 	 * Default constructor. Initializes the sender by passing the ip address and uses koblitz 163 as a default dlog group.<P>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
-	 * @param party An object that holds the ip address and port.
+	 * @param bindAddress The address of this party
+	 * @param listeningPort the port of this party
+	 * @param numOts the number of ots to do in parallel
 	 */
 	public OTExtensionMaliciousSender(String bindAddress, int listeningPort, int numOts){
 		// Create the sender by passing the local host address.

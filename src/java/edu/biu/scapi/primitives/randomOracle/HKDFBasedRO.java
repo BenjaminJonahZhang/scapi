@@ -60,7 +60,7 @@ public class HKDFBasedRO implements RandomOracle{
 	
 	/**
 	 * Constructor that gets a HKDF name, creates the corresponding object and sets it to the class member.
-	 * @param hkdf
+	 * @param hkdfName the name of the required hkdf.
 	 * @throws FactoriesException 
 	 */
 	public HKDFBasedRO(String hkdfName) throws FactoriesException{

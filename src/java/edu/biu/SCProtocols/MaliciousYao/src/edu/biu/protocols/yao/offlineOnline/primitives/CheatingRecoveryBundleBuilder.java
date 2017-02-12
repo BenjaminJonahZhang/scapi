@@ -30,7 +30,7 @@ public class CheatingRecoveryBundleBuilder extends BundleBuilder {
 	 * @param gbc The garbled circuit to use in the bundle.
 	 * @param matrix The matrix used to extends y1 keys.
 	 * @param primitives Provides the primitives that are used in the protocol, such as hash function.
-	 * @param channel The channel communicate between the parties.
+	 * @param channels The channel communicate between the parties.
 	 * @param proofOfCheating A proof that the other party is cheating.
 	 */
 	public CheatingRecoveryBundleBuilder(FastGarbledBooleanCircuit gbc, KProbeResistantMatrix matrix, CryptoPrimitives primitives, Channel[] channels, SecretKey proofOfCheating) {

@@ -229,7 +229,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	
 	/** 
 	 * This function performs the encryption of he given plain text
-	 * @param plainText MUST be an instance of BigIntegerPlainText.
+	 * @param plaintext MUST be an instance of BigIntegerPlainText.
 	 * @return an object of type BigIntegerCiphertext holding the encryption of the plaintext.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
@@ -280,7 +280,6 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
 	 * since this can cause problems when more than one value is being encrypt. 
 	 * Instead, we decided to have an additional encrypt value that gets the random value from the user.
-	 * @param plainText message to encrypt
 	 * @param r The random value to use in the encryption. 
 	 * @param plainText MUST be an instance of BigIntegerPlainText.
 	 * @return an object of type BigIntegerCiphertext holding the encryption of the plaintext.

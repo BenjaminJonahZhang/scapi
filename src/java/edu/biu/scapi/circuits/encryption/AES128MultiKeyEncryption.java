@@ -29,6 +29,7 @@ import java.security.InvalidKeyException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
+import edu.biu.scapi.circuits.garbledCircuit.MinimizeAESSetKeyGarblingParameters;
 import edu.biu.scapi.exceptions.CiphertextTooLongException;
 import edu.biu.scapi.exceptions.KeyNotSetException;
 import edu.biu.scapi.exceptions.PlaintextTooLongException;
@@ -44,7 +45,7 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
  * This implementation follows their second suggestion in section .6 (the second paragraph starting with a dash '-' ). <p>
  * 
  * Note that this encryption scheme does not minimize the number of AES set key operations. 
- * See {@link MinimizeAESSetKeyGarbledBooleanCircuitUtil} and {@code MinimizeAESSetKeyGarbledGate} for a circuit and gate that do that as
+ * See {@code MinimizeAESSetKeyGarbledBooleanCircuitUtil} and {@code MinimizeAESSetKeyGarbledGate} for a circuit and gate that do that as
  * well as a discussion of why a separate circuit was necessary to accomplish this. <p>
  * 
  * This encryption scheme encrypts by setting each key from the {@code MultiSecretKey} as the AES key and then calling AES on the tweak.

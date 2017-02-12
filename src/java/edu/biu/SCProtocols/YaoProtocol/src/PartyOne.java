@@ -121,7 +121,6 @@ public class PartyOne {
 	
 	/**
 	 * Runs OT protocol in order to send p2 the necessary keys without revealing any other information.
-	 * @param allInputWireValues The keys for each wire.
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 * @throws CheatAttemptException

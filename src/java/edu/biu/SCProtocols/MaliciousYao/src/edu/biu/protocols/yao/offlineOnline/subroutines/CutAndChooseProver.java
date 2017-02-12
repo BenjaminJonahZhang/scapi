@@ -61,7 +61,7 @@ public class CutAndChooseProver {
 	 * Constructor that sets the parameters and creates the commitment objects.
 	 * @param execution Contains parameters regarding the execution. 
 	 * @param primitives Contains primitives to use in the protocol.
-	 * @param channel The channel that communicates between the parties.
+	 * @param channels The channel that communicates between the parties.
 	 * @param bundleBuilders Contains the circuit parameters and used to build the circuit.
 	 */
 	public CutAndChooseProver(ExecutionParameters execution, CryptoPrimitives primitives, Channel[] channels, BundleBuilder[] bundleBuilders) {

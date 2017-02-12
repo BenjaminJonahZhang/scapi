@@ -16,10 +16,10 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
  * As the garbledBooleanCircuit interface, fast garbled circuits have four main operations: <p>
  * 1. The {@link #garble()} function that generates the keys and creates the garbled tables. <p>
  * 2. The {@link #compute()} function computes a result on a garbled circuit whose input has been set. <p>
- * 3. The {@link #verify(BooleanCircuit, Map)} method is used in the case of a malicious adversary to verify that the garbled circuit 
+ * 3. The {@link #verify(byte[])} method is used in the case of a malicious adversary to verify that the garbled circuit 
  * created is an honest garbling of the agreed upon non garbled circuit. For example, the constructing party constructs many garbled circuits and
  * the second party chooses all but one of them to verify and test the honesty of the constructing party.<p>
- * 4. The {@link #translate(Map)} that translates the garbled output from {@link #compute()} into meaningful output.<p>
+ * 4. The {@link #translate(byte[])} that translates the garbled output from {@link #compute()} into meaningful output.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  * 
@@ -59,8 +59,7 @@ public interface FastGarbledBooleanCircuit {
 	
 	/**
 	 * This method computes the circuit using the given inputs. <p>
-	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
-	 * @param garbledInput A single key for each input wire.
+	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate(byte[])} method.
 	 * @return returns an array containing the garbled value of each output wire.
 	 * @throws NotAllInputsSetException if the given inputs array does not includes a key for all input wires.
 	 */

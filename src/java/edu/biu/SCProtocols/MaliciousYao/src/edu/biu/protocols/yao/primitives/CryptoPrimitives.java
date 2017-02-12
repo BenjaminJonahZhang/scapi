@@ -174,7 +174,6 @@ public class CryptoPrimitives {
 
 		/**
 		 * Created a CryptoPrimitives object using this builder instance.
-		 * @return
 		 */
 		public CryptoPrimitives build() {
 			return new CryptoPrimitives(this);

@@ -481,7 +481,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
   	/**
   	 * Check that the output wires translate correctly. 
   	 * @param internalOutputs
-  	 * @return
+  	 * @return true if verified; false, otherwise.
   	 */
 	private boolean verifyTranslationTable(Map<Integer, SecretKey[]> keys) {
 		//Check that the output wires translate correctly. 

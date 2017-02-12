@@ -57,7 +57,7 @@ public class HashBasedRO implements RandomOracle{
 	
 	/**
 	 * Constructor that gets a cryptographic hash name, creates the corresponding object and sets it to the class member.
-	 * @param hash
+	 * @param hashName the name of the required hash
 	 * @throws FactoriesException 
 	 */
 	public HashBasedRO(String hashName) throws FactoriesException{

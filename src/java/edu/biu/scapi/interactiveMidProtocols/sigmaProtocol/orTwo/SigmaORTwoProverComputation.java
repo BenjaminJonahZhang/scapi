@@ -40,7 +40,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * where each statement can be proven by an associated Sigma protocol.
  * 
  * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.<P>
- * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -70,7 +70,7 @@ public class SigmaORTwoProverComputation implements SigmaProverComputation{
 	
 	/**
 	 * Constructor that gets the underlying provers.
-	 * @param provers array of SigmaProverComputation that contains TWO underlying provers.
+	 * @param prover underlying prover.
 	 * @param t soundness parameter. t MUST be equal to both t values of the underlying provers object.
 	 * @throws IllegalArgumentException if the given t is not equal to both t values of the underlying provers.
 	 * @throws IllegalArgumentException if the given provers array does not contains two objects.
@@ -102,7 +102,7 @@ public class SigmaORTwoProverComputation implements SigmaProverComputation{
 	 *  COMPUTE the first message ab in SigmaB, using (xb,w) as input.<p>
 	 *	RUN the simulator M for SigmaI on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b).<p>
 	 *	The message is (a0,a1); e1-b,z1-b are stored for later". 
-	 * @param input MUST be an instance of SigmaORTwoProverInput.
+	 * @param in MUST be an instance of SigmaORTwoProverInput.
 	 * @return SigmaORFirstMsg contains a0, a1.  
 	 * @throws IllegalArgumentException if input is not an instance of SigmaORTwoProverInput.
 	 */

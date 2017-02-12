@@ -76,7 +76,7 @@ public class BundleBuilder {
 	 * @param gbc The garbled circuit to use in the bundle.
 	 * @param matrix The matrix used to extends y1 keys.
 	 * @param primitives Provides the primitives that are used in the protocol, such as hash function.
-	 * @param channel The channel communicate between the parties.
+	 * @param channels The channel communicate between the parties.
 	 */
 	public BundleBuilder(FastGarbledBooleanCircuit gbc, KProbeResistantMatrix matrix, CryptoPrimitives primitives, Channel[] channels) {
 		this.gbc = gbc;

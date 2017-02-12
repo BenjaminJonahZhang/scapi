@@ -47,7 +47,6 @@ public class OTRBasicInput implements OTRInput{
 	
 	/**
 	 * Returns the sigma input.
-	 * @return
 	 */
 	public byte getSigma(){
 		return sigma;

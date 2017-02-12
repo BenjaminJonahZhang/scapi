@@ -433,8 +433,8 @@ public class FastGarbledBooleanCircuitExtendedImp implements FastGarbledBooleanC
 	/**
 	 * Check that the output wires translate correctly.
 	 * 
-	 * @param internalOutputs
-	 * @return
+	 * @param keys contains both possible values for every output wire of the inner circuit.
+	 * @return true is the output keys are valid. false, otherwise.
 	 */
 	public boolean verifyTranslationTable(byte[] keys) {
 		// Check that the output wires translate correctly.

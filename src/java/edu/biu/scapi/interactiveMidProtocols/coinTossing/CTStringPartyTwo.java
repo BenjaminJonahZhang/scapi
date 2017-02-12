@@ -47,7 +47,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * This protocol is fully secure under the stand-alone simulation-based definitions.<p>
  * 
  * This protocol is based on: Y. Lindell. Parallel Coin-Tossing and Constant-Round Secure Two-Party Computation. CRYPTO 2001.<p>
- * The pseudo code of this protocol can be found in Protocol 6.2 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 6.2 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
  * 
  * This protocol is used for a party to verify that the prover knows the private key to an ElGamal public key.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.8 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.8 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -108,7 +108,7 @@ public class SigmaElGamalPrivateKeyVerifierComputation implements SigmaVerifierC
 	/**
 	 * Verifies the proof.
 	 * @param z second message from prover
-	 * @param input MUST be an instance of SigmaElGamalPrivateKeyCommonInput.
+	 * @param in MUST be an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg

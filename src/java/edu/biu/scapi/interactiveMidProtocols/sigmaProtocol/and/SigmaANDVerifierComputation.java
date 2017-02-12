@@ -38,7 +38,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
  * This protocol is used for a prover to convince a verifier that the AND of any number of statements are true, 
  * where each statement can be proven by an associated Sigma protocol.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.14 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.14 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -145,7 +145,7 @@ public class SigmaANDVerifierComputation implements SigmaVerifierComputation{
 	/**
 	 * Computes the verification of the protocol.<p>
 	 * 	"ACC IFF all verifier checks are ACC".
-	 * @param input MUST be an instance of SigmaANDCommonInput.
+	 * @param in MUST be an instance of SigmaANDCommonInput.
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

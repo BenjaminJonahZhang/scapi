@@ -35,7 +35,6 @@ public class CommitmentBundle implements Serializable {
 	
 	/**
 	 * A constructor that sets the given arguments.
-	 * @param labels The wires' indices.
 	 * @param commitments Commitments on all wires' keys.
 	 * @param decommitments Decommitments on all wires' keys.
 	 */
@@ -49,7 +48,6 @@ public class CommitmentBundle implements Serializable {
 	
 	/**
 	 * A constructor that sets the given arguments.
-	 * @param labels The wires' indices.
 	 * @param commitments Commitments on all wires' keys.
 	 */
 	public CommitmentBundle(byte[] commitments, long[] commitmentIds) {
@@ -121,7 +119,6 @@ public class CommitmentBundle implements Serializable {
 	/**
 	 * Set the commitments of the given wires' indices.
 	 * @param commitmentsArr two- dimensions array that holds each commitment of each wire's key.
-	 * @param labels Indices of the wires.
 	 * @return A new created commitment bundle.
 	 */
 	public static CommitmentBundle setCommitments(byte[] commitmentsArr, long[] commitmentIds) {

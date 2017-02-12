@@ -161,7 +161,6 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
 	 * since this can cause problems when more than one value is being encrypt. 
 	 * Instead, we decided to have an additional encrypt value that gets the random value from the user.
-	 * @param plainText message to encrypt
 	 * @param r The random value to use in the encryption. 
 	 * @param plaintext message to encrypt. MUST be an instance of ByteArrayPlaintext.
 	 * @return Ciphertext the encrypted plaintext.

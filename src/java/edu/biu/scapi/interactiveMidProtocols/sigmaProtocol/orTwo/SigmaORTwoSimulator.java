@@ -37,7 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * where each statement can be proven by an associated Sigma protocol.
  * 
  * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.<P>
- * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -88,7 +88,7 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with the given challenge.
-	 * @param input MUST be an instance of SigmaORTwoCommonInput.
+	 * @param in MUST be an instance of SigmaORTwoCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.

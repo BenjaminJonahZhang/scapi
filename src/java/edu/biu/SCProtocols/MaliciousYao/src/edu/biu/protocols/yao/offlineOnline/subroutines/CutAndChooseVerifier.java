@@ -106,8 +106,8 @@ public class CutAndChooseVerifier {
 	 * Constructor that sets the parameters and creates the commitment objects.
 	 * @param execution Contains parameters regarding the execution. 
 	 * @param primitives Contains primitives to use in the protocol.
-	 * @param channel The channel that communicates between the parties.
-	 * @param bundleBuilders Contains the circuit parameters and used to build the circuit.
+	 * @param channels The channel that communicates between the parties.
+	 * @param bundleBuilder Contains the circuit parameters and used to build the circuit.
 	 * @param matrix Used to transform p1 inputs to the extended inputs. 
 	 */
 	public CutAndChooseVerifier(ExecutionParameters execution, CryptoPrimitives primitives, Channel[] channels, BundleBuilder bundleBuilder, KProbeResistantMatrix matrix, String filePrefix) {
@@ -119,8 +119,8 @@ public class CutAndChooseVerifier {
 	 * Constructor that sets the parameters and creates the commitment objects.
 	 * @param execution Contains parameters regarding the execution. 
 	 * @param primitives Contains primitives to use in the protocol.
-	 * @param channel The channel that communicates between the parties.
-	 * @param bundleBuilders Contains the circuit parameters and used to build the circuit.
+	 * @param channels The channel that communicates between the parties.
+	 * @param bundleBuilder Contains the circuit parameters and used to build the circuit.
 	 * @param matrix Used to transform p1 inputs to the extended inputs. 
 	 * @param inputLabelsY2 The input wires' indices of p2. Sometimes these indices are not the same as in the given circuit.
 	 */

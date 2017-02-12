@@ -43,7 +43,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * This protocol is used for a prover to convince a verifier that it knows the discrete log of the value h in G. <P>
  * 
  * This implementation is based on Schnorr's sigma protocol for Dlog Group, see reference in Protocol 6.1.1, page 148 of Hazay-Lindell..<p>
- * The pseudo code of this protocol can be found in Protocol 1.1 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.
+ * The pseudo code of this protocol can be found in Protocol 1.1 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

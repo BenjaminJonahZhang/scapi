@@ -80,10 +80,10 @@ public class OTExtensionMaliciousReceiver implements Malicious, OTBatchReceiver{
 	 * A constructor that creates the native receiver with communication abilities. <p>
 	 * It uses the ip address and port given in the party object.<p>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
-	 * @param party An object that holds the ip address and port.
-	 * @param koblitzOrZpSize An integer that determines whether the OT extension uses Zp or ECC koblitz. The optional parameters are the following.
-	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp.
-	 * @param numOfThreads
+	 * @param serverAddress the ip of the other sender
+	 * @param serverPort the port of the other sender
+	 * @param numBaseOts to use in the ot protocol 
+	 * @param numOts to do in parallel.
 	 * 	      
 	 */
 	public OTExtensionMaliciousReceiver(String serverAddress, int serverPort, int numOfThreads, int numBaseOts, int numOts){
@@ -95,7 +95,9 @@ public class OTExtensionMaliciousReceiver implements Malicious, OTBatchReceiver{
 	/**
 	 * Default constructor. Initializes the receiver by passing the ip address and uses koblitz 163 as a default dlog group. <P>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
-	 * @param party An object that holds the ip address and port.
+	 * @param serverAddress the ip address of the sender
+	 * @param serverPort the port of the sender
+	 * @param numOts to do in the ot in parallel.
 	 */
 	public OTExtensionMaliciousReceiver(String serverAddress, int serverPort, int numOts){
 		

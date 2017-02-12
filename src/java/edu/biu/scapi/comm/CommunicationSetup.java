@@ -296,7 +296,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * @param listeningThreadMap
 	 * @param channel
 	 * @param keyExchangeOutput
-	 * @return
+	 * @return the number of incoming connections
 	 */
 	private int downConnection(
 			Party party,

@@ -43,7 +43,7 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
  * All garbled circuits have four main operations: <p>
  * 1. The {@link #garble()} function that generates the keys and creates the garbled tables. <p>
  * 2. The {@link #compute()} function computes a result on a garbled circuit whose input has been set. <p>
- * 3. The {@link #verify(BooleanCircuit, Map)} method is used in the case of a malicious adversary to verify that the garbled circuit 
+ * 3. The {@link #verify(Map)} method is used in the case of a malicious adversary to verify that the garbled circuit 
  * created is an honest garbling of the agreed upon non garbled circuit. For example, the constructing party constructs many garbled circuits and
  * the second party chooses all but one of them to verify and test the honesty of the constructing party.<p>
  * 4. The {@link #translate(Map)} that translates the garbled output from {@link #compute()} into meaningful output.<p>
@@ -71,7 +71,7 @@ public interface GarbledBooleanCircuit {
 	/**
 	 * This method sets the input of the circuit. <p>
 	 * It takes as a parameter a {@code Map} that maps the input wire indices to a garbled wire containing the appropriate garbled values. <p>
-	 * See {@link #setGarbledInputFromUngarbledInput(File, Map)} for an alternate way of setting the input.
+	 * See {@link #setGarbledInputFromUngarbledInput(Map, Map)} for an alternate way of setting the input.
 	 * @param presetInputWires A {@code Map} containing the input wires that have been preset with their values.
   	 */
 	public void setInputs(Map<Integer, GarbledWire> presetInputWires) ;
@@ -97,7 +97,7 @@ public interface GarbledBooleanCircuit {
      * The verify method is used in the case of malicious adversaries.<p>
      * Alice constructs n circuits and Bob can verify n-1 of them (of his choice) to confirm that they are indeed garbling of the 
      * agreed upon non garbled circuit. In order to verify, Alice has to give Bob both keys for each of the input wires.
-     * @param allInputWireValues A {@Map} containing both keys for each input wire.
+     * @param allInputWireValues A map containing both keys for each input wire.
      * For each input wire , the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
      * value in the 1 position is the 1 encoding.
      * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling the given keys, {@code false} if it is not.
@@ -108,10 +108,10 @@ public interface GarbledBooleanCircuit {
      * This function behaves exactly as the verify(Map<Integer, SecretKey[]> allInputWireValues) method except the last part.
      * The verify function verifies that the translation table matches the resulted output garbled values, while this function does not check it 
      * but return the resulted output garbled values. 
-     * @param allInputWireValues A {@Map} containing both keys for each input wire.
+     * @param allInputWireValues A map containing both keys for each input wire.
      * For each input wire index, the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
      * value in the 1 position is the 1 encoding.
-     * @param allOutputWireValues A {@Map} containing both keys for each output wire. 
+     * @param allOutputWireValues A map containing both keys for each output wire. 
      * When calling the function this map should be empty and will be filled during the process of the function.
      * @return {@code true} if the garbled table of this circuit is complied with the given input keys, {@code false} otherwise.
      */
@@ -119,7 +119,7 @@ public interface GarbledBooleanCircuit {
 	
 	/**
 	 * Translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
-	 * @param garbledOutput A {@code Map) that contains the garbled output. This map maps the output wire indices to {@code GarbledWire}s
+	 * @param garbledOutput A {@code Map} that contains the garbled output. This map maps the output wire indices to {@code GarbledWire}s
 	 * @return a {@code Map} that maps the output wire  to ungarbled {@code Wire}s that are set to either 0 or 1.
 	 */
 	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput);
@@ -128,7 +128,7 @@ public interface GarbledBooleanCircuit {
 	 * Verifies that the given garbledOutput is valid values according to the given all OutputWireValues. <p>
 	 * Meaning, for each output wire, checks that the garbled wire is one of the two possibilities.
 	 * Then, translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
-	 * @param garbledOutput A {@code Map) that contains the garbled output. This map maps the output wire s to {@code GarbledWire}s
+	 * @param garbledOutput A map that contains the garbled output. This map maps the output wire s to {@code GarbledWire}s
 	 * @param allOutputWireValues both values for each output wire.
 	 * @return a {@code Map} that maps the output wire indices to ungarbled {@code Wire}s that are set to either 0 or 1.
 	 * @throws CheatAttemptException if there is a garbledOutput values that is not one of the two possibilities.

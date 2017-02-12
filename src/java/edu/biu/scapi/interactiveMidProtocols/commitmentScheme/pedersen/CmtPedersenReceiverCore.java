@@ -226,9 +226,6 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	 *	    OUTPUT ACC and value x<P>
 	 *	ELSE<P>
 	 *	    OUTPUT REJ".	<P>
-	 * @param id of the commitment
-	 * @param x 
-	 * @param r
 	 * @return the committed value
 	 */
 	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {

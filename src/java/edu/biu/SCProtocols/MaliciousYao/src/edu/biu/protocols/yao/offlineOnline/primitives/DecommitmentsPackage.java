@@ -105,7 +105,7 @@ public class DecommitmentsPackage implements Serializable {
 	/**
 	 * Sets the IDDecommitments of the given index.
 	 * @param i The index of the decommitment.
-	 * @param maskCommitments The decommitment to set.
+	 * @param idCommitments The decommitment to set.
 	 */
 	public void setIdDecommitment(int i, CmtCDecommitmentMessage idCommitments) {
 		//Copy the decommitment's values to the class members.
@@ -137,7 +137,7 @@ public class DecommitmentsPackage implements Serializable {
 	/**
 	 * Sets the R_k value of the diference decommitment.
 	 * @param k The index of x.
-	 * @param xr The random value.
+	 * @param r The random value.
 	 */
 	public void setR(int k, byte[] r) {
 		System.arraycopy(r, 0, this.r, k*inputSize*s, inputSize*s);
@@ -145,7 +145,7 @@ public class DecommitmentsPackage implements Serializable {
 	
 	/**
 	 * Returns the R_i random value of the diference decommitment.
-	 * @param i The index of the r value that should be returned.
+	 * @param k The index of the r value that should be returned.
 	 */
 	public byte[] getR(int k){
 		//Copy the requested value and return it.

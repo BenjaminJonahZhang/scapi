@@ -32,7 +32,7 @@ public class Preconditions {
 	/**
 	 * Checks if the given expression is not null. 
 	 * If the expression is null, the function throws an exception.
-	 * @param expression To check.
+	 * @param ref To check.
 	 */
 	public static void checkNotNull(Object ref) {
 		checkArgument(null != ref);

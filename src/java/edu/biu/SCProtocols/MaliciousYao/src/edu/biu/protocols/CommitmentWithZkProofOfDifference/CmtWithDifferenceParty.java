@@ -70,7 +70,6 @@ abstract class CmtWithDifferenceParty {
 	/**
 	 * Returns random array where each cell contains 0/1 value.
 	 * @param n The size of the required array.
-	 * @return
 	 */
 	protected byte[] getRandomString(int n) {
 		//Create the array.

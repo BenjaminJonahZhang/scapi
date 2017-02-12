@@ -29,6 +29,8 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 
+import edu.biu.scapi.comm.Channel;
+
 public interface CramerShoupPrivateKey extends PrivateKey {
 	BigInteger getPrivateExp1();
 	BigInteger getPrivateExp2();
@@ -37,7 +39,7 @@ public interface CramerShoupPrivateKey extends PrivateKey {
 	BigInteger getPrivateExp5();
 	
 	/**
-	 * This function is used when a Cramer Shoup Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * This function is used when a Cramer Shoup Private Key needs to be sent via a {@link Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
 	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
 	 * @return the KeySendableData object

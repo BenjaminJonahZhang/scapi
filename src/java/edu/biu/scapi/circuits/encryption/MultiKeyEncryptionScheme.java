@@ -52,7 +52,7 @@ import edu.biu.scapi.exceptions.TweakNotSetException;
 public interface MultiKeyEncryptionScheme {
 
 	/**
-	 * This method generates a <b>single</b> {@codeSecretKey} NOT a {@code MultiSecretKey}. <p>
+	 * This method generates a <b>single</b> {@code SecretKey} NOT a {@code MultiSecretKey}. <p>
 	 * This is necessary since the user will often need to generate single keys first and then combine them to a single 
 	 * {@code MultiSecretKey}.<p>
 	 * Consider the following problem: Say we want to garble and compute a gate in Yao's protocol. 

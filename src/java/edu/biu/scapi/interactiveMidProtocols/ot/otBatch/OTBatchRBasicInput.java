@@ -46,7 +46,6 @@ public class OTBatchRBasicInput implements OTBatchRInput{
 	
 	/**
 	 * Returns the input for the Batch OT Receiver, array of sigmaI.
-	 * @return
 	 */
 	public ArrayList<Byte> getSigmaArr(){
 		return sigmaArr;

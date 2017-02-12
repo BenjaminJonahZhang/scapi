@@ -78,7 +78,6 @@ public abstract class OpenSSLAdapterDlogEC extends DlogGroupEC{
 	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
 	 * @param curveName name of NIST curve to initialized.
-	 * @param random The source of randomness to use.
 	 * @throws IOException
 	 */
 	public OpenSSLAdapterDlogEC(String curveName) throws IOException {

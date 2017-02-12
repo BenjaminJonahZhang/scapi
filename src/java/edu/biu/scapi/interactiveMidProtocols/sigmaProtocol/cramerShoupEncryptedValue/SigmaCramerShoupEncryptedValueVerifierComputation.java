@@ -48,7 +48,7 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
  * with public-key g1,g2,c,d,h is x. <p>
  * The protocol is for the case that the prover knows the randomness used to encrypt.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.10 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.10 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -151,7 +151,7 @@ public class SigmaCramerShoupEncryptedValueVerifierComputation implements SigmaV
 
 	/**
 	 * Verifies the proof.
-	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueCommonInput.
+	 * @param in MUST be an instance of SigmaCramerShoupEncryptedValueCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IllegalArgumentException if input is not the expected.

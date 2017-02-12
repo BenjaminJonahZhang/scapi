@@ -58,7 +58,6 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	/**
 	 * Constructor that sets the given channel and random.
 	 * @param channel
-	 * @param random
 	 */
 	public SigmaVerifier(Channel channel, SigmaVerifierComputation verifierComputation){
 		

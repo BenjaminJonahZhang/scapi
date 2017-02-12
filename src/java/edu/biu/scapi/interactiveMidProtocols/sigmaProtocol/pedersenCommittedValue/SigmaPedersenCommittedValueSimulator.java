@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that the value committed to in the commitment (h, c) is x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.5 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.5 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -100,7 +100,7 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with the given challenge.
-	 * @param input MUST be an instance of SigmaPedersenCommittedValueCommonInput.
+	 * @param in MUST be an instance of SigmaPedersenCommittedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
@@ -117,7 +117,7 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation with a randomly chosen challenge.
-	 * @param input MUST be an instance of SigmaPedersenCommittedValueCommonInput.
+	 * @param in MUST be an instance of SigmaPedersenCommittedValueCommonInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCommittedValueCommonInput.
 	 */

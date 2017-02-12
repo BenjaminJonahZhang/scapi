@@ -49,9 +49,8 @@ public class SigmaElGamalEncryptedValuePrivKeyProverInput implements SigmaProver
 	
 	/**
 	 * Sets the given ciphertext, public key, encrypted value and private key.
-	 * @param isRandomness represents if the encryption was done by private key knowledge or by a randomness knowledge.
 	 * @param cipher ciphertext outputed by the encryption scheme on the given x
-	 * @param publicKey used to encrypt.
+	 * @param pubKey used to encrypt.
 	 * @param x encrypted value
 	 * @param privateKey used to decrypt.
 	 */

@@ -37,7 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
  * where each statement can be proven by an associated Sigma protocol.
  * 
  * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.<p>
- * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -116,7 +116,7 @@ public class SigmaORTwoVerifierComputation implements SigmaVerifierComputation{
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF all verifier checks are ACC".
-	 * @param input MUST be an instance of SigmaORTwoCommonInput.
+	 * @param in MUST be an instance of SigmaORTwoCommonInput.
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

@@ -6,10 +6,10 @@ import edu.biu.scapi.comm.ProtocolOutput;
 
 /**
  * This is a wrapper to the native implementation of the GMW protocol. <p>
- * A general explanation of the GMW protocol can be found at {@link http://crypto.biu.ac.il/sites/default/files/Winter%20School%2015%20-%20GMW%20and%20OT%20extension.pdf}.
+ * A general explanation of the GMW protocol can be found at <a href ="http://crypto.biu.ac.il/sites/default/files/Winter%20School%2015%20-%20GMW%20and%20OT%20extension.pdf">http://crypto.biu.ac.il/sites/default/files/Winter%20School%2015%20-%20GMW%20and%20OT%20extension.pdf</a>.
  * This implementation is more efficient since we use Beaver's multiplication triples instead of 1 out of 4 OT. <P>
  * 
- * The native implementation can be found at {@link https://github.com/cryptobiu/libscapi/tree/dev/protocols/GMW}<p>
+ * The native implementation can be found at <a href ="https://github.com/cryptobiu/libscapi/tree/dev/protocols/GMW">https://github.com/cryptobiu/libscapi/tree/dev/protocols/GMW</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

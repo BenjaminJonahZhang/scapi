@@ -43,7 +43,7 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * 
  * This protocol is used for a party who encrypted a value x to prove that it indeed encrypted x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.12 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.12 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -62,7 +62,6 @@ public class SigmaDJEncryptedValueVerifierComputation implements SigmaVerifierCo
 	
 	/**
 	 * Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
-	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
@@ -135,7 +134,7 @@ public class SigmaDJEncryptedValueVerifierComputation implements SigmaVerifierCo
 	/**
 	 * Verifies the proof.
 	 * @param z second message from prover
-	 * @param input MUST be an instance of SigmaDJEncryptedValueCommonInput.
+	 * @param in MUST be an instance of SigmaDJEncryptedValueCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedValueCommonInput.
 	 * @throws IllegalArgumentException if the messages of the prover are not an instance of SigmaBIMsg

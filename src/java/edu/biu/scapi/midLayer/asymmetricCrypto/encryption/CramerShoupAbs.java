@@ -265,8 +265,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * 
 	 * This function does NOT create a new private key. It reconstructs a private key that has been previously serialized.
 	 * @param data
-	 * @return
-	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructPrivateKey(KeySendableData data)
+	 * @deprecated As of SCAPI-V1-0-2-2 
 	 */
 	@Deprecated public CramerShoupPrivateKey generatePrivateKey(KeySendableData data){
 		if(! (data instanceof CramerShoupPrivateKey))
@@ -276,7 +275,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 
 	/**
 	 * 
-	 * @data The KeySendableData object has to be of type CramerShoupPrivateKey
+	 * @param data The KeySendableData object has to be of type CramerShoupPrivateKey
 	 */
 	public CramerShoupPrivateKey reconstructPrivateKey(KeySendableData data){
 		if(! (data instanceof CramerShoupPrivateKey))
@@ -288,8 +287,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	/**
 	 * This function does NOT create a new public key. It reconstructs a public key that has been previously serialized.
 	 * @param data
-	 * @return
-	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructPublicKey(KeySendableData data)
+	 * @deprecated As of SCAPI-V1-0-2-2 
 	 */
 	@Deprecated public CramerShoupPublicKey generatePublicKey(KeySendableData data){
 		if(! (data instanceof ScCramerShoupPublicKeySendableData))
@@ -305,7 +303,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	}
 	
 	/**
-	 * @data The KeySendableData object has to be of type ScCramerShoupPublicKeySendableData
+	 * @param data The KeySendableData object has to be of type ScCramerShoupPublicKeySendableData
 	 */
 	public CramerShoupPublicKey reconstructPublicKey(KeySendableData data){
 		if(! (data instanceof ScCramerShoupPublicKeySendableData))
@@ -324,7 +322,6 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @deprecated Instead use reconstructPublicKey and reconstructPrivateKey. 
 	 * @param publicKeyData
 	 * @param privateKeyData
-	 * @return
 	 */
 	@Deprecated public KeyPair generateKeyPair(KeySendableData publicKeyData, KeySendableData privateKeyData){
 		if(! (publicKeyData instanceof ScCramerShoupPublicKeySendableData) || (! (privateKeyData instanceof ScCramerShoupPrivateKey)))

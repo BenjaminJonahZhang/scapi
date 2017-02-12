@@ -62,7 +62,8 @@ public class FasterTCPChannel extends PlainChannel {
 	/**
 	 * Creates a channel given a Party and an established socket
 	 * Allows us to bypass scapi's communication establishment and replace the channel type.
-	 * @param socketAddress other end's InetSocketAddress
+	 * @param party other the other party the channel connects 
+	 * @param socket the socket between this party and the other
 	 */
 	public FasterTCPChannel(Party party, Socket socket) {
 		this.socketAddress = new InetSocketAddress(party.getIpAddress(), party.getPort());
@@ -138,7 +139,7 @@ public class FasterTCPChannel extends PlainChannel {
 	 * is not up yet then we sleep for a while and try again until the connection is established. This is done by the SecuringConnectionThread which keeps trying
 	 * until it succeeds or a timeout has been reached.<p>		
 	 * After the connection has succeeded the input and output streams are set for the send and receive functions.
-	 * @return
+	 * @return true when connected
 	 * @throws IOException 
 	 */
 	@Override

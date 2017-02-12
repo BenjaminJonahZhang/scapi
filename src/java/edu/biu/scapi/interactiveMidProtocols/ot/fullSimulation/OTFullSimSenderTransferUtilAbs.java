@@ -82,7 +82,6 @@ public abstract class OTFullSimSenderTransferUtilAbs {
 	 * @param channel each call should get a different one.
 	 * @param input the parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
 	 * @param preprocessValues hold the values calculated in the preprocess phase.
-	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if the send or receive functions failed
 	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism

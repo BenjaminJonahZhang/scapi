@@ -108,8 +108,8 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	 * The constructor also initializes information stored in java as well as in the c++ code.
 	 * 
 	 * @param fileName the name of the circuit file.
-	 * @param isFreeXor a flag indicating the use of the optimization of FreeXor
-	 * @param isRowReduction a flag indicating the use of the optimization of Row Reduction
+	 * @param type The required type of the circuit.
+	 * @param isNonXorOutputsRequired a flag indicates if the outputs should be a xor of each other with a delta.
 	 */
 	public ScNativeGarbledBooleanCircuit(String fileName, CircuitType type, boolean isNonXorOutputsRequired){
 
@@ -223,12 +223,10 @@ public class ScNativeGarbledBooleanCircuit implements FastGarbledBooleanCircuit{
 	}
 	/**
 	 * Computes the circuit using the given inputs. <p>
-	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate()} method.
-	 * @param garbledInput A single key for each input wire.
+	 * It returns an array containing the garbled output. This output can be translated via the {@link #translate(byte[])} method.
 	 * @return returns an array containing the garbled value of each output wire.
 	 * @throws NotAllInputsSetException if the given inputs array is not the same size of the inputs for this circuit.
 	 */
-	
 	@Override
 	public byte[] compute() throws NotAllInputsSetException {
 		

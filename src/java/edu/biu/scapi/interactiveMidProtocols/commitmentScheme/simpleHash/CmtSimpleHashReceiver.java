@@ -49,7 +49,7 @@ import edu.biu.scapi.securityLevel.SecureCommit;
  * It can be viewed as a random-oracle scheme, but its security can also be viewed as a standard assumption on modern hash functions. 
  * Note that computational binding follows from the standard collision resistance assumption. <p>
  * 
- * The pseudo code of this protocol can be found in Protocol 3.6 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.6 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

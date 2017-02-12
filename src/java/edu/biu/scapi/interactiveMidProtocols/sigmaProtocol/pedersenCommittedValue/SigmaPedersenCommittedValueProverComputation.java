@@ -43,7 +43,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * 
  * This protocol is used for a committer to prove that the value committed to in the commitment (h, c) is x.<p>
  * 
- * The pseudo code of this protocol can be found in Protocol 1.5 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.5 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -109,7 +109,7 @@ public class SigmaPedersenCommittedValueProverComputation implements SigmaProver
 
 	/**
 	 * Computes the first message of the protocol.
-	 * @param input MUST be an instance of SigmaPedersenCommittedValueProverInput.
+	 * @param in MUST be an instance of SigmaPedersenCommittedValueProverInput.
 	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaPedersenCommittedValueProverInput.
 	 */

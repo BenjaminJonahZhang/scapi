@@ -50,7 +50,6 @@ public class OnlineComputeRoutine implements ComputeCircuitsRoutine {
 	 * A constructor that sets the given parameters.
 	 * @param garbledCircuits The circuits to work on. There is one circuit per thread.
 	 * @param primitives Primitives objects to use in the compute step.
-	 * @param enc Used to extract the proof of cheating.
 	 * @param proofCiphers Used to extract the proof of cheating.
 	 * @param hashedProof Used to extract the proof of cheating.
 	 */

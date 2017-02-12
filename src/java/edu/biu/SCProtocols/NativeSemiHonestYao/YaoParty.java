@@ -6,7 +6,7 @@ import edu.biu.scapi.comm.ProtocolOutput;
 
 /**
  * This is a wrapper to the native implementation of the semi honest Yao protocol. <p>
- * The native implementation can be found at {@link https://github.com/cryptobiu/libscapi/tree/dev/protocols/SemiHonestYao}<p>
+ * The native implementation can be found at <a href = "https://github.com/cryptobiu/libscapi/tree/dev/protocols/SemiHonestYao">https://github.com/cryptobiu/libscapi/tree/dev/protocols/SemiHonestYao</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

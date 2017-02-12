@@ -48,7 +48,7 @@ public class SigmaCramerShoupEncryptedValueProverInput implements SigmaProverInp
 	/**
 	 * Sets the ciphertext, public key, the encrypted element and the random value used to encrypt x.
 	 * @param cipher ciphertext the output of the encryption scheme on the encrypted element.
-	 * @param publicKey used to encrypt.
+	 * @param pubKey used to encrypt.
 	 * @param x encrypted element.
 	 * @param r random value used to encrypt x.
 	 */

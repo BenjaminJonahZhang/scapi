@@ -8,9 +8,12 @@ import edu.biu.SCProtocols.NativeSemiHonestYao.YaoProtocolOutput;
 /**
  * This is a wrapper to the native implementation of the online phase of the malicious yao protocol. <p>
  * The full protocol specification is described in "Blazing Fast 2PC in the "Offline/Online Setting with Security for
- Malicious Adversaries" paper by Yehuda Lindell and Ben Riva, page 18 - section E, "The Full Protocol Specification". <p>
+ * Malicious Adversaries" paper by Yehuda Lindell and Ben Riva, page 18 - section E, "The Full Protocol Specification". <p>
  * 
- * The native implementation can be found at {@link https://github.com/cryptobiu/libscapi/tree/dev/protocols/MaliciousYao}<p>
+ * Since c++ implementation is usually more efficient than the java implementation, we chose to wrap our c++ implementation 
+ * of this protocol, along with the java implementation. This way, we can compare the results, times, and other performance issues.
+ *   
+ * The native implementation can be found at <a href="https://github.com/cryptobiu/libscapi/tree/dev/protocols/MaliciousYao">https://github.com/cryptobiu/libscapi/tree/dev/protocols/MaliciousYao</a> <p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

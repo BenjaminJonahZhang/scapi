@@ -180,10 +180,9 @@ public interface DlogGroup {
 	public GroupElement generateElement(boolean bCheckMembership, BigInteger...values) throws IllegalArgumentException;
 	
 	/**
-	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
+	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link DlogGroup#reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
 	 * @param bCheckMembership
 	 * @param data
-	 * @return
 	 */
 	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data);
 	

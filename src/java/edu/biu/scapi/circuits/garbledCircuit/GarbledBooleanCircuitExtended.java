@@ -82,10 +82,10 @@ public interface GarbledBooleanCircuitExtended extends GarbledBooleanCircuit{
      * This verify function is the same as the verify(Map<Integer, SecretKey[]> allInputWireValues) but also check that the 
      * resulted output garbled values are equal to the given allOutputWireValues.<p>
      * 
-     * @param allInputWireValues A {@Map} containing both keys for each input wire.
+     * @param allInputWireValues A {@code Map} containing both keys for each input wire.
      * For each input wire index, the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
      * value in the 1 position is the 1 encoding.
-     * @param allOutputWireValues A {@Map} containing both keys for each output wire. 
+     * @param allOutputWireValues A {@code Map} containing both keys for each output wire. 
      * The generated output garbled values are checked against these values to see if they are equal.
      * For each output wire index, the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
      * value in the 1 position is the 1 encoding.
@@ -103,9 +103,9 @@ public interface GarbledBooleanCircuitExtended extends GarbledBooleanCircuit{
      * translation table and check that the result is equal to the given hashedCircuit.<p>
      * 
 	 * @param seed to use in order to generate the keys.
-	 * @param allInputGarbledValues A {@Map} containing both keys for each input wire. 
+	 * @param allInputGarbledValues A map containing both keys for each input wire. 
 	 * Should be null in case the user set no input garbled values before garbling.
-	 * @param allOutputGarbledValues A {@Map} containing both keys for each output wire.
+	 * @param allOutputGarbledValues A map containing both keys for each output wire.
 	 * Should be null in case the user set no output garbled values before garbling.
 	 * @param hash CryptographicHash object to use.
 	 * @param hashedCircuit A byte array that suppose to be the result of the hash function on the circuit.

@@ -104,7 +104,7 @@ public abstract class OpenSSLEncWithIVAbs implements SymmetricEnc{
 	 * For CTR mode of operations: AES.
 	 * @param prpName the name of a specific Pseudorandom permutation, for example "AES".
 	 * @param random  a user provided source of randomness.
-	 * @throw IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
+	 * @throws IllegalArgumentException in case the given prpName is not valid for this encryption scheme.
 	 */
 	public OpenSSLEncWithIVAbs(String prpName, SecureRandom random) {
 		//Check that the given prp name is a valid algorithm for this encryption scheme.

@@ -41,7 +41,7 @@ public class SSLSocketMultipartyCommunicationSetup extends SocketMultipartyCommu
 	/**
 	 * Constructor that gets the data of all parties and the password to the keyStore and trustStore.
 	 * @param parties The data of all the parties.
-	 * @param storePassword The password to the keyStore and trustStore.
+	 * @param storePass The password to the keyStore and trustStore.
 	 * @throws SSLException In case there is a problem during the SSL protocol initialization.
 	 */
 	public SSLSocketMultipartyCommunicationSetup(List<PartyData> parties, String storePass) throws SSLException {
@@ -54,7 +54,7 @@ public class SSLSocketMultipartyCommunicationSetup extends SocketMultipartyCommu
 	 * @param parties The data of all the parties.
 	 * @param keyStoreName Name of the keyStore file.
 	 * @param trustStoreName Name of the trustStore file.
-	 * @param storePassword The password to the keyStore and trustStore.
+	 * @param storePass The password to the keyStore and trustStore.
 	 * @throws SSLException In case there is a problem during the SSL protocol initialization.
 	 */
 	public SSLSocketMultipartyCommunicationSetup(List<PartyData> parties, String keyStoreName, String trustStoreName, String storePass) throws SSLException{

@@ -46,7 +46,7 @@ public interface GarbledGate {
   	
 	/**
 	 * Computes the output of this gate and sets the output wire(s) to that value.
-	 * @param computedWires A {@link Map} containing the {@link GarbledWires}s that have already been computed and had their values set.
+	 * @param computedWires A {@link Map} containing the {@link GarbledWire}s that have already been computed and had their values set.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws CiphertextTooLongException

@@ -46,7 +46,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * This protocol uses any perfectly-hiding commitment scheme (e.g., COMMIT_PEDERSEN,  COMMIT_HASH_PEDERSEN, COMMIT_HASH) 
  * and any perfectly-binding commitment scheme (e.g., COMMIT_ELGAMAL). <P>
  * 
- * The pseudo code of this protocol can be found in Protocol 6.3 of pseudo codes document at {@link http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf}.<p>
+ * The pseudo code of this protocol can be found in Protocol 6.3 of pseudo codes document at <a href="http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf">http://cryptobiu.github.io/scapi/SDK_Pseudocode.pdf</a>.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

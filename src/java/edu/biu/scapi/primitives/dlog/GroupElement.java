@@ -26,6 +26,8 @@
 
 package edu.biu.scapi.primitives.dlog;
 
+import edu.biu.scapi.comm.Channel;
+
 /**
  * This is the main interface of the Group element hierarchy.<p> 
  * We can refer to a group element as a general term OR we can relate to the fact that an element of an elliptic curve
@@ -43,7 +45,7 @@ public interface GroupElement{
 	public boolean isIdentity();
 	
 	/**
-	 * This function is used when a group element needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * This function is used when a group element needs to be sent via a {@link Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this Group Element at a later time and/or in a different VM.
 	 * It puts all the data in an instance of the relevant class that implements the GroupElementSendableData interface.
 	 * @return the GroupElementSendableData object
