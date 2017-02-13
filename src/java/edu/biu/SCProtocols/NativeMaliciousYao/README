@@ -1,0 +1,150 @@
+/**
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+* Copyright (c) 2016 SCAPI (http://crypto.biu.ac.il/SCAPI)
+* This file is part of the SCAPI project.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+* http://crypto.biu.ac.il/SCAPI.
+*
+* Libscapi uses several open source libraries. Please see these projects for any further licensing issues.
+* For more information , See https://github.com/cryptobiu/libscapi/blob/master/LICENSE.MD
+*
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+*/
+
+INTRODUCTION
+------------
+
+This protocol is a wrapper for native implementation of malicious Yao protocol.
+
+The implementation is based on "Blazing Fast 2PC in the Offline/Online Setting with Security for Malicious Adversaries"
+by Yehuda Lindell and Ben Riva. The paper can be found at https://eprint.iacr.org/2015/987.
+
+Recently, several new techniques were presented to dramatically improve key parts of secure two-party computation (2PC)
+protocols that use the cut-and-choose paradigm on garbled circuits for 2PC with security against malicious adversaries.
+These include techniques for reducing the number of garbled circuits (Lindell 13, Huang et al.~13, Lindell and Riva 14,
+Huang et al.~14) and techniques for reducing the overheads besides garbled circuits (Mohassel and Riva 13, Shen and Shelat~13).
+
+We design a highly optimized protocol in the offline/online setting that makes use of all state-of-the-art techniques,
+along with several new techniques that we introduce. A crucial part of our protocol is a new technique for enforcing
+consistency of the inputs used by the party who garbles the circuits. This technique has both theoretical and practical
+advantages over \mbox{previous methods.}
+
+Since native implementation is more efficient than a java implementation, we chose to have, along with the existing 
+java implementation, a wrapper to an implementation in c++. This way one can compare between the implementations and 
+take the one he prefer. 
+
+
+EXECUTION
+---------
+The wrapper has one class for offline protocol and one for online protocol. 
+The protocols, offline and online, should get as parameter the MaliciousYaoProtocolInput, which contains:
+1. Party id (1 or 2). According to the party id, the protocols execute the appropriate party.
+2. A config file that contains the protocol configuration. It configure: 
+	* Protocol's parametrs (number of buckets, number of circuit in each bucket, security parameter, probability parameter)
+	* Additional input files (circuits, communication, inputs, etc.)
+Detailed information of the config file will be mentioned later.
+
+In order to run the protocol:
+1. Open a terminal for each party
+2. Navigate to the bin directory of scapi
+3. Run 
+~ java -Djava.library.path="..\scapi\assets\x64Dlls" edu.biu.SCProtocols.NativeMaliciousYao.MaliciousYaoOfflineParty 1 ..\scapi\src\java\edu\biu\SCProtocols\NativeMaliciousYao\MaliciousYaoConfig.txt
+This executes party one of the offline protocol, using the config file supplied by scapi.
+In order to execute the other party or the online protocol one should change the appropriate parameters. The config file remains the same.
+
+The output is printed to the screen.
+
+CONFIG FILE
+------------
+The format of the config file is as follows:
+	n1 = [..]
+	b1 = [..]
+	s1 = [..]
+	p1 = [..]
+	n2 = [..]
+	b2 = [..]
+	s2 = [..]
+	p2 = [..]
+	num_threads = [..]
+	
+	input_section = [..]
+	
+	# OS name is added automatically
+	[AES-Linux]
+	main_circuit_file = [..]
+	cr_circuit_file = [..]
+	ec_file = [..]
+	main_matrix = [..]
+	cr_matrix = [..]
+	bucket_prefix_main1 = [..]
+	bucket_prefix_cr1 = [..]
+	bucket_prefix_main2 = [..]
+	bucket_prefix_cr2 = [..]
+	input_file_party_1 = [..]
+	input_file_party_2 = [..]
+	parties_file = [..]
+	
+	[AES-Windows]
+	main_circuit_file = [..]
+	cr_circuit_file = [..]
+	ec_file = [..]
+	main_matrix = [..]
+	cr_matrix = [..]
+	bucket_prefix_main1 = [..] 
+	bucket_prefix_cr1 = [..]
+	bucket_prefix_main2 = [..]
+	bucket_prefix_cr2 = [..]
+	input_file_party_1 = [..]
+	input_file_party_2 = [..]
+	parties_file = [..]
+    	
+An example of config file:
+
+	n1 = 32
+	b1 = 7
+	s1 = 40
+	p1 = 0.62
+	n2 = 32
+	b2 = 20
+	s2 = 40
+	p2 = 0.71
+	num_threads = 8 
+	
+	input_section = AES 
+	
+	# OS name is added automatically
+	[AES-Windows]
+	main_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/NigelAes.txt
+	cr_circuit_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/CheatingRecovery/UnlockP1Input.txt
+	ec_file = ../../libscapi/include/configFiles/NISTEC.txt
+	main_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/aes.matrix
+	cr_matrix = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/cr.matrix
+	bucket_prefix_main1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P1/aes
+	bucket_prefix_cr1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P1/cr
+	bucket_prefix_main2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/aes
+	bucket_prefix_cr2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/data/P2/cr
+	input_file_party_1 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/AESPartyOneInputs.txt
+	input_file_party_2 = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/circuits/AES/AESPartyTwoInputs.txt
+	parties_file = ../scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/assets/conf/PartiesConfig.txt
+	
+	
+	
+	
+
+
+
+

@@ -65,10 +65,10 @@ public class MaliciousYaoOfflineParty implements Protocol {
 	}
 		 
 	public static void main(String[] args) {
-		String HOME_DIR = "C:/Github/scapi/scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/";
+		//String HOME_DIR = "C:/Github/scapi/scapi/src/java/edu/biu/SCProtocols/NativeMaliciousYao/";
 		int id = new Integer(args[0]); 
 		System.out.println("id = " + id);
-		String configFile = HOME_DIR + args[1];
+		String configFile = args[1];
 		System.out.println("configFile = " + configFile);
 		
 		MaliciousYaoProtocolInput input = new MaliciousYaoProtocolInput(id, configFile);

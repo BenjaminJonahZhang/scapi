@@ -15,6 +15,9 @@ public class YaoProtocolInput implements ProtocolInput {
 	private String configFileName; //Contains the 
 	
 	public YaoProtocolInput(int id, String configFileName){
+		if (id < 1 || id > 2){
+			throw new IllegalArgumentException("Party id should be 1 or 2");
+		}
 		this.id = id;
 		this.configFileName = configFileName;
 	}

@@ -67,14 +67,13 @@ public class GmwParty implements Protocol{
 
 	public static void main(String[] args){
 		
-		String HOME_DIR = "C:/Github/scapi/scapi/src/java/edu/biu/SCProtocols/gmw/";
 		int id = new Integer(args[0]); 
 		System.out.println("id = " + id);
-		String circuitFile = HOME_DIR + args[1];
+		String circuitFile = args[1];
 		System.out.println("circuitFile = " + circuitFile);
-		String partiesFile = HOME_DIR + args[2];
+		String partiesFile = args[2];
 		System.out.println("partiesFile = " + partiesFile);
-		String inputsFile = HOME_DIR + args[3];
+		String inputsFile = args[3];
 		System.out.println("inputsFile = " + inputsFile);
 		
 		int numThreads = new Integer(args[4]);

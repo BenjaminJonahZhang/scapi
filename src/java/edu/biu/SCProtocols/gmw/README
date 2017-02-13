@@ -1,0 +1,73 @@
+/**
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+* Copyright (c) 2016 SCAPI (http://crypto.biu.ac.il/SCAPI)
+* This file is part of the SCAPI project.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+* http://crypto.biu.ac.il/SCAPI.
+*
+* Libscapi uses several open source libraries. Please see these projects for any further licensing issues.
+* For more information , See https://github.com/cryptobiu/libscapi/blob/master/LICENSE.MD
+*
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+*/
+
+INTRODUCTION
+------------
+
+This protocol is a wrapper for native implementation of GMW protocol.
+
+A general explanation of the GMW protocol can be found at http://crypto.biu.ac.il/sites/default/files/Winter%20School%2015%20-%20GMW%20and%20OT%20extension.pdf.
+This implementation is more efficient since we use Beaver's multiplication triples instead of 1 out of 4 OT.
+
+Since native implementation is more efficient than a java implementation, we chose to have a wrapper to an implementation 
+in c++ instead of implementing it in java.
+
+
+EXECUTION
+---------
+The protocol should get as parameter the GMWProtocolInput, which contains:
+1. Party id (starts with 0 to number_of_parties -1). According to the party id, the protocol executes the appropriate party.
+2. A circuit file name
+3. A communication file name
+4. An input file name 
+5. Number of threads to use in the execution.
+
+In order to run the protocol:
+1. Open a terminal for each party
+2. Navigate to the bin directory of scapi
+3. Run 
+~ java -Djava.library.path="..\scapi\assets\x64Dlls" edu.biu.SCProtocols.gmw.GmwParty 0 ..\scapi\src\java\edu\biu\SCProtocols\gmw\NigelAES3Parties.txt ..\scapi\src\java\edu\biu\SCProtocols\gmw\Parties ..\scapi\src\java\edu\biu\SCProtocols\gmw\AesInputs0.txt 2
+This executes party 0 of the gmw protocol, using AES circuit.
+In order to execute the other parties one should change the id and input file parameters. Other parameters remain the same.
+
+The output is printed to the screen.
+
+
+COMMUNICATION
+-------------
+Each party open two channels between him and every other party in the protocol. Meaning, each party needs 2*(numberofParties-1) available ports. 
+The implementation takes the first port index from the communication file and open the other ports in the following indices. 
+For example in 3 parties case, if the communication file says that the port of the first party is 8000, it means that 
+party 0 creates 4 channels, from 8000 to 8003.
+
+An example of a communication file:
+party_0_ip = 127.0.0.1
+party_1_ip = 127.0.0.1
+party_2_ip = 127.0.0.1
+party_0_port = 8000
+party_1_port = 8020
+party_2_port = 8040

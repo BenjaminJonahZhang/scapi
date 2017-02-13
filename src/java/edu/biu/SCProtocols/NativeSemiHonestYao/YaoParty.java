@@ -61,9 +61,8 @@ public class YaoParty implements Protocol{
 	 }
 
 	public static void main(String[] args) {
-		String HOME_DIR = "C:/Github/scapi/scapi/src/java/edu/biu/SCProtocols/NativeSemiHonestYao/";
 		int id = new Integer(args[0]); 
-		String configFile = HOME_DIR + args[1];
+		String configFile = args[1];
 		
 		YaoProtocolInput input = new YaoProtocolInput(id, configFile);
 		YaoParty party = new YaoParty();
