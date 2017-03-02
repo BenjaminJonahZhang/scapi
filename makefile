@@ -3,11 +3,12 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 ARCH := $(shell getconf LONG_BIT)
 
 # Prefix for installation (run make prefix=/usr/local to install there instead)
-export prefix=$(abspath ./install)
+export prefix=$(abspath ./build/Libscapi/install)
 export exec_prefix=$(prefix)
-export includedir=$(prefix)/include
+# export includedir=$(prefix)/include
+export includedir=$(abspath ./lib/Libscapi/)
 export bindir=$(exec_prefix)/bin
-export libdir=$(prefix)/lib
+export libdir=$(abspath ./build/Libscapi/install/lib)
 
 export builddir=$(abspath ./build)
 
@@ -16,7 +17,7 @@ export builddir=$(abspath ./build)
 CC=gcc
 CXX=g++
 CFLAGS=-fPIC
-CXXFLAGS="-DNDEBUG -g -O2 -fPIC"
+CXXFLAGS="-DNDEBUG -O3 -fPIC"
 
 ifeq ($(uname_S),Linux)
 	JAVA_HOME=$(shell dirname $$(dirname $$(readlink -f `which javac`)))
@@ -104,7 +105,7 @@ JAR_JUNIT:=$(shell pwd)/assets/$(BASENAME_JUNIT)
 JAR_SCAPI:=$(builddir)/scapi/$(BASENAME_SCAPI)
 
 # ntl
-NTL_CFLAGS="-fPIC -O2"
+NTL_CFLAGS="-fPIC -O3"
 
 # scapi install dir
 INSTALL_DIR=$(libdir)/scapi
@@ -113,7 +114,7 @@ INSTALL_DIR=$(libdir)/scapi
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 
 # external libs
-EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-openssl compile-otextension compile-malotext compile-ntl compile-libscapi
+EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-cryptopp compile-miracl compile-openssl compile-otextension compile-malotext compile-ntl
 
 ## targets
 #all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
@@ -126,9 +127,9 @@ all: $(JNI_TARGETS)
 compile-cryptopp:
 	@echo "Compiling the Crypto++ library..."
 	cp -r lib/CryptoPP $(builddir)
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS)
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) PREFIX=$(prefix) install
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/)
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/) dynamic
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/) PREFIX=$(prefix) install
 	@touch compile-cryptopp
 
 prepare-miracl:
@@ -155,7 +156,7 @@ compile-miracl-cpp:
 	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp CXX=$(CXX) install
 	@touch compile-miracl-cpp
 
-compile-otextension: compile-openssl compile-miracl-cpp
+compile-otextension: compile-libscapi
 	@echo "Compiling the OtExtension library..."
 	@cp -r lib/OTExtension $(builddir)/OTExtension
 	@$(MAKE) -C $(builddir)/OTExtension CXX=$(CXX)
@@ -163,7 +164,7 @@ compile-otextension: compile-openssl compile-miracl-cpp
 	@touch compile-otextension
 
 # TODO:
-compile-malotext: compile-openssl compile-miracl-cpp
+compile-malotext: compile-libscapi
 	@echo "Compiling the Malicious OtExtension library..."
 	@cp -r lib/MaliciousOTExtension $(builddir)/MaliciousOTExtension
 	@$(MAKE) -C $(builddir)/MaliciousOTExtension CXX=$(CXX)
