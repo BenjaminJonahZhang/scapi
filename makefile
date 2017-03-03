@@ -127,9 +127,9 @@ all: $(JNI_TARGETS)
 compile-cryptopp:
 	@echo "Compiling the Crypto++ library..."
 	cp -r lib/CryptoPP $(builddir)
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/)
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/) dynamic
-	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I($abspath ./lib/CryptoPP/) PREFIX=$(prefix) install
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I$(abspath ./lib/CryptoPP/)
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I$(abspath ./lib/CryptoPP/) dynamic
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) -I$(abspath ./lib/CryptoPP/) PREFIX=$(prefix) install
 	@touch compile-cryptopp
 
 prepare-miracl:
