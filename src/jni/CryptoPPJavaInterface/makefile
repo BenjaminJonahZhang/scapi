@@ -7,7 +7,7 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # crypto++ dependency
-CRYPTOPP_INCLUDES = -I$(includedir)/cryptopp/
+CRYPTOPP_INCLUDES = -I$(includedir)/cryptopp/ -I../../../lib/CryptoPP/
 CRYPTOPP_LIB = -L$(libdir) -lcryptopp
 
 # java jvm dependency
