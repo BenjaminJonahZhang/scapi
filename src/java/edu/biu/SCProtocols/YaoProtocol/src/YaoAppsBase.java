@@ -32,8 +32,8 @@ public abstract class YaoAppsBase {
 	static YaoConfig yao_config;
 	static Channel channel;
 	
-	protected static void init(int party_number) {
-		yao_config = YaoConfig.readYaoConfiguration("propertiesFiles/yao.properties");
+	protected static void init(int party_number, String propertiesFile) {
+		yao_config = YaoConfig.readYaoConfiguration(propertiesFile);
 		// set up the communication with the other side and get the created channel.
 		// channel channel = setCommunication();
 		String net_config_file = (party_number==1)? yao_config.party_1_net_config : yao_config.party_2_net_config;

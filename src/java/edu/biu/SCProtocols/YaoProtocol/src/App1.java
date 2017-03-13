@@ -18,7 +18,7 @@ public class App1 extends YaoAppsBase{
 	 */
 	public static void main(String[] args) {
 		try {
-			init(1);
+			init(1, args[0]);
 			
 			Date start = new Date();
 			OTBatchSender otSender = new OTSemiHonestExtensionSender(partySender, 163, 1);

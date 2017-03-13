@@ -20,7 +20,8 @@ public class App2 extends YaoAppsBase{
 	 */
 	public static void main(String[] args) {
 		try {
-			init(2);
+			System.out.println(args[0]);
+			init(2, args[0]);
 			
 			// create the OT receiver.
 			Date start = new Date();
