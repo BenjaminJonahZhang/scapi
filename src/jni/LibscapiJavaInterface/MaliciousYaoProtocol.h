@@ -2,16 +2,17 @@
 #include <jni.h>
 #include <string>
 #include <stdio.h>
-#include <libscapi\include\infra\ConfigFile.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\primitives\CommunicationConfig.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\primitives\ExecutionParameters.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\primitives\BucketLimitedBundle.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\primitives\BucketBundle.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\specs\OfflineProtocolP1.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\specs\OfflineProtocolP2.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\specs\OnlineProtocolP1.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\OfflineOnline\specs\OnlineProtocolP2.hpp>
-#include <libscapi\protocols\MaliciousYao\lib\include\primitives\CheatingRecoveryCircuitCreator.hpp>
+#include <libscapi/include/infra/ConfigFile.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/primitives/CommunicationConfig.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/primitives/ExecutionParameters.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/primitives/BucketLimitedBundle.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/primitives/BucketBundle.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/specs/OfflineProtocolP1.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/specs/OfflineProtocolP2.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/specs/OnlineProtocolP1.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/OfflineOnline/specs/OnlineProtocolP2.hpp>
+#include <libscapi/include/interactive_mid_protocols/OTExtensionBristol.hpp>
+#include <libscapi/protocols/MaliciousYao/lib/include/primitives/CheatingRecoveryCircuitCreator.hpp>
 
 /* Header for class edu_biu_scapi_protocols_maliciousYao_MaliciousYaoParty */
 

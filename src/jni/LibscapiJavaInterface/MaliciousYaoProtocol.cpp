@@ -354,7 +354,7 @@ void restoreBucketTables(int size, BucketLimitedBundle* bucket, block** tables) 
 	}
 	delete[] tables;
 }
-
+/*
 int main(int argc, char* argv[]) {
 	int partyNum = atoi(argv[1]);
 	//set io_service for peer to peer communication
@@ -558,3 +558,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
+*/

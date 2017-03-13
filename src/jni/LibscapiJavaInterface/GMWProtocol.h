@@ -11,6 +11,7 @@
 
 #ifndef _Included_edu_biu_SCProtocols_gmw_GmwParty
 #define _Included_edu_biu_SCProtocols_gmw_GmwParty
+
 #ifdef __cplusplus
 extern "C" {
 #endif

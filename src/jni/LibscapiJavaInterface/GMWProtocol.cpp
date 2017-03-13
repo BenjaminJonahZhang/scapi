@@ -20,6 +20,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_gmw_GmwParty_createGMWParty
     shared_ptr<Circuit> circuit = make_shared<Circuit>();
     circuit->readCircuit(circuitFile);
 
+cout<<"after circuit"<<endl;
 	//Create the GMW party. This is the class that executes the protocol.
     GMWParty* party = new GMWParty(id, circuit, partiesFile, numThreads, inputFile);
 	

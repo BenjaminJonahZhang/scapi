@@ -1,5 +1,5 @@
 #include "YaoProtocol.h"
-#include <libscapi\protocols\SemiHonestYao\YaoParties.hpp>
+#include <libscapi/protocols/SemiHonestYao/YaoParties.hpp>
 
 /**
  * Create the Yao party.
