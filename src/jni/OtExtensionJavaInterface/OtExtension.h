@@ -27,6 +27,7 @@
 #include <string>
 
 using namespace std;
+using namespace semihonestot;
 
 static const char* m_nSeed = "437398417012387813714564100";
 

@@ -7,10 +7,10 @@ CXX=g++-4.9
 CXXFLAGS=-std=c++0x -g -fPIC
 
 # dependencies
-LIBMIRACL = $(prefix)/lib/libmiracl.a
+LIBMIRACL = $(libscapi_prefix)/lib/libmiracl.a
 
-INCLUDES=-I$(prefix)/include -I$(includedir) -I$(prefix)/ssl/include -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/darwin/
-LIBRARIES_DIR=-L$(prefix)/ssl/lib -L$(libdir) -L$(prefix)/lib
+INCLUDES=-I$(libscapi_prefix)/include -I$(prefix)/ssl/include -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/darwin/
+LIBRARIES_DIR=-L$(prefix)/ssl/lib -L$(libdir) -L$(libscapi_prefix)/lib
 LIBRARIES=$(INCLUDE_ARCHIVES_START) $(LIBMIRACL)  -lssl -lcrypto -lMaliciousOTExtension $(INCLUDE_ARCHIVES_END)
 
 # objects

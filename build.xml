@@ -39,7 +39,6 @@
     <mkdir dir="${scapi.build.output}"/>
     <javac destdir="${scapi.build.output}" debug="true" optimize="false" includeAntRuntime="false" encoding="ISO-8859-1">
       <src path="${basedir}/src/java"/>
-       <exclude name="**/edu/biu/SCProtocols/**"/>
       <classpath>
         <path refid="bouncy-castle"/>
 		<path refid="apache-commons-exec"/>

@@ -4,6 +4,7 @@
 #include <MaliciousOTExtension/util/socket.h>
 
 using namespace std;
+using namespace maliciousot;
 
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_comm_twoPartyComm_NativeChannel_initSendSocket
   (JNIEnv *env, jobject, jstring ip, jint port){

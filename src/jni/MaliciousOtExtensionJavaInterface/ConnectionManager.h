@@ -9,6 +9,8 @@
 #include <vector>
 #include <sys/time.h>
 
+using namespace maliciousot;
+
 namespace maliciousot {
 
 // abstract base class

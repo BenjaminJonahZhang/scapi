@@ -3,12 +3,14 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 ARCH := $(shell getconf LONG_BIT)
 
 # Prefix for installation (run make prefix=/usr/local to install there instead)
-export prefix=$(abspath ./build/Libscapi/install)
+export prefix=$(abspath ./install)
+export libscapi_prefix=$(abspath ./build/Libscapi/install)
 export exec_prefix=$(prefix)
-# export includedir=$(prefix)/include
-export includedir=$(abspath ./lib/Libscapi/)
+export includedir=$(prefix)/include
+export libscapi_includedir=$(abspath ./lib/Libscapi/install)
 export bindir=$(exec_prefix)/bin
-export libdir=$(abspath ./build/Libscapi/install/lib)
+#export libdir=$(abspath ./build/Libscapi/install/lib)
+export libdir=$(prefix)/lib
 
 export builddir=$(abspath ./build)
 
@@ -68,8 +70,7 @@ export SHARED_LIB_EXT
 export JNI_LIB_EXT
 
 # target names
-CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension \
-				clean-malotext clean-libscapi clean-ntl clean-openssl clean-scgarbledcircuit \
+CLEAN_TARGETS:=clean-cryptopp clean-libscapi clean-openssl clean-miracl clean-scgarbledcircuit \
 				clean-scgarbledcircuitnofixedkey clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension \
 					clean-jni-malotext clean-jni-malyaoutil clean-jni-libscapi clean-jni-ntl clean-jni-openssl \
@@ -83,12 +84,12 @@ JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(JNI_LIB_EXT)
 JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_MALOTEXT:=src/jni/MaliciousOtExtensionJavaInterface/libMaliciousOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_MALYAOUTIL:=src/jni/MaliciousYaoUtilJavaInterface/libMaliciousYaoUtilJavaInterface$(JNI_LIB_EXT)
-JNI_LIBSCAPI:=src/jni/LibscapiJavaInterface/libscapiJavaInterface$(JNI_LIB_EXT)
+JNI_LIBSCAPI:=src/jni/LibscapiJavaInterface/libLibscapiJavaInterface$(JNI_LIB_EXT)
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUIT:=src/jni/ScGarbledCircuitJavaInterface/libScGarbledCircuitJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUITNOFIXEDKEY:=src/jni/ScGarbledCircuitNoFixedKeyJavaInterface/libScGarbledCircuitNoFixedKeyJavaInterface$(JNI_LIB_EXT)
-JNI_TARGETS=jni-cryptopp jni-openssl jni-malyaoutil jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey
+JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-malyaoutil jni-ntl jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey  jni-libscapi
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
@@ -114,12 +115,10 @@ INSTALL_DIR=$(libdir)/scapi
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 
 # external libs
-EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-cryptopp
+EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-cryptopp compile-miracl
 
 ## targets
-#all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
-all: $(JNI_TARGETS)
-
+all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
 
 # compile and install the crypto++ lib:
 # first compile the default target (test program + static lib)
@@ -140,7 +139,7 @@ prepare-miracl:
 	@rm -f $(builddir)/$(MIRACL_DIR)/mrmuldv.c
 	@cp -r lib/MiraclCompilation/* $(builddir)/$(MIRACL_DIR)/
 
-compile-miracl: 
+compile-miracl:
 	@$(MAKE) prepare-miracl MIRACL_DIR=Miracl
 	@echo "Compiling the Miracl library (C)..."
 	@$(MAKE) -C $(builddir)/Miracl MIRACL_TARGET_LANG=c
@@ -156,36 +155,12 @@ compile-miracl-cpp:
 	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp CXX=$(CXX) install
 	@touch compile-miracl-cpp
 
-compile-otextension: compile-libscapi
-	@echo "Compiling the OtExtension library..."
-	@cp -r lib/OTExtension $(builddir)/OTExtension
-	@$(MAKE) -C $(builddir)/OTExtension CXX=$(CXX)
-	@$(MAKE) -C $(builddir)/OTExtension CXX=$(CXX) SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
-	@touch compile-otextension
-
-# TODO:
-compile-malotext: compile-libscapi
-	@echo "Compiling the Malicious OtExtension library..."
-	@cp -r lib/MaliciousOTExtension $(builddir)/MaliciousOTExtension
-	@$(MAKE) -C $(builddir)/MaliciousOTExtension CXX=$(CXX)
-	@$(MAKE) -C $(builddir)/MaliciousOTExtension CXX=$(CXX) SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
-	@touch compile-malotext
-
 compile-libscapi:
 	@echo "Compiling the libscapi library..."
 	@mkdir -p $(builddir)/Libscapi
 	@cp -r lib/Libscapi/* $(builddir)/Libscapi
 	@$(MAKE) -C $(builddir)/Libscapi
 	@touch compile-libscapi
-
-# TODO: add GMP and GF2X
-compile-ntl:
-	@echo "Compiling the NTL library..."
-	@cp -r lib/NTL/unix $(builddir)/NTL
-	@cd $(builddir)/NTL/src/ && ./configure CFLAGS=$(NTL_CFLAGS) CC=$(CC) CXX=$(CXX)
-	@$(MAKE) -C $(builddir)/NTL/src/
-	@$(MAKE) -C $(builddir)/NTL/src/ PREFIX=$(prefix) install
-	@touch compile-ntl
 
 compile-openssl:
 	@echo "Compiling the OpenSSL library..."
@@ -208,7 +183,7 @@ compile-scgarbledcircuitnofixedkey:
 	@cp -r lib/ScGarbledCircuitNoFixedKey $(builddir)/ScGarbledCircuitNoFixedKey
 	@$(MAKE) -C $(builddir)/ScGarbledCircuitNoFixedKey
 	@$(MAKE) -C $(builddir)/ScGarbledCircuitNoFixedKey install
-	@touch compile-scgarbledcircuitnofixedkey	
+	@touch compile-scgarbledcircuitnofixedkey
 
 compile-bouncycastle: $(JAR_BOUNCYCASTLE)
 compile-scapi: $(JAR_SCAPI)
@@ -237,12 +212,12 @@ $(JNI_MIRACL): compile-miracl
 	@$(MAKE) -C src/jni/MiraclJavaInterface
 	@cp $@ assets/
 
-$(JNI_OTEXTENSION): compile-otextension
+$(JNI_OTEXTENSION): compile-libscapi
 	@echo "Compiling the OtExtension jni interface..."
 	@$(MAKE) -C src/jni/OtExtensionJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 
-$(JNI_MALOTEXT): compile-malotext
+$(JNI_MALOTEXT): compile-libscapi
 	@echo "Compiling the Malicious OtExtension jni interface..."
 	@$(MAKE) -C src/jni/MaliciousOtExtensionJavaInterface CXX=$(CXX)
 	@cp $@ assets/
@@ -254,10 +229,11 @@ $(JNI_MALYAOUTIL): compile-openssl
 	
 $(JNI_LIBSCAPI): compile-libscapi
 	@echo "Compiling the libscapi jni interface..."
-	@$(MAKE) -C src/jni/LibscapiJavaInterface CXX=$(CXX)
+	@cmake src/jni/LibscapiJavaInterface/CMakeLists.txt
+	@$(MAKE) -C src/jni/LibscapiJavaInterface
 	@cp $@ assets/
 
-$(JNI_NTL): compile-ntl
+$(JNI_NTL): compile-libscapi
 	@echo "Compiling the NTL jni interface..."
 	@$(MAKE) -C src/jni/NTLJavaInterface CXX=$(CXX)
 	@cp $@ assets/
@@ -324,30 +300,10 @@ clean-miracl:
 	@rm -rf $(builddir)/Miracl
 	@rm -f compile-miracl
 
-clean-miracl-cpp:
-	@echo "Cleaning the miracl build dir..."
-	@rm -rf $(builddir)/MiraclCPP
-	@rm -f compile-miracl-cpp
-
-clean-otextension:
-	@echo "Cleaning the otextension build dir..."
-	@rm -rf $(builddir)/OTExtension
-	@rm -f compile-otextension
-
-clean-malotext:
-	@echo "Cleaning the malicious ot extension build dir..."
-	@rm -rf $(builddir)/MaliciousOTExtension
-	@rm -f compile-malotext
-	
 clean-libscapi:
 	@echo "Cleaning the libscapi build dir..."
 	@rm -rf $(builddir)/Libscapi
 	@rm -f compile-libscapi
-
-clean-ntl:
-	@echo "Cleaning the ntl build dir..."
-	@rm -rf $(builddir)/NTL
-	@rm -f compile-ntl
 
 clean-openssl:
 	@echo "Cleaning the openssl build dir..."
@@ -393,6 +349,7 @@ clean-jni-malyaoutil:
 clean-jni-libscapi:
 	@echo "Cleaning the libscapi jni build dir..."
 	@$(MAKE) -C src/jni/LibscapiJavaInterface clean
+	@rm -rf src/jni/LibscapiJavaInterface/cmake-build-debug
 
 clean-jni-ntl:
 	@echo "Cleaning the NTL jni build dir..."

@@ -7,13 +7,13 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # OTExtension dependency
-OT_INCLUDES = -I$(includedir) -I$(prefix)/ssl/include
-OT_LIB = -L$(libdir) -lOTExtension
+OT_INCLUDES = -I$(libscapi_prefix)/include -I$(prefix)/ssl/include
+OT_LIB = -L$(libscapi_prefix)/lib -lOTExtension
 
 # OPENSSL dependency
 OPENSSL_INCLUDES = -I$(prefix)/ssl/include
 OPENSSL_LIB_DIR = -L$(prefix)/ssl/lib
-OPENSSL_LIB = -lssl -lcrypto
+OPENSSL_LIB = -lssl -lcrypto ${HOME}/scapi/build/OpenSSL/libcrypto.so.1.1.0
 
 ## targets ##
 
