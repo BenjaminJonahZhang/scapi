@@ -17,5 +17,5 @@ RUN mkdir build
 
 # Install Scapi
 
-RUN sudo make prefix=/usr
-RUN sudo make install prefix=/usr
+RUN make prefix=/usr
+RUN make install prefix=/usr
