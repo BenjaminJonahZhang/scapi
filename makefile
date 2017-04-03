@@ -4,12 +4,12 @@ ARCH := $(shell getconf LONG_BIT)
 
 # Prefix for installation (run make prefix=/usr/local to install there instead)
 export prefix=$(abspath ./install)
-export libscapi_prefix=$(abspath ./build/Libscapi/install)
+export libscapi_prefix=$(abspath ./build/libscapi/install)
 export exec_prefix=$(prefix)
 export includedir=$(prefix)/include
 export libscapi_includedir=$(abspath ./lib/Libscapi/install)
 export bindir=$(exec_prefix)/bin
-#export libdir=$(abspath ./build/Libscapi/install/lib)
+#export libdir=$(abspath ./build/libscapi/install/lib)
 export libdir=$(prefix)/lib
 
 export builddir=$(abspath ./build)
@@ -70,7 +70,7 @@ export SHARED_LIB_EXT
 export JNI_LIB_EXT
 
 # target names
-CLEAN_TARGETS:=clean-cryptopp clean-libscapi clean-openssl clean-miracl clean-scgarbledcircuit \
+CLEAN_TARGETS:=clean-cryptopp clean-libscapi clean-libscapi-protocols clean-openssl clean-miracl clean-scgarbledcircuit \
 				clean-scgarbledcircuitnofixedkey clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension \
 					clean-jni-malotext clean-jni-malyaoutil clean-jni-libscapi clean-jni-ntl clean-jni-openssl \
@@ -115,7 +115,7 @@ INSTALL_DIR=$(libdir)/scapi
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 
 # external libs
-EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-cryptopp compile-miracl
+EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-libscapi-protocols compile-cryptopp compile-miracl
 
 ## targets
 all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
@@ -157,10 +157,25 @@ compile-miracl-cpp:
 
 compile-libscapi:
 	@echo "Compiling the libscapi library..."
-	@mkdir -p $(builddir)/Libscapi
-	@cp -r lib/Libscapi/* $(builddir)/Libscapi
-	@$(MAKE) -C $(builddir)/Libscapi
+	@mkdir -p $(builddir)/libscapi
+	@cp -r lib/Libscapi/* $(builddir)/libscapi
+	@$(MAKE) -C $(builddir)/libscapi
 	@touch compile-libscapi
+
+compile-libscapi-protocols:
+	@echo "Compiling the libscapi protocols..."
+	@cp -r lib/Libscapi/protocols/* $(builddir)/libscapi/protocols
+	@cmake $(builddir)/libscapi/protocols/GMW/CMakeLists.txt
+	@$(MAKE) -C $(builddir)/libscapi/protocols/GMW
+	@$(MAKE) -C $(builddir)/libscapi/protocols/MaliciousYao/lib
+	@$(MAKE) -C $(builddir)/libscapi/protocols/MaliciousYao/apps/OfflineP1
+	@$(MAKE) -C $(builddir)/libscapi/protocols/MaliciousYao/apps/OfflineP2
+	@$(MAKE) -C $(builddir)/libscapi/protocols/MaliciousYao/apps/OnlineP1
+	@$(MAKE) -C $(builddir)/libscapi/protocols/MaliciousYao/apps/OnlineP2
+	@$(MAKE) -C $(builddir)/libscapi/protocols/SemiHonestYao
+	@cmake $(builddir)/libscapi/protocols/YaoSingleExecution/CMakeLists.txt
+	@$(MAKE) -C $(builddir)/libscapi/protocols/YaoSingleExecution
+	@touch compile-libscapi-protocols
 
 compile-openssl:
 	@echo "Compiling the OpenSSL library..."
@@ -227,7 +242,7 @@ $(JNI_MALYAOUTIL): compile-openssl
 	@$(MAKE) -C src/jni/MaliciousYaoUtilJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 	
-$(JNI_LIBSCAPI): compile-libscapi
+$(JNI_LIBSCAPI): compile-libscapi compile-libscapi-protocols
 	@echo "Compiling the libscapi jni interface..."
 	@cmake src/jni/LibscapiJavaInterface/CMakeLists.txt
 	@$(MAKE) -C src/jni/LibscapiJavaInterface
@@ -304,6 +319,11 @@ clean-libscapi:
 	@echo "Cleaning the libscapi build dir..."
 	@rm -rf $(builddir)/Libscapi
 	@rm -f compile-libscapi
+
+clean-libscapi-protocols:
+	@echo "Cleaning the libscapi protocols build dir..."
+	@rm -rf $(builddir)/libscapi/protocols/GMW/
+	@rm -f compile-libscapi-protocols
 
 clean-openssl:
 	@echo "Cleaning the openssl build dir..."

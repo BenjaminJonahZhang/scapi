@@ -1,9 +1,6 @@
 package edu.biu.SCProtocols.YaoSingleExecution;
 
 import edu.biu.SCProtocols.NativeSemiHonestYao.YaoProtocolOutput;
-import edu.biu.SCProtocols.gmw.GmwParty;
-import edu.biu.SCProtocols.gmw.GmwProtocolInput;
-import edu.biu.SCProtocols.gmw.GmwProtocolOutput;
 import edu.biu.scapi.comm.Protocol;
 import edu.biu.scapi.comm.ProtocolInput;
 import edu.biu.scapi.comm.ProtocolOutput;
@@ -75,15 +72,10 @@ public class YaoSEParty implements Protocol {
 	public static void main(String[] args){
 		
 		int id = new Integer(args[0]); 
-		System.out.println("id = " + id);
 		String circuitFile = args[1];
-		System.out.println("circuitFile = " + circuitFile);
 		String ip = args[2];
-		System.out.println("ip = " + ip);
 		int port = new Integer(args[3]); 
-		System.out.println("port = " + port);
 		String inputsFile = args[4];
-		System.out.println("inputsFile = " + inputsFile);
 		
 		YaoSEProtocolInput input = new YaoSEProtocolInput(id, circuitFile, ip, port, inputsFile);
 		YaoSEParty party = new YaoSEParty();

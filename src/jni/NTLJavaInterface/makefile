@@ -4,12 +4,12 @@
 
 # compilation options
 CXX=g++
-CXXFLAGS=-fPIC -fpermissive
+CXXFLAGS=-fPIC -fpermissive -std=c++11
 
 # ntl dependency
-NTL_INCLUDES = -I$(includedir)
-NTL_LIB = -lntl
-NTL_LIB_DIR = -L$(libdir)
+NTL_INCLUDES = -I$(libscapi_prefix)/include
+NTL_LIB = -lntl -lgmp
+NTL_LIB_DIR = -L$(libscapi_prefix)/lib
 
 # sources
 SOURCES = EvaluationHashFunction.cpp JniEvaluationHashFunction.cpp SigmaProtocolOR.cpp KProbeResistantMatrix.cpp

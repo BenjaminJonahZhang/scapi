@@ -3,6 +3,7 @@
 
 JNIEXPORT jlong JNICALL Java_edu_biu_SCProtocols_YaoSingleExecution_YaoSEParty_createYaoSEParty
 (JNIEnv * env, jobject, jint id, jstring circuitFileName, jstring ipAddress, jint port, jstring inputsFileName) {
+
 	//Convert the jni objects to c++ objects.
 	const char* circuitFile = env->GetStringUTFChars(circuitFileName, NULL);
 	const char* ip = env->GetStringUTFChars(ipAddress, NULL);
@@ -23,7 +24,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_SCProtocols_YaoSingleExecution_YaoSEPa
 	//Run the protocol/
 	((YaoSEParty*)party)->run();
 	auto output = ((YaoSEParty*)party)->getOutput();
-cout<<" in java interface. output size = "<<output.size()<<endl;
+
 	//Create a jni object and fill it with the protocol output.
 	jbyteArray result = env->NewByteArray(output.size());
 	env->SetByteArrayRegion(result, 0, output.size(), (jbyte*)output.data());
