@@ -25,11 +25,11 @@ RUN apt-get install libgmp3-dev -y
 RUN apt-get install -y libssl-ocaml-dev libssl-dev
 RUN apt-get install wget -y
 
-#install boost
-
-RUN wget -O boost_1_60_0.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download
+# Download and install boost
+WORKDIR /root
+RUN wget -O boost_1_60_0.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download 
 RUN tar --bzip2 -xf boost_1_60_0.tar.bz2
 WORKDIR boost_1_60_0
 RUN ./bootstrap.sh
-RUN ./b2 ; exit 0
+RUN ./b2 ; exit 0 # TODO: boost build fails on some packages - need to fix it
 
