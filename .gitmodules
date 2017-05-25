@@ -32,4 +32,4 @@
 	url = https://github.com/cryptobiu/ScGarbledCircuitNoFixedKey.git
 [submodule "lib/Libscapi"]
 	path = lib/Libscapi
-	url = git@github.com:cryptobiu/libscapi.git
+	url = https://github.com/cryptobiu/libscapi.git
