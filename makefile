@@ -115,7 +115,7 @@ INSTALL_DIR=$(libdir)/scapi
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 
 # external libs
-EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-libscapi-protocols compile-cryptopp compile-miracl
+EXTERNAL_LIBS_TARGETS:=compile-libscapi compile-libscapi-protocols compile-cryptopp 
 
 ## targets
 all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
