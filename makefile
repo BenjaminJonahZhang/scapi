@@ -89,7 +89,7 @@ JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUIT:=src/jni/ScGarbledCircuitJavaInterface/libScGarbledCircuitJavaInterface$(JNI_LIB_EXT)
 JNI_SCGARBLEDCIRCUITNOFIXEDKEY:=src/jni/ScGarbledCircuitNoFixedKeyJavaInterface/libScGarbledCircuitNoFixedKeyJavaInterface$(JNI_LIB_EXT)
-JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-malotext jni-malyaoutil jni-ntl jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey  jni-libscapi
+JNI_TARGETS=jni-cryptopp jni-openssl jni-otextension jni-malotext jni-malyaoutil jni-scgarbledcircuit jni-scgarbledcircuitnofixedkey  jni-libscapi
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
