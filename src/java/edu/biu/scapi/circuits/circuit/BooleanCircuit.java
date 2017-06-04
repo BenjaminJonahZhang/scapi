@@ -26,6 +26,8 @@ package edu.biu.scapi.circuits.circuit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -349,6 +351,85 @@ public class BooleanCircuit {
 	 */
 	public int getNumberOfParties() {
 		return numberOfParties;
+	}
+	
+	public void write(String outputFileName){
+		
+		PrintWriter outputFile;
+		try {
+			outputFile = new PrintWriter(outputFileName, "UTF-8");
+		
+		
+			//write the number of gates.
+			int numberOfGates = gates.length;
+			outputFile.println(numberOfGates);
+			//write the number of parties.
+			outputFile.println(numberOfParties);
+			outputFile.println();
+	
+			//For each party, read the party's number, number of input wires and their indices.
+			for (int i = 0; i < numberOfParties; i++) {
+				
+				int numberOfInputsForCurrentParty = eachPartysInputWires.get(i).size();
+				//Read the number of input wires.
+				outputFile.println(i+1 + " " + numberOfInputsForCurrentParty);
+	
+				//Read the input wires indices.
+				for (int j = 0; j < numberOfInputsForCurrentParty; j++) {
+					outputFile.println(eachPartysInputWires.get(i).get(j));
+				}
+				outputFile.println();
+			}
+	
+			//Write the outputs number
+			int numberOfOutputs = outputWireIndices.length;
+			outputFile.println(numberOfOutputs);
+	
+			//Write the output wires indices.
+			for (int i = 0; i < numberOfOutputs; i++) {
+				outputFile.println(outputWireIndices[i]);
+			}
+	
+			outputFile.println();
+	
+			//For each gate, write the number of input and output wires, their indices and the truth table.
+			int numberOfGateInputs, numberOfGateOutputs;
+			for (int i = 0; i < numberOfGates; i++) {
+	
+				numberOfGateInputs = gates[i].getInputWireIndices().length;
+				numberOfGateOutputs = gates[i].getOutputWireIndices().length;
+				outputFile.print(numberOfGateInputs + " " + numberOfGateOutputs + " ");
+	
+				for (int j = 0; j < numberOfGateInputs; j++) {
+					outputFile.print(gates[i].getInputWireIndices()[j] + " ");
+				}
+				for (int j = 0; j < numberOfGateOutputs; j++) {
+					outputFile.print(gates[i].getOutputWireIndices()[j] + " ");
+				}
+	
+				/*
+				* We create a BitSet representation of the truth table from the 01 String
+				* that we read from the file.
+				*/
+				BitSet tTable = gates[i].getTruthTable();
+				int tableSize = (int) Math.pow(2, numberOfGateInputs);
+				for (int j = 0; j < tableSize; j++) {
+					if (tTable.get(j))
+						outputFile.print("1");
+					else
+						outputFile.print("0");
+				}
+				outputFile.println();
+				
+			}
+			outputFile.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 
