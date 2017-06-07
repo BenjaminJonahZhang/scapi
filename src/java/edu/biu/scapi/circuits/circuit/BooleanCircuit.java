@@ -69,9 +69,9 @@ public class BooleanCircuit {
 	private Gate[] gates;
   
 	/**
-	 * An array containing the indices of the output {@code Wire}s of this {@code BooleanCircuit}.
+	 * An arrayList containing the indices of the output {@code Wire}s of this {@code BooleanCircuit} indexed by the party number.
 	 */
-	private int[] outputWireIndices;
+	private ArrayList<ArrayList<Integer>> eachPartysOutputWires = new ArrayList<ArrayList<Integer>>();
   
 	/**
 	 * The number of parties that are interacting (i.e. receiving input and/or output) with this circuit.
@@ -143,11 +143,35 @@ public class BooleanCircuit {
 	     * The ouputWireIndices are the outputs from this circuit. However, this circuit may actually be a single layer of a 
 	     * larger layered circuit. So this output can be part of the input to another layer of the circuit.
 	     */
-	    int numberOfCircuitOutputs = Integer.parseInt(read(s));
-	    outputWireIndices = new int[numberOfCircuitOutputs];
-	    //Read the output wires indices.
-	    for (int i = 0; i < numberOfCircuitOutputs; i++) {
-	    	outputWireIndices[i] = Integer.parseInt(read(s));
+	    
+	    if (numberOfParties == 2){
+		    int numberOfCircuitOutputs = Integer.parseInt(read(s));
+		    ArrayList<Integer> circuitOutput = new ArrayList<Integer>();
+	    	eachPartysOutputWires.add(circuitOutput);
+	    	
+		    //Read the output wires indices.
+		    for (int i = 0; i < numberOfCircuitOutputs; i++) {
+		    	circuitOutput.add(Integer.parseInt(read(s)));
+		    }
+	    } else {
+	    	//For each party, read the party's number, number of input wires and their indices.
+		    for (int i = 0; i < numberOfParties; i++) {
+		    	if (Integer.parseInt(read(s)) != i+1) {//add 1 since parties are indexed from 1, not 0
+		    		throw new CircuitFileFormatException();
+		    	}
+		    	//Read the number of input wires.
+		    	int numberOfOutputsForCurrentParty = Integer.parseInt(read(s));
+		    	if(numberOfOutputsForCurrentParty < 0){
+		    		throw new CircuitFileFormatException();
+		    	}
+		    	
+		    	ArrayList<Integer> currentPartyOutput = new ArrayList<Integer>();
+		    	eachPartysOutputWires.add(currentPartyOutput);
+		    	//Read the input wires indices.
+		    	for (int j = 0; j < numberOfOutputsForCurrentParty; j++) {
+		    		currentPartyOutput.add(Integer.parseInt(read(s)));
+		    	}
+		    }
 	    }
 	    
 	    int numberOfGateInputs, numberOfGateOutputs;
@@ -194,16 +218,46 @@ public class BooleanCircuit {
 	 * Each gate keeps an array of the indices of its input and output wires. The constructor is provided with a list of which 
 	 * {@link Wire}s are output {@link Wire}s of the {@code BooleanCircuit}.
 	 * 
+	 * This constructor is used in case of two party circuit only. In order to create a multi-party circuit use the constructor that accept 
+	 * the output as arrayList.
+	 * @param gates An array of {@link Gate}s to create from which to construct the {@code BooleanCircuit}.
+	 * @param outputWireIndices An array containing the indices of the wires that will be output of the {@code BooleanCircuit}.
+	 * @param eachPartysInputWires An arrayList containing the indices of the input {@code Wire}s of this
+	 * {@code BooleanCircuit} indexed by the party number.
+	 * @throws InvalidInputException if number of parties is not 2
+	 */
+	public BooleanCircuit(Gate[] gates, int[] outputWireIndices, ArrayList<ArrayList<Integer>> eachPartysInputWires) throws InvalidInputException {
+		this.gates = gates;
+		this.eachPartysInputWires = eachPartysInputWires;
+		numberOfParties = eachPartysInputWires.size();
+		if (numberOfParties != 2){
+			throw new InvalidInputException();
+		}
+		int numberOfCircuitOutputs = outputWireIndices.length;
+	    ArrayList<Integer> circuitOutput = new ArrayList<Integer>();
+    	eachPartysOutputWires.add(circuitOutput);
+    	
+	    //Read the output wires indices.
+	    for (int i = 0; i < numberOfCircuitOutputs; i++) {
+	    	circuitOutput.add(Integer.valueOf(outputWireIndices[i]));
+	    }
+  	}
+	
+	/**
+	 * Constructs a {code BooleanCircuit} from an array of gates. <p>
+	 * Each gate keeps an array of the indices of its input and output wires. The constructor is provided with a list of which 
+	 * {@link Wire}s are output {@link Wire}s of the {@code BooleanCircuit}.
+	 * 
 	 * @param gates An array of {@link Gate}s to create from which to construct the {@code BooleanCircuit}.
 	 * @param outputWireIndices An array containing the indices of the wires that will be output of the {@code BooleanCircuit}.
 	 * @param eachPartysInputWires An arrayList containing the indices of the input {@code Wire}s of this
 	 * {@code BooleanCircuit} indexed by the party number.
 	 */
-	public BooleanCircuit(Gate[] gates, int[] outputWireIndices, ArrayList<ArrayList<Integer>> eachPartysInputWires) {
+	public BooleanCircuit(Gate[] gates, ArrayList<ArrayList<Integer>> eachPartysOutputWires, ArrayList<ArrayList<Integer>> eachPartysInputWires) {
 		this.gates = gates;
-		this.outputWireIndices = outputWireIndices;
 		this.eachPartysInputWires = eachPartysInputWires;
 		numberOfParties = eachPartysInputWires.size();
+    	this.eachPartysOutputWires = eachPartysOutputWires;
   	}
 
     /**
@@ -272,8 +326,13 @@ public class BooleanCircuit {
 		 * We return outputMap.
 		 */
 		Map<Integer, Wire> outputMap = new HashMap<Integer, Wire>();
-		for (int w : outputWireIndices) {
-			outputMap.put(w, computedWires.get(w));
+		for (int i=0; i<numberOfParties; i++){
+			ArrayList<Integer> outputWireIndices = eachPartysOutputWires.get(i);
+			for (int w : outputWireIndices) {
+				if (!outputMap.containsKey(w)){
+					outputMap.put(w, computedWires.get(w));
+				}
+			}
 		}
 		return outputMap;
 	}
@@ -317,7 +376,17 @@ public class BooleanCircuit {
 	 * @return an array of the output{@link Wire} indices of this circuit.
   	 */
 	public int[] getOutputWireIndices() {
-		return outputWireIndices;
+		if (numberOfParties != 2){
+			throw new IllegalStateException("This function should be called in case of two party only.");
+		}
+		ArrayList<Integer> outputWireIndices = eachPartysOutputWires.get(0);
+		int size = outputWireIndices.size();
+		int[] outputWiresArray = new int[size];
+		
+		for (int i=0; i<size; i++){
+			outputWiresArray[i] = outputWireIndices.get(i).intValue();
+		}
+		return outputWiresArray;
 	}
 
 	/**
@@ -381,13 +450,30 @@ public class BooleanCircuit {
 				outputFile.println();
 			}
 	
-			//Write the outputs number
-			int numberOfOutputs = outputWireIndices.length;
-			outputFile.println(numberOfOutputs);
-	
-			//Write the output wires indices.
-			for (int i = 0; i < numberOfOutputs; i++) {
-				outputFile.println(outputWireIndices[i]);
+			if (numberOfParties == 2){
+				//Write the outputs number
+				
+				int numberOfOutputs = eachPartysOutputWires.get(0).size();
+				outputFile.println(numberOfOutputs);
+		
+				//Write the output wires indices.
+				for (int i = 0; i < numberOfOutputs; i++) {
+					outputFile.println(eachPartysOutputWires.get(0).get(i));
+				}
+			} else {
+				//For each party, read the party's number, number of input wires and their indices.
+				for (int i = 0; i < numberOfParties; i++) {
+					
+					int numberOfOutputsForCurrentParty = eachPartysOutputWires.get(i).size();
+					//Read the number of input wires.
+					outputFile.println(i+1 + " " + numberOfOutputsForCurrentParty);
+		
+					//Read the input wires indices.
+					for (int j = 0; j < numberOfOutputsForCurrentParty; j++) {
+						outputFile.println(eachPartysOutputWires.get(i).get(j));
+					}
+					outputFile.println();
+				}
 			}
 	
 			outputFile.println();
