@@ -401,6 +401,19 @@ public class BooleanCircuit {
 		//We subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
 		return eachPartysInputWires.get(partyNumber-1);
 	}
+	
+	/**
+	 * @param partyNumber The number of the party whose output wires will be returned.
+	 * @return an ArrayList containing the output {@link Wire} indices of the specified party.
+	 * @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
+	 */
+	public ArrayList<Integer> getOutputWireIndices(int partyNumber) throws NoSuchPartyException {
+		if(partyNumber < 1 || partyNumber > numberOfParties){
+			throw new NoSuchPartyException();
+		}
+		//We subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
+		return eachPartysOutputWires.get(partyNumber-1);
+	}
   
 	/**
 	 * @param partyNumber The number of the party whose number of input wires will be returned.
