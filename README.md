@@ -1,6 +1,8 @@
 SCAPI - The Secure Computation API
 ==================================
 
+(08/01/2018: As of this year, we no longer support project developed over Java scapi. Please use [libscapi](https://github.com/cryptobiu/libscapi). libscapi is developed in C++11/14 and outperforms the Java library 2-10X in performance and memory usage. We would be happy to assit anyone who would like to contribute bindings for Java, Python or any other langauge. In excecptional cases we may offer support, you may open an issue.
+
 What is SCAPI?
 --------------
 
